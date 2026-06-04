@@ -8,16 +8,10 @@ Python mock application simulating an AI-driven billing reconciliation agent for
 
 > A billing dispute that took 6–8 hours and 6–9 teams should take one person under 8 minutes, with a paper trail that holds up in front of a regulator.
 
-## Guiding Principles
+## Requirement context
 
-| Principle | What it means in practice |
-|-----------|--------------------------|
-| Explainability over automation | Agent only recommends — never acts. Every recommendation names its source system and record. |
-| Conflicts surface, never resolve silently | When systems disagree, that contradiction is the finding. CC&B is never assumed authoritative. |
-| One evidence base, many voices | Customer letter, exec brief, and engineering handoff are rendered from the same reconciliation object — divergent narratives are structurally impossible. |
-| Human judgment at the threshold | DRI approval is the only mandatory human step — one touchpoint, not nine. |
-| Speed is a safety property | Slow conflict detection = wider window for invalid bills, bad revenue posts, missed regulatory deadlines. < 15 sec and < 7 min are hard targets. |
-| Auditability is a first-class output | The audit trail is a deliverable, not debug logging. 100% source citation is an acceptance criterion. |
+ five enterprise systems (CC&B, MDM, OMS, CRM, GL) each hold a piece of the truth about a customer's billing situation, but they operate independently. When a disconnect event happens mid-cycle, none of them automatically tells the others. CC&B keeps billing. MDM keeps estimating reads. CRM logs the complaint. GL posts the revenue. Nobody reconciles the full picture until a human manually pulls data from all five — which takes 6–8 hours across 6–9 teams, produces inconsistent outputs, and leaves a 60% audit gap.
+
 
 ## Implementation Rules
 
