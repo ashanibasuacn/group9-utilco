@@ -1,0 +1,2283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Utilico Energy — Billing Reconciliation · Accenture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --purple:#A100FF;--pl:#F3E5FF;--pm:#D580FF;
+  --blk:#000;--n90:#1C1C1C;--g70:#4A4A4A;--g50:#767676;--g30:#B8B8B8;--g10:#E8E8E8;--g05:#F5F5F5;--wht:#FFF;
+  --red:#C8001D;--rl:#FFF0F2;--grn:#007A3D;--gl:#E5F5ED;--amb:#B45000;--al:#FFF3E5;--blu:#004F9F;--bl:#E5EEF8;
+  --sans:"Barlow",sans-serif;--cond:"Barlow Condensed",sans-serif;
+}
+body{font-family:var(--sans);background:var(--wht);color:var(--n90);min-height:100vh;font-size:14px;line-height:1.6;}
+.site-header{background:var(--blk);color:var(--wht);display:grid;grid-template-columns:6px 1fr;}
+.hstripe{background:var(--purple);}
+.hinner{padding:40px 56px 36px;}
+.acn-logo{font-family:var(--cond);font-size:12px;letter-spacing:.18em;font-weight:700;color:var(--purple);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.acn-logo::after{content:"";flex:1;height:1px;background:rgba(161,0,255,.3);}
+.h-eyebrow{font-family:var(--cond);font-size:11px;letter-spacing:.16em;font-weight:500;color:var(--g30);text-transform:uppercase;margin-bottom:9px;}
+.h-title{font-family:var(--cond);font-size:46px;font-weight:700;line-height:1.0;letter-spacing:-.01em;margin-bottom:14px;text-transform:uppercase;}
+.h-title em{color:var(--purple);font-style:normal;}
+.h-sub{font-size:13px;color:var(--g30);max-width:580px;font-weight:300;line-height:1.7;}
+.h-stats{display:flex;gap:36px;margin-top:26px;padding-top:20px;border-top:1px solid rgba(255,255,255,.1);flex-wrap:wrap;}
+.hstat-v{font-family:var(--cond);font-size:24px;font-weight:700;color:var(--wht);line-height:1;margin-bottom:2px;}
+.hstat-v.p{color:var(--pm);}
+.hstat-l{font-size:10px;color:var(--g50);text-transform:uppercase;letter-spacing:.06em;}
+.nav-bar{background:var(--wht);border-bottom:2px solid var(--g10);padding:0 56px;display:flex;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.nav-label{font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--g30);margin-right:10px;white-space:nowrap;}
+.nav-btn{padding:15px 22px 13px;border:none;background:none;font-family:var(--sans);font-size:12px;font-weight:600;color:var(--g50);cursor:pointer;border-bottom:3px solid transparent;transition:all .15s;white-space:nowrap;text-transform:uppercase;letter-spacing:.05em;}
+.nav-btn:hover{color:var(--n90);}
+.nav-btn.active{color:var(--purple);border-bottom-color:var(--purple);}
+.view{display:none;}
+.view.active{display:block;animation:fi .2s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.journey-wrap{padding:36px 56px 80px;}
+.j-header{margin-bottom:24px;padding-bottom:18px;border-bottom:2px solid var(--g10);}
+.j-kicker{font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--purple);margin-bottom:6px;}
+.j-title{font-family:var(--cond);font-size:26px;font-weight:700;text-transform:uppercase;letter-spacing:-.01em;margin-bottom:6px;}
+.j-sub{font-size:13px;color:var(--g70);line-height:1.65;max-width:560px;}
+.legend{display:flex;gap:14px;flex-wrap:wrap;padding:11px 16px;border:1px solid var(--g10);background:var(--g05);margin-bottom:22px;}
+.litem{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--g70);font-weight:500;}
+.lsw{width:11px;height:11px;flex-shrink:0;}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+.scol-label{font-family:var(--cond);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:6px 14px;display:inline-block;margin-bottom:18px;}
+.scol-label.bef{background:var(--red);color:var(--wht);}
+.scol-label.aft{background:var(--purple);color:var(--wht);}
+.stl{position:relative;padding-left:28px;}
+.stl::before{content:"";position:absolute;left:7px;top:8px;bottom:8px;width:1px;background:var(--g10);}
+.sph{margin-bottom:20px;}
+.sphd{display:flex;align-items:center;gap:8px;margin-bottom:9px;position:relative;}
+.sdot{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--cond);font-size:9px;font-weight:700;color:var(--wht);position:absolute;left:-29px;flex-shrink:0;}
+.sphn{font-size:12px;font-weight:600;color:var(--n90);}
+.spht{font-family:var(--cond);font-size:9px;font-weight:700;color:var(--g30);margin-left:auto;letter-spacing:.04em;text-transform:uppercase;}
+.ssteps{display:flex;flex-direction:column;gap:4px;}
+.sstep{display:flex;align-items:flex-start;gap:7px;background:var(--wht);border:1px solid var(--g10);padding:8px 11px;font-size:12px;}
+.who{font-family:var(--cond);font-size:9px;font-weight:700;padding:2px 6px;border-radius:2px;flex-shrink:0;white-space:nowrap;margin-top:1px;letter-spacing:.06em;text-transform:uppercase;}
+.wag{background:var(--purple);color:var(--wht);}
+.whu{background:var(--blu);color:var(--wht);}
+.wtrb{background:var(--bl);color:var(--blu);border:1px solid var(--blu);}
+.wai{background:var(--purple);color:var(--wht);letter-spacing:.08em;}
+.ai-badge{display:inline-block;font-family:var(--cond);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:2px 8px;background:var(--purple);color:var(--wht);margin-left:8px;vertical-align:middle;}
+.wsy{background:var(--g10);color:var(--g70);border:1px solid var(--g30);}
+.wcu{background:var(--amb);color:var(--wht);}
+.wcs{background:var(--grn);color:var(--wht);}
+.stxt{color:var(--g70);line-height:1.5;}
+.stxt strong{color:var(--n90);}
+.cfblock{background:var(--rl);border-left:4px solid var(--red);padding:10px 12px;margin:6px 0 0;}
+.cfttl{font-family:var(--cond);font-size:10px;font-weight:700;color:var(--red);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;}
+.cfrow{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid rgba(200,0,29,.1);font-size:11px;flex-wrap:wrap;}
+.cfrow:last-child{border-bottom:none;}
+.spill{background:var(--wht);border:1px solid var(--g10);padding:1px 6px;font-family:var(--cond);font-size:9px;font-weight:700;color:var(--n90);white-space:nowrap;text-transform:uppercase;}
+.carr{color:var(--red);font-weight:700;flex-shrink:0;}
+.cdesc{color:var(--g70);flex:1;min-width:120px;}
+.mrow{display:flex;gap:1px;background:var(--g10);margin-top:24px;flex-wrap:wrap;}
+.mbox{background:var(--wht);padding:14px 16px;flex:1;min-width:140px;}
+.mv{font-family:var(--cond);font-size:18px;font-weight:700;line-height:1;margin-bottom:3px;}
+.mv.r{color:var(--red);}
+.mv.g{color:var(--grn);}
+.mv.p{color:var(--purple);}
+.ml{font-size:10px;color:var(--g50);line-height:1.3;}
+.jcard{background:var(--g05);border:1px solid var(--g10);border-top:3px solid var(--purple);padding:14px;margin-top:7px;}
+.jid{font-family:var(--cond);font-size:10px;font-weight:700;color:var(--purple);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;}
+.jtitle{font-size:13px;font-weight:600;margin-bottom:9px;line-height:1.4;}
+.jmeta{display:flex;gap:14px;margin-bottom:10px;flex-wrap:wrap;}
+.jf{font-size:11px;color:var(--g50);}
+.jf span{color:var(--n90);font-weight:600;}
+.jact{font-family:var(--cond);font-size:9px;font-weight:700;color:var(--g50);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;}
+.jcard ol{padding-left:14px;}
+.jcard li{font-size:11px;color:var(--g70);margin-bottom:4px;line-height:1.5;}
+.jcard li strong{color:var(--n90);}
+.personas-wrap{padding:36px 56px 80px;}
+.p-header{margin-bottom:28px;padding-bottom:18px;border-bottom:2px solid var(--g10);}
+.p-kicker{font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--purple);margin-bottom:6px;}
+.p-title{font-family:var(--cond);font-size:26px;font-weight:700;text-transform:uppercase;letter-spacing:-.01em;margin-bottom:6px;}
+.p-sub{font-size:13px;color:var(--g70);line-height:1.65;max-width:580px;}
+.p-tabs{display:flex;gap:0;border-bottom:2px solid var(--g10);margin-bottom:32px;}
+.p-tab{padding:10px 20px;font-family:var(--sans);font-size:12px;font-weight:600;color:var(--g50);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;}
+.p-tab:hover{color:var(--n90);}
+.p-tab.active{color:var(--purple);border-bottom-color:var(--purple);}
+.p-tab-ai.active{color:var(--purple);border-bottom-color:var(--purple);}
+.p-panel{display:none;}
+.p-panel.active{display:block;animation:fi .2s ease;}
+.persona-card-lg{display:grid;grid-template-columns:280px 1fr 1fr;gap:28px;align-items:start;}
+.pc-av{width:68px;height:68px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--cond);font-size:20px;font-weight:700;margin-bottom:12px;}
+.pc-name{font-family:var(--cond);font-size:22px;font-weight:700;text-transform:uppercase;margin-bottom:2px;}
+.pc-job{font-size:12px;color:var(--g70);margin-bottom:6px;line-height:1.4;}
+.pc-role-tag{display:inline-block;font-family:var(--cond);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 10px;margin-bottom:14px;}
+.pc-quote{font-size:13px;color:var(--g70);font-style:italic;line-height:1.65;border-left:3px solid var(--purple);padding-left:12px;}
+.pc-stitle{font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--purple);margin-bottom:10px;}
+.pc-list{list-style:none;}
+.pc-list li{font-size:13px;color:var(--g70);padding:6px 0 6px 14px;border-bottom:1px solid rgba(161,0,255,.1);position:relative;line-height:1.5;}
+.pc-list li:last-child{border-bottom:none;}
+.pc-list li::before{content:"\203A";position:absolute;left:0;color:var(--purple);font-weight:700;}
+.pc-metrics{display:flex;flex-direction:column;gap:7px;}
+.pc-m{background:var(--g05);border:1px solid var(--g10);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:12px;}
+.pc-ml{font-size:11px;color:var(--g70);}
+.pc-mv{font-family:var(--cond);font-size:16px;font-weight:700;white-space:nowrap;}
+.pc-mv.r{color:var(--red);}
+.pc-mv.g{color:var(--grn);}
+.pc-mv.p{color:var(--purple);}
+.pc-mv.k{color:var(--n90);}
+
+.wf-step{border:1px solid var(--g10);border-top:none;cursor:pointer;transition:background .12s;}
+.wf-step:first-child{border-top:1px solid var(--g10);}
+.wf-step:hover .wf-step-hd{background:var(--g05);}
+.wf-step-hd{display:flex;align-items:flex-start;gap:14px;padding:16px 18px;transition:background .12s;}
+.wf-step-num{font-family:var(--cond);font-size:18px;font-weight:700;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;flex-shrink:0;}
+.wf-step-body{flex:1;}
+.wf-pattern{font-family:var(--cond);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:3px;}
+.wf-title{font-family:var(--cond);font-size:16px;font-weight:700;text-transform:uppercase;margin-bottom:4px;color:var(--n90);}
+.wf-summary{font-size:12px;color:var(--g70);line-height:1.55;}
+.wf-chevron{font-size:20px;color:var(--g30);transition:transform .2s;flex-shrink:0;padding-top:10px;}
+.wf-chevron.open{transform:rotate(90deg);color:var(--purple);}
+.wf-step-detail{display:none;padding:0 18px 18px 72px;animation:fi .2s ease;}
+.wf-step-detail.open{display:block;}
+.wf-detail-grid{display:flex;flex-direction:column;gap:14px;}
+.wf-dl{font-family:var(--cond);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--purple);margin-bottom:5px;}
+.wf-dv{font-size:13px;color:var(--g70);line-height:1.65;}
+.wf-list{list-style:none;padding:0;display:flex;flex-direction:column;gap:4px;}
+.wf-list li{font-size:12px;color:var(--g70);padding:5px 0 5px 14px;border-bottom:1px solid var(--g10);position:relative;line-height:1.5;}
+.wf-list li:last-child{border-bottom:none;}
+.wf-list li::before{content:"\203A";position:absolute;left:0;color:var(--purple);font-weight:700;}
+.wf-nfr{font-family:var(--cond);font-size:13px;font-weight:700;background:var(--pl);color:var(--purple);border:1px solid rgba(161,0,255,.2);padding:2px 10px;}
+
+.sc-coll{border:1px solid var(--g10);border-top:none;cursor:pointer;}
+.sc-coll:first-child{border-top:1px solid var(--g10);}
+.sc-coll:hover .sc-hd{background:var(--g05);}
+.sc-hd{display:flex;align-items:flex-start;gap:14px;padding:14px 18px;transition:background .12s;}
+.sc-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--cond);font-size:11px;font-weight:700;flex-shrink:0;}
+.sc-meta{flex:1;}
+.sc-name{font-family:var(--cond);font-size:15px;font-weight:700;color:var(--n90);margin-bottom:3px;}
+.sc-desc{font-size:12px;color:var(--g70);line-height:1.5;}
+.sc-chevron{font-size:20px;color:var(--g30);transition:transform .2s;flex-shrink:0;padding-top:6px;}
+.sc-chevron.open{transform:rotate(90deg);color:var(--purple);}
+.sc-detail{display:none;padding:0 18px 18px 68px;animation:fi .2s ease;}
+.sc-detail.open{display:block;}
+.sc-code{background:var(--g05);border:1px solid var(--g10);padding:14px 16px;font-family:var(--cond);font-size:11px;line-height:1.8;overflow-x:auto;white-space:pre;}
+.sf{color:var(--blu);}
+.sv{color:var(--grn);}
+.sc2{color:var(--g30);font-style:italic;}
+.sc-indexes{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;padding:8px 12px;background:var(--g05);border:1px solid var(--g10);}
+.sc-idx-label{font-family:var(--cond);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g50);}
+.sc-idx{font-family:var(--cond);font-size:10px;font-weight:600;background:var(--wht);border:1px solid var(--g10);padding:2px 8px;color:var(--n90);}
+
+.wf-connector{width:2px;height:20px;background:var(--g10);margin-left:35px;}
+
+footer{background:var(--blk);color:var(--g50);padding:18px 56px;display:flex;align-items:center;justify-content:space-between;font-family:var(--cond);font-size:10px;letter-spacing:.1em;text-transform:uppercase;}
+.facc{color:var(--purple);font-weight:700;font-size:12px;}
+@media(max-width:900px){
+  .hinner,.nav-bar,.journey-wrap,.personas-wrap{padding-left:18px;padding-right:18px;}
+  .h-title{font-size:32px;}
+  .sgrid,.persona-card-lg{grid-template-columns:1fr;}
+  .mbox{min-width:45%;}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="hstripe"></div>
+  <div class="hinner">
+    <div class="acn-logo">Accenture &nbsp;&middot;&nbsp; Utilico Energy Engagement</div>
+    <p class="h-eyebrow">AI Agentification &nbsp;&middot;&nbsp; Billing Reconciliation &nbsp;&middot;&nbsp; Case Study</p>
+    <h1 class="h-title">Billing Dispute Resolution<br><em>Before vs After</em></h1>
+    <p class="h-sub">Full stakeholder journey &mdash; every step, every actor, every system &mdash; mapped across the manual process and the agentic process, with persona responsibilities and KPIs.</p>
+    <div class="h-stats">
+      <div><div class="hstat-v">6&ndash;8 hrs</div><div class="hstat-l">Manual resolution time</div></div>
+      <div><div class="hstat-v p">&lt;5 min</div><div class="hstat-l">DRI decision time (NFR-01)</div></div>
+      <div><div class="hstat-v">5</div><div class="hstat-l">Enterprise systems</div></div>
+      <div><div class="hstat-v">5</div><div class="hstat-l">Stakeholder personas</div></div>
+      <div><div class="hstat-v p">&#8595;99%</div><div class="hstat-l">Resolution time reduction</div></div>
+    </div>
+  </div>
+</header>
+
+<nav class="nav-bar">
+  <span class="nav-label">Section:</span>
+  <button class="nav-btn active" onclick="setTab('journey')">Journey Comparison</button>
+  <button class="nav-btn" onclick="setTab('personas')">Persona Details</button>
+  <button class="nav-btn" onclick="setTab('interface')">Application Interface</button>
+  <button class="nav-btn" onclick="setTab('workflow')">Agent Workflow</button>
+  <button class="nav-btn" onclick="setTab('schema')">MongoDB Schema</button>
+  <button class="nav-btn" onclick="setTab('architecture')">Target Architecture</button>
+</nav>
+
+<!-- TAB 1: JOURNEY -->
+<div class="view active" id="view-journey">
+<div class="journey-wrap">
+
+  <div class="j-header">
+    <div class="j-kicker">Full Journey &middot; Before vs After</div>
+    <h2 class="j-title">Every Step &middot; Every Actor &middot; Every System</h2>
+    <p class="j-sub">Both the manual and agentic journeys side by side &mdash; who does what at every phase and what changes when the agent handles the work.</p>
+  </div>
+
+  <div class="legend">
+    <div class="litem"><div class="lsw" style="background:var(--amb)"></div>Customer / external</div>
+    <div class="litem"><div class="lsw" style="background:var(--purple)"></div>Agent (automated)</div>
+    <div class="litem"><div class="lsw" style="background:var(--blu)"></div>DRI (human decision)</div>
+    <div class="litem"><div class="lsw" style="background:var(--g30)"></div>Internal team (manual)</div>
+    <div class="litem"><div class="lsw" style="background:var(--red)"></div>Risk / conflict</div>
+  </div>
+
+  <div class="sgrid">
+
+    <div>
+      <div class="scol-label bef">Before &mdash; Manual &nbsp;&middot;&nbsp; 6&ndash;8 hrs</div>
+      <div class="stl">
+
+        <div class="sph">
+          <div class="sphd"><div class="sdot" style="background:var(--amb)">1</div><span class="sphn">Customer raises dispute</span><span class="spht">T = 0</span></div>
+          <div class="ssteps">
+            <div class="sstep"><span class="who wcu">Customer</span><span class="stxt">Receives full-cycle bill covering <strong>post-disconnect days</strong> with MDM estimated reads. Files formal regulatory dispute &mdash; regulatory clock starts.</span></div>
+          </div>
+        </div>
+
+        <div class="sph">
+          <div class="sphd"><div class="sdot" style="background:var(--amb)">2</div><span class="sphn">CSR closes case incorrectly</span><span class="spht">+ 30 min</span></div>
+          <div class="ssteps">
+            <div class="sstep"><span class="who wsy">CSR</span><span class="stxt">Opens <strong>CC&amp;B only.</strong> Bill shows valid. <strong>Case closed incorrectly.</strong> No workflow requires checking the other 4 systems &mdash; root cause structurally invisible.</span></div>
+          </div>
+        </div>
+
+        <div class="sph">
+          <div class="sphd"><div class="sdot" style="background:var(--amb)">3</div><span class="sphn">Re-escalation &middot; IT pulls MDM</span><span class="spht">+ 1&ndash;3 hrs</span></div>
+          <div class="ssteps">
+            <div class="sstep"><span class="who wcu">Customer</span><span class="stxt">Re-escalates to manager. Case reopened under pressure.</span></div>
+            <div class="sstep"><span class="who wsy">IT Team</span><span class="stxt">Manual <strong>MDM data pull.</strong> No actual reads post-disconnect &mdash; MDM applied historical averages. <strong>Phantom consumption.</strong> 1&ndash;2 hrs.</span></div>
+          </div>
+        </div>
+
+        <div class="sph">
+          <div class="sphd"><div class="sdot" style="background:var(--amb)">4</div><span class="sphn">Ops + Finance investigate</span><span class="spht">+ 3&ndash;6 hrs</span></div>
+          <div class="ssteps">
+            <div class="sstep"><span class="who wsy">Ops Team</span><span class="stxt">Manual <strong>OMS review.</strong> Disconnect confirmed by field tech. No CC&amp;B suppression mechanism. 1&ndash;2 hrs.</span></div>
+            <div class="sstep"><span class="who wsy">Finance</span><span class="stxt">Manual <strong>GL review.</strong> Revenue already posted &mdash; reversal needs credit note + regulatory filing. 1&ndash;2 hrs.</span></div>
+            <div class="sstep"><span class="who wsy">Multiple</span><span class="stxt"><strong>No unified view.</strong> Three teams hold pieces of truth. No shared doc, no named owner, no reconciliation.</span></div>
+          </div>
+        </div>
+
+        <div class="sph">
+          <div class="sphd"><div class="sdot" style="background:var(--amb)">5</div><span class="sphn">Manual summary &middot; Legal draft</span><span class="spht">+ 6&ndash;8 hrs</span></div>
+          <div class="ssteps">
+            <div class="sstep"><span class="who wsy">Manager</span><span class="stxt">Manually writes unstructured summary. <strong>No citations, no conflict flags, no source refs.</strong> 2&ndash;4 hrs. Quality varies by author.</span></div>
+            <div class="sstep"><span class="who wsy">Legal</span><span class="stxt">Drafts regulator response. <strong>~30% inconsistency</strong> with customer communications.</span></div>
+          </div>
+        </div>
+
+        <div class="sph">
+          <div class="sphd"><div class="sdot" style="background:var(--red)">&#10007;</div><span class="sphn">Decision (maybe)</span><span class="spht">2&ndash;5 days</span></div>
+          <div class="ssteps">
+            <div class="sstep"><span class="who wsy">Multiple</span><span class="stxt"><strong>No DRI. No audit trail (~40%).</strong> No traceability from recommendation to source data. $800&ndash;$4,200 revenue at risk. ~18% recurrence &mdash; root cause never fixed.</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div>
+      <div class="scol-label aft">After &mdash; Agentic &nbsp;&middot;&nbsp; &lt;5 min</div>
+      <div class="stl">
+
+        <div class="sph">
+          <div class="sphd"><div class="sdot" style="background:var(--amb)">1</div><span class="sphn">Customer raises dispute</span><span class="spht">T = 0</span></div>
+          <div class="ssteps">
+            <div class="sstep"><span class="who wcu">Customer</span><span class="stxt">Same trigger as manual &mdash; receives bad bill, contacts CSR. <strong>The process starts identically.</strong> The divergence happens in the next step.</span></div>
+          </div>
+        </div>
+
+        <div class="sph">
+          <div class="sphd"><div class="sdot" style="background:var(--purple)">2</div><span class="sphn">Agent triggered &mdash; 2 strategies</span><span class="spht">T = 0</span></div>
+          <div class="ssteps">
+            <div class="sstep">
+              <span class="who wag">Trigger A &mdash; Analyst</span>
+              <span class="stxt">
+                <strong>Proactive &mdash; OMS auto-trigger (preferred).</strong> Mid-cycle disconnect logged in OMS fires the reconciliation workflow automatically, <em>before</em> the next CC&amp;B billing run. The bad bill never reaches the customer. No complaint needed.
+              </span>
+            </div>
+            <div class="sstep">
+              <span class="who wtrb">Trigger B</span>
+              <span class="stxt">
+                <strong>Reactive &mdash; CSR manual trigger.</strong> Customer calls with a filed dispute. CSR opens the escalation screen and triggers the agent workflow in one click &mdash; instead of opening CC&amp;B in isolation. Agent brief returned in &lt;7 min.
+              </span>
+            </div>
+            <div class="sstep"><span class="who whu">DRI</span><span class="stxt"><strong>Named DRI assigned immediately</strong> on trigger (BR-01). Identity stamped on every output regardless of trigger path.</span></div>
+          </div>
+        </div>
+
+        <div class="sph">
+          <div class="sphd"><div class="sdot" style="background:var(--purple)">3</div><span class="sphn">5-system parallel ingestion</span><span class="spht">0&ndash;7 min</span></div>
+          <div class="ssteps">
+            <div class="sstep"><span class="who wag">Analyst</span><span class="stxt"><strong>CC&amp;B</strong> &mdash; billing period, billing rules, bill timestamp.</span></div>
+            <div class="sstep"><span class="who wag">Analyst</span><span class="stxt"><strong>MDM</strong> &mdash; reads flagged actual vs estimated, mapped to period.</span></div>
+            <div class="sstep"><span class="who wag">Analyst</span><span class="stxt"><strong>OMS</strong> &mdash; disconnect work order, timestamp, field tech record.</span></div>
+            <div class="sstep"><span class="who wag">Analyst</span><span class="stxt"><strong>CRM</strong> &mdash; prior complaints, billing-hold flags. Prior complaint found &mdash; never propagated.</span></div>
+            <div class="sstep"><span class="who wag">Analyst</span><span class="stxt"><strong>GL</strong> &mdash; revenue posting status, reversal implications flagged (BR-06).</span></div>
+          </div>
+        </div>
+
+        <div class="sph">
+          <div class="sphd"><div class="sdot" style="background:var(--purple)">4</div><span class="sphn">Conflict detection</span><span class="spht">&lt;15 sec</span></div>
+          <div class="ssteps">
+            <div class="sstep"><span class="who wag">Analyst</span><span class="stxt">Maps OMS timestamp to CC&amp;B period. Every day classified: <strong>billable / non-billable / proration.</strong></span></div>
+            <div class="sstep">
+              <span class="who wag">Analyst</span>
+              <span class="stxt"><strong>4 conflicts explicitly surfaced</strong> &mdash; BR-07: none silently resolved.
+                <div class="cfblock">
+                  <div class="cfttl">Conflicts detected</div>
+                  <div class="cfrow"><span class="spill">OMS</span><span class="carr">&#8596;</span><span class="spill">CC&amp;B</span><span class="cdesc">Full-cycle bill despite mid-cycle disconnect</span></div>
+                  <div class="cfrow"><span class="spill">MDM</span><span class="carr">&#8596;</span><span class="spill">OMS</span><span class="cdesc">Estimated reads on post-disconnect days</span></div>
+                  <div class="cfrow"><span class="spill">CRM</span><span class="carr">&#8596;</span><span class="spill">CC&amp;B</span><span class="cdesc">Prior complaint, no billing-hold propagated</span></div>
+                  <div class="cfrow"><span class="spill">GL</span><span class="carr">&#8596;</span><span class="spill">CRM</span><span class="cdesc">Revenue posted for a bill under dispute</span></div>
+                </div>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sph">
+          <div class="sphd"><div class="sdot" style="background:var(--purple)">5</div><span class="sphn">Recommendation + decision-ready brief</span><span class="spht">&lt;7 min (NFR-01)</span></div>
+          <div class="ssteps">
+            <div class="sstep"><span class="who wag">Analyst</span><span class="stxt">Recommendation: <strong>suppress, prorate, credit note, flag GL.</strong> Every line cites source + timestamp (FR-05).</span></div>
+            <div class="sstep"><span class="who wag">Analyst</span><span class="stxt">Decision-ready brief: <strong>100% citation coverage (FR-06).</strong> Regulator, VP, or DRI can act without additional context.</span></div>
+          </div>
+        </div>
+
+        <div class="sph">
+          <div class="sphd"><div class="sdot" style="background:var(--blu)">6</div><span class="sphn">DRI approval gate</span><span class="spht">1 touchpoint</span></div>
+          <div class="ssteps">
+            <div class="sstep"><span class="who whu">DRI</span><span class="stxt">Reviews brief. Approves, overrides with reason, or flags exception. <strong>Mandatory decision-authority gate</strong> (BR-05).</span></div>
+            <div class="sstep"><span class="who wag">Analyst</span><span class="stxt">Approval logged: <strong>immutable audit trail</strong> &mdash; timestamp + identity. 100% coverage (FR-09).</span></div>
+          </div>
+        </div>
+
+        <div class="sph">
+          <div class="sphd"><div class="sdot" style="background:var(--purple)">7</div><span class="sphn">3 outputs drafted &rarr; CSR review &amp; dispatch</span><span class="spht">1 CSR gate &middot; &lt;24 hrs</span></div>
+          <div class="ssteps">
+            <div class="sstep"><span class="who wag">Analyst</span><span class="stxt"><strong>Customer summary</strong> &mdash; plain language, &lt;2 min read. Same evidence base as regulatory response (BR-08).</span></div>
+            <div class="sstep"><span class="who wag">Analyst</span><span class="stxt"><strong>Executive brief</strong> &mdash; 1 page, GL reversal included, regulatory exposure stated.</span></div>
+            <div class="sstep"><span class="who wag">Analyst</span><span class="stxt"><strong>Jira BILL-NEW-1147</strong> &mdash; P1, linked systems (OMS-DISCON, MDM-EST-READS), acceptance criteria.</span></div>
+            <div class="sstep"><span class="who wcs">CSR</span><span class="stxt"><strong>Reviews, edits &amp; approves each of the 3 outputs</strong> before send. Outputs dispatch only once all 3 are approved &mdash; every approval logged to the immutable audit trail (FR-09).</span></div>
+          </div>
+        </div>
+
+        <div class="sph">
+          <div class="sphd"><div class="sdot" style="background:var(--g50)">8</div><span class="sphn">Engineering closes root cause</span><span class="spht">Day 60&ndash;90</span></div>
+          <div class="ssteps">
+            <div class="sstep">
+              <span class="who wsy">Engineering</span>
+              <span class="stxt">OMS&rarr;CC&amp;B suppression. MDM read suppression. CRM billing-hold propagation. <strong>Recurrence: ~18% &rarr; &lt;3%.</strong>
+                <div class="jcard">
+                  <div class="jid">BILL-NEW-1147</div>
+                  <div class="jtitle">Implement OMS disconnect event as billing suppression trigger in CC&amp;B</div>
+                  <div class="jmeta"><span class="jf">Priority: <span>P1</span></span><span class="jf">Links: <span>OMS-DISCON &middot; MDM-EST-READS</span></span><span class="jf">Team: <span>CC&amp;B Config</span></span></div>
+                  <div class="jact">Acceptance criteria</div>
+                  <ol>
+                    <li><strong>OMS disconnect timestamp</strong> cross-referenced at CC&amp;B billing run time</li>
+                    <li><strong>MDM estimated reads suppressed</strong> for disconnected premises automatically</li>
+                    <li><strong>CRM billing-hold flags</strong> propagated to CC&amp;B without manual link</li>
+                    <li><strong>Proration logic tested</strong> across mixed-cycle scenarios</li>
+                    <li><strong>Staged deploy</strong> with 4-week parallel validation</li>
+                    <li><strong>Regulator-ready audit log</strong> per case &mdash; every claim cites source system</li>
+                  </ol>
+                </div>
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:32px;padding-top:24px;border-top:2px solid var(--g10);">
+    <div style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--purple);margin-bottom:14px;">Key performance outcomes</div>
+    <div class="mrow">
+      <div class="mbox"><div class="mv r">45&ndash;90 min</div><div class="ml">CSR handle time before</div></div>
+      <div class="mbox"><div class="mv g">3&ndash;8 min</div><div class="ml">CSR handle time target</div></div>
+      <div class="mbox"><div class="mv r">~31%</div><div class="ml">First-contact resolution before</div></div>
+      <div class="mbox"><div class="mv g">&gt;78%</div><div class="ml">First-contact resolution target</div></div>
+      <div class="mbox"><div class="mv r">~40%</div><div class="ml">Audit trail coverage before</div></div>
+      <div class="mbox"><div class="mv g">100%</div><div class="ml">Audit trail coverage target</div></div>
+      <div class="mbox"><div class="mv r">~18%</div><div class="ml">Billing error recurrence before</div></div>
+      <div class="mbox"><div class="mv g">&lt;3%</div><div class="ml">Billing error recurrence target</div></div>
+      <div class="mbox"><div class="mv r">$800&ndash;$4,200</div><div class="ml">Revenue at risk per dispute before</div></div>
+      <div class="mbox"><div class="mv g">&lt;$150</div><div class="ml">Revenue at risk per dispute target</div></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- TAB 2: PERSONAS -->
+<div class="view" id="view-personas">
+<div class="personas-wrap">
+
+  <div class="p-header">
+    <div class="p-kicker">Stakeholder Personas</div>
+    <h2 class="p-title">Responsibilities, Touchpoints &amp; Impact Metrics</h2>
+    <p class="p-sub">Five personas interact with the billing reconciliation process &mdash; from the customer who raises the dispute to the engineering team that closes the root cause. Each persona's role changes materially with the agentic process.</p>
+  </div>
+
+  <div class="p-tabs">
+    <div class="p-tab active" onclick="setPersona('cu',this)">Customer</div>
+    <div class="p-tab" onclick="setPersona('csr',this)">CSR</div>
+    <div class="p-tab" onclick="setPersona('dri',this)">DRI</div>
+    <div class="p-tab" onclick="setPersona('exec',this)">Executive</div>
+    <div class="p-tab" onclick="setPersona('eng',this)">Engineering</div>
+    <div class="p-tab p-tab-ai" id="tab-ai" onclick="activateAnalyst()" style="display:flex;align-items:center;gap:7px;">The Analyst <span class="ai-badge" style="pointer-events:none;">AI</span></div>
+  </div>
+
+  <div class="p-panel active" id="pp-cu">
+    <div class="persona-card-lg">
+      <div>
+        <div class="pc-av" style="background:#FFF3E5;color:#B45000;">CU</div>
+        <div class="pc-name">Customer</div>
+        <div class="pc-job">Affected large commercial account &mdash; regulated utility customer</div>
+        <div class="pc-role-tag" style="background:#FFF3E5;color:#B45000;">External &middot; Dispute originator</div>
+        <div class="pc-quote">&ldquo;We were billed for consumption after our service was disconnected. This is not a billing error &mdash; this is evidence that your systems don&rsquo;t communicate.&rdquo;</div>
+      </div>
+      <div>
+        <div class="pc-stitle">Responsibilities &amp; touchpoints</div>
+        <ul class="pc-list">
+          <li>Identifies billing discrepancy &mdash; full-cycle bill covering post-disconnect days</li>
+          <li>Files formal regulatory dispute with documented evidence of systemic failure</li>
+          <li>Re-escalates when CSR response closes case without addressing root cause</li>
+          <li>Receives plain-language summary letter from agent within 24 hours post-resolution</li>
+          <li>Receives corrected bill and credit note confirmation after DRI approval</li>
+          <li>Holds regulatory leverage &mdash; documented evidence that 5 systems don't communicate</li>
+          <li>Triggers the regulatory review clock &mdash; each failed response compounds exposure</li>
+        </ul>
+      </div>
+      <div>
+        <div class="pc-stitle">Impact metrics</div>
+        <div class="pc-metrics">
+          <div class="pc-m"><span class="pc-ml">First-contact resolution &mdash; before</span><span class="pc-mv r">~31%</span></div>
+          <div class="pc-m"><span class="pc-ml">First-contact resolution &mdash; target</span><span class="pc-mv g">&gt;78%</span></div>
+          <div class="pc-m"><span class="pc-ml">Elapsed resolution time &mdash; before</span><span class="pc-mv r">2&ndash;5 days</span></div>
+          <div class="pc-m"><span class="pc-ml">First coherent update &mdash; target</span><span class="pc-mv g">&lt;24 hrs</span></div>
+          <div class="pc-m"><span class="pc-ml">Billing CSAT before &rarr; target</span><span class="pc-mv p">54 &rarr; 82</span></div>
+          <div class="pc-m"><span class="pc-ml">Regulatory inconsistency experienced</span><span class="pc-mv r">~30%</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-panel" id="pp-csr">
+    <div class="persona-card-lg">
+      <div>
+        <div class="pc-av" style="background:#E5EEF8;color:#004F9F;">CS</div>
+        <div class="pc-name">CSR</div>
+        <div class="pc-job">Customer Service Representative &mdash; Billing Operations</div>
+        <div class="pc-role-tag" style="background:#E5EEF8;color:#004F9F;">Internal &middot; Frontline &middot; First contact</div>
+        <div class="pc-quote">&ldquo;I need to pull this from five different systems and I still can&rsquo;t be sure I have the full picture after two hours of work.&rdquo;</div>
+      </div>
+      <div>
+        <div class="pc-stitle">Responsibilities &amp; touchpoints</div>
+        <ul class="pc-list">
+          <li>Receives inbound dispute &mdash; first point of contact on every billing escalation</li>
+          <li>Logs complaint in CRM, opens escalation ticket</li>
+          <li>Before: queries CC&amp;B only &mdash; misses root cause, closes case incorrectly</li>
+          <li>After: triggers reconciliation agent workflow from escalation screen (one click)</li>
+          <li>Receives agent-generated context brief within 7 minutes &mdash; no cross-system queries needed</li>
+          <li>Presents cited, consistent findings to customer &mdash; no improvised summary</li>
+          <li>After DRI approval: reviews, edits &amp; approves each of the 3 generated outputs before they are sent (output review gate)</li>
+          <li>Closes escalation with full audit log reference attached</li>
+        </ul>
+      </div>
+      <div>
+        <div class="pc-stitle">Impact metrics</div>
+        <div class="pc-metrics">
+          <div class="pc-m"><span class="pc-ml">Handle time per escalation &mdash; before</span><span class="pc-mv r">45&ndash;90 min</span></div>
+          <div class="pc-m"><span class="pc-ml">Handle time per escalation &mdash; target</span><span class="pc-mv g">3&ndash;8 min</span></div>
+          <div class="pc-m"><span class="pc-ml">Teams contacted per escalation &mdash; before</span><span class="pc-mv r">6&ndash;9</span></div>
+          <div class="pc-m"><span class="pc-ml">Manual touchpoints &mdash; target</span><span class="pc-mv g">2 (DRI decision + CSR output review)</span></div>
+          <div class="pc-m"><span class="pc-ml">First-contact resolution &mdash; before</span><span class="pc-mv r">~31%</span></div>
+          <div class="pc-m"><span class="pc-ml">First-contact resolution &mdash; target</span><span class="pc-mv g">&gt;78%</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-panel" id="pp-dri">
+    <div class="persona-card-lg">
+      <div>
+        <div class="pc-av" style="background:#F3E5FF;color:#A100FF;">DR</div>
+        <div class="pc-name">DRI</div>
+        <div class="pc-job">Directly Responsible Individual &mdash; Escalation Owner</div>
+        <div class="pc-role-tag" style="background:#F3E5FF;color:#A100FF;">Internal &middot; Decision authority</div>
+        <div class="pc-quote">&ldquo;I need to be confident in what I&rsquo;m signing off &mdash; and I need a trail that holds up if a regulator asks me to account for every decision.&rdquo;</div>
+      </div>
+      <div>
+        <div class="pc-stitle">Responsibilities &amp; touchpoints</div>
+        <ul class="pc-list">
+          <li>Named as DRI at escalation open &mdash; identity stamped on all outputs (BR-01)</li>
+          <li>Receives the full reconciliation brief: confirmed facts, conflicts, and recommendation</li>
+          <li>Reviews brief without needing to query any source system directly</li>
+          <li>Approves recommended action, overrides with documented reason, or flags exception</li>
+          <li>Authorises credit note, proration adjustment, and regulatory submission</li>
+          <li>Approves the recommended decision &mdash; the mandatory decision-authority gate. The CSR then reviews &amp; approves the 3 generated outputs before dispatch</li>
+          <li>Owns the regulatory response and all customer-facing communications</li>
+          <li>Every decision logged with timestamp, approver identity, and rationale (FR-09)</li>
+        </ul>
+      </div>
+      <div>
+        <div class="pc-stitle">Impact metrics</div>
+        <div class="pc-metrics">
+          <div class="pc-m"><span class="pc-ml">Audit trail coverage &mdash; before</span><span class="pc-mv r">~40%</span></div>
+          <div class="pc-m"><span class="pc-ml">Audit trail coverage &mdash; target</span><span class="pc-mv g">100%</span></div>
+          <div class="pc-m"><span class="pc-ml">Regulatory inconsistency &mdash; before</span><span class="pc-mv r">~30%</span></div>
+          <div class="pc-m"><span class="pc-ml">Regulatory inconsistency &mdash; target</span><span class="pc-mv g">&lt;2%</span></div>
+          <div class="pc-m"><span class="pc-ml">Named DRI per escalation</span><span class="pc-mv p">100%</span></div>
+          <div class="pc-m"><span class="pc-ml">Decision-ready brief latency</span><span class="pc-mv g">&lt;7 min</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-panel" id="pp-exec">
+    <div class="persona-card-lg">
+      <div>
+        <div class="pc-av" style="background:#E5F5ED;color:#007A3D;">EX</div>
+        <div class="pc-name">Executive</div>
+        <div class="pc-job">VP / Senior Leadership &mdash; Regulatory &amp; Commercial Risk</div>
+        <div class="pc-role-tag" style="background:#E5F5ED;color:#007A3D;">Internal &middot; Strategic oversight</div>
+        <div class="pc-quote">&ldquo;Tell me what happened, what it costs us, and what we&rsquo;re doing about it. One page. I need to know our regulatory exposure before end of day.&rdquo;</div>
+      </div>
+      <div>
+        <div class="pc-stitle">Responsibilities &amp; touchpoints</div>
+        <ul class="pc-list">
+          <li>Receives auto-generated 1-page executive brief post DRI approval</li>
+          <li>Reviews: situation summary, financial impact, findings, and next steps</li>
+          <li>Assesses GL reversal implications and total revenue at risk per dispute</li>
+          <li>Confirms regulatory exposure is quantified, documented, and traceable</li>
+          <li>Approves escalation to regulatory authority where required</li>
+          <li>Monitors billing error recurrence rates and system-level KPIs across portfolio</li>
+          <li>Champions the 90-day architectural fix programme at board level</li>
+        </ul>
+      </div>
+      <div>
+        <div class="pc-stitle">Impact metrics</div>
+        <div class="pc-metrics">
+          <div class="pc-m"><span class="pc-ml">Revenue at risk per dispute &mdash; before</span><span class="pc-mv r">$800&ndash;$4,200</span></div>
+          <div class="pc-m"><span class="pc-ml">Revenue at risk per dispute &mdash; target</span><span class="pc-mv g">&lt;$150</span></div>
+          <div class="pc-m"><span class="pc-ml">Billing error recurrence &mdash; before</span><span class="pc-mv r">~18%</span></div>
+          <div class="pc-m"><span class="pc-ml">Billing error recurrence &mdash; target</span><span class="pc-mv g">&lt;3%</span></div>
+          <div class="pc-m"><span class="pc-ml">Regulatory fines &mdash; first full quarter</span><span class="pc-mv p">Target: 0</span></div>
+          <div class="pc-m"><span class="pc-ml">Exec brief latency &mdash; target</span><span class="pc-mv g">&lt;24 hrs</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-panel" id="pp-eng">
+    <div class="persona-card-lg">
+      <div>
+        <div class="pc-av" style="background:#F5F5F5;color:#1C1C1C;">EN</div>
+        <div class="pc-name">Engineering</div>
+        <div class="pc-job">CC&amp;B Configuration Team &mdash; Architectural Fix Owner</div>
+        <div class="pc-role-tag" style="background:#F5F5F5;color:#4A4A4A;border:1px solid #E8E8E8;">Internal &middot; Technical &middot; Root cause fix</div>
+        <div class="pc-quote">&ldquo;Give me the exact systems involved, the acceptance criteria, and the linked tickets. I can fix the root cause &mdash; but I need the full picture, not a vague summary from ops.&rdquo;</div>
+      </div>
+      <div>
+        <div class="pc-stitle">Responsibilities &amp; touchpoints</div>
+        <ul class="pc-list">
+          <li>Receives auto-generated Jira story (BILL-NEW-1147) from reconciliation evidence</li>
+          <li>Reviews: P1 priority, linked systems, conflict description, acceptance criteria</li>
+          <li>Implements OMS disconnect timestamp cross-reference at CC&amp;B billing run time</li>
+          <li>Implements MDM estimated read suppression for disconnected premises</li>
+          <li>Implements CRM billing-hold flag auto-propagation to CC&amp;B</li>
+          <li>Tests proration logic across mixed-cycle billing scenarios</li>
+          <li>Executes staged deploy with 4-week parallel validation against manual process</li>
+          <li>Delivers regulator-ready audit log capability per case</li>
+        </ul>
+      </div>
+      <div>
+        <div class="pc-stitle">Impact metrics</div>
+        <div class="pc-metrics">
+          <div class="pc-m"><span class="pc-ml">Billing error recurrence &mdash; before fix</span><span class="pc-mv r">~18%</span></div>
+          <div class="pc-m"><span class="pc-ml">Billing error recurrence &mdash; after fix</span><span class="pc-mv g">&lt;3%</span></div>
+          <div class="pc-m"><span class="pc-ml">Recurrence reduction</span><span class="pc-mv g">&#8595;83%</span></div>
+          <div class="pc-m"><span class="pc-ml">Architectural fix delivery</span><span class="pc-mv p">Day 90</span></div>
+          <div class="pc-m"><span class="pc-ml">Systems requiring CC&amp;B changes</span><span class="pc-mv k">3</span></div>
+          <div class="pc-m"><span class="pc-ml">Regulatory fines after fix</span><span class="pc-mv g">Target: 0</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-panel" id="pp-ai">
+    <div style="background:var(--purple);height:3px;margin-bottom:20px;"></div>
+    <div class="persona-card-lg">
+      <div>
+        <div class="pc-av" style="background:var(--purple);color:var(--wht);">AI</div>
+        <div class="pc-name" style="color:var(--purple);">The Analyst</div>
+        <div class="pc-job">AI Reconciliation Agent &mdash; Agentic Billing Resolution</div>
+        <div class="pc-role-tag" style="background:var(--purple);color:var(--wht);">AI Actor &middot; Always on &middot; Zero-latency</div>
+        <div class="pc-quote" style="border-left-color:var(--purple);">&ldquo;Utilico commercial customer billed full cycle [CC&amp;B &middot; 2024-11-01]. Disconnect confirmed mid-cycle [OMS &middot; 2024-10-18T14:32]. Post-disconnect reads estimated, not actual [MDM]. Prior complaint on file, no billing-hold triggered [CRM]. Revenue already posted [GL]. Recommend: suppress post-disconnect portion, issue proration credit, flag GL for reversal.&rdquo;<br><span style="font-size:11px;color:var(--g50);font-style:normal;display:block;margin-top:6px;">Sample output &mdash; verbatim context brief generated in &lt;60 sec</span></div>
+      </div>
+      <div>
+        <div class="pc-stitle">Responsibilities &amp; capabilities</div>
+        <ul class="pc-list">
+          <li>Triggered automatically on OMS disconnect event or manually by CSR / DRI (FR-02)</li>
+          <li>Queries all 5 enterprise systems in parallel &mdash; CC&amp;B, MDM, OMS, CRM, GL (FR-01)</li>
+          <li>Classifies every day in the billing period: billable / non-billable / proration required (FR-03)</li>
+          <li>Detects all 4 architectural conflict types explicitly &mdash; never silently resolves (FR-04, BR-07)</li>
+          <li>Generates structured recommendation citing source system for every rationale element (FR-05)</li>
+          <li>Assembles decision-ready context brief with 100% citation coverage (FR-06)</li>
+          <li>Produces 3 audience-specific outputs from one evidence base &mdash; customer, executive, engineering (FR-07)</li>
+          <li>Writes every decision and approval to an immutable, queryable audit trail (FR-09)</li>
+          <li>Flags confidence signals where data is incomplete or reads cannot be verified</li>
+        </ul>
+      </div>
+      <div>
+        <div class="pc-stitle">Performance targets (NFR-01)</div>
+        <div class="pc-metrics">
+          <div class="pc-m"><span class="pc-ml">Full context assembly end-to-end</span><span class="pc-mv" style="color:var(--purple);">&lt;7 min</span></div>
+          <div class="pc-m"><span class="pc-ml">Conflict detection</span><span class="pc-mv" style="color:var(--purple);">&lt;15 sec</span></div>
+          <div class="pc-m"><span class="pc-ml">Brief generation</span><span class="pc-mv" style="color:var(--purple);">&lt;60 sec</span></div>
+          <div class="pc-m"><span class="pc-ml">DRI decision time target</span><span class="pc-mv" style="color:var(--purple);">&lt;5 min</span></div>
+          <div class="pc-m"><span class="pc-ml">First coherent stakeholder update</span><span class="pc-mv" style="color:var(--purple);">&lt;24 hrs</span></div>
+          <div class="pc-m"><span class="pc-ml">Citation coverage</span><span class="pc-mv g">100%</span></div>
+          <div class="pc-m"><span class="pc-ml">Conflicts silently resolved</span><span class="pc-mv g">0</span></div>
+          <div class="pc-m"><span class="pc-ml">Conflicts surfaced per escalation</span><span class="pc-mv" style="color:var(--purple);">4 types checked</span></div>
+        </div>
+        <div style="margin-top:16px;padding:12px 14px;background:var(--pl);border-left:3px solid var(--purple);">
+          <div style="font-family:var(--cond);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--purple);margin-bottom:6px;">Key constraint</div>
+          <div style="font-size:12px;color:var(--g70);line-height:1.6;">The Analyst <strong>never makes the final decision.</strong> Every recommended action requires explicit DRI approval before dispatch (BR-05). The Analyst does the legwork &mdash; the human holds the authority.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- TAB 3: APPLICATION INTERFACE -->
+<div class="view" id="view-interface">
+<div class="journey-wrap">
+
+  <div class="j-header">
+    <div class="j-kicker">Application Interface &middot; Role-Based UI Specification</div>
+    <h2 class="j-title">Three Roles &middot; Three Dashboards &middot; One App</h2>
+    <p class="j-sub">Single application with role-based login. Each role sees a purpose-built interface grounded in the functional and non-functional requirements. The Analyst fires automatically on ticket submission &mdash; no manual handoff between screens.</p>
+  </div>
+
+  <!-- ROLE TABS -->
+  <div class="p-tabs" style="margin-bottom:28px;">
+    <div class="p-tab active" id="itab-csr" onclick="setIface('csr',this)">CSR &nbsp;<span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:#FFF3E5;color:#B45000;padding:2px 7px;pointer-events:none;">Frontline</span></div>
+    <div class="p-tab" id="itab-dri" onclick="setIface('dri',this)">DRI &nbsp;<span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--pl);color:var(--purple);padding:2px 7px;pointer-events:none;">Decision authority</span></div>
+    <div class="p-tab" id="itab-am" onclick="setIface('am',this)">Analyst Manager &nbsp;<span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--gl);color:var(--grn);padding:2px 7px;pointer-events:none;">System oversight</span></div>
+  </div>
+
+  <!-- CSR PANEL -->
+  <div class="p-panel active" id="ip-csr">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:28px;">
+      <div>
+        <div class="pc-stitle">Role context</div>
+        <p style="font-size:13px;color:var(--g70);line-height:1.65;margin-bottom:12px;">First point of contact. Receives the dispute call, logs it, and triggers The Analyst in one click. The UI must be fast &mdash; target handle time is <strong>3&ndash;8 minutes</strong> (NFR-05). Every action the CSR used to do manually across 6&ndash;9 teams is now a single button.</p>
+        <div class="pc-stitle" style="margin-top:16px;">Grounding requirements</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <span class="tag ta">FR-02 Trigger</span>
+          <span class="tag ta">FR-10 DRI assign</span>
+          <span class="tag th2">NFR-05 Handle time</span>
+          <span class="tag th2">NFR-06 FCR rate</span>
+          <span class="tag th2">NFR-07 Touchpoints</span>
+        </div>
+      </div>
+      <div>
+        <div class="pc-stitle">Notification behaviour</div>
+        <ul class="pc-list">
+          <li>Notified immediately when DRI approves &mdash; 3 output drafts ready for review &amp; approval before dispatch</li>
+          <li>Notified when DRI rejects &mdash; sees rejection reason and next action</li>
+          <li>Badge count on ticket list for items needing attention</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+
+      <!-- Screen 1: Raise Ticket -->
+      <div style="border:1px solid var(--g10);border-top:3px solid var(--amb);">
+        <div style="padding:12px 16px;border-bottom:1px solid var(--g10);background:var(--al);">
+          <div style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amb);">Screen 1 &mdash; Raise New Ticket</div>
+        </div>
+        <div style="padding:16px;">
+          <div style="background:var(--g05);border:1px solid var(--g10);padding:12px;margin-bottom:10px;">
+            <div style="font-size:10px;font-weight:700;color:var(--g50);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;">Account ID</div>
+            <div style="background:var(--wht);border:1px solid var(--g10);padding:7px 10px;font-size:12px;color:var(--g30);">e.g. UTL-00421937</div>
+          </div>
+          <div style="background:var(--g05);border:1px solid var(--g10);padding:12px;margin-bottom:10px;">
+            <div style="font-size:10px;font-weight:700;color:var(--g50);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;">Dispute type</div>
+            <div style="background:var(--wht);border:1px solid var(--g10);padding:7px 10px;font-size:12px;color:var(--g30);">Billing after disconnect &darr;</div>
+          </div>
+          <div style="background:var(--g05);border:1px solid var(--g10);padding:12px;margin-bottom:14px;">
+            <div style="font-size:10px;font-weight:700;color:var(--g50);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;">Notes</div>
+            <div style="background:var(--wht);border:1px solid var(--g10);padding:7px 10px;font-size:12px;color:var(--g30);height:48px;"></div>
+          </div>
+          <div style="background:var(--purple);color:var(--wht);padding:9px 16px;font-family:var(--cond);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;text-align:center;">Submit &mdash; Trigger Analyst</div>
+          <div style="margin-top:8px;font-size:11px;color:var(--g50);line-height:1.5;">On submit: DRI assigned (FR-10, BR-01) &middot; Analyst triggered (FR-02) &middot; Ticket status set to <em>Analysing</em></div>
+        </div>
+      </div>
+
+      <!-- Screen 2: My Tickets -->
+      <div style="border:1px solid var(--g10);border-top:3px solid var(--amb);">
+        <div style="padding:12px 16px;border-bottom:1px solid var(--g10);background:var(--al);">
+          <div style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amb);">Screen 2 &mdash; My Tickets</div>
+        </div>
+        <div style="padding:0;">
+          <!-- ticket rows -->
+          <div style="display:grid;grid-template-columns:1fr auto;align-items:center;padding:11px 16px;border-bottom:1px solid var(--g10);gap:8px;">
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--n90);">UTL-00421937</div>
+              <div style="font-size:11px;color:var(--g50);">Billing after disconnect &middot; 4 min ago</div>
+            </div>
+            <span style="font-family:var(--cond);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--pl);color:var(--purple);padding:2px 8px;">Analysing</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr auto;align-items:center;padding:11px 16px;border-bottom:1px solid var(--g10);gap:8px;">
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--n90);">UTL-00389204</div>
+              <div style="font-size:11px;color:var(--g50);">Estimated read dispute &middot; 1 hr ago</div>
+            </div>
+            <span style="font-family:var(--cond);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--bl);color:var(--blu);padding:2px 8px;">Awaiting DRI</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr auto;align-items:center;padding:11px 16px;border-bottom:1px solid var(--g10);gap:8px;">
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--n90);">UTL-00371055</div>
+              <div style="font-size:11px;color:var(--g50);">GL revenue dispute &middot; Yesterday</div>
+            </div>
+            <span style="font-family:var(--cond);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--rl);color:var(--red);padding:2px 8px;">Rejected</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr auto;align-items:center;padding:11px 16px;gap:8px;">
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--n90);">UTL-00358811</div>
+              <div style="font-size:11px;color:var(--g50);">Post-disconnect billing &middot; 2 days ago</div>
+            </div>
+            <span style="font-family:var(--cond);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--gl);color:var(--grn);padding:2px 8px;">Resolved</span>
+          </div>
+        </div>
+        <div style="padding:10px 16px;border-top:1px solid var(--g10);background:var(--g05);">
+          <div style="font-size:11px;color:var(--g50);">Status flow: <strong style="color:var(--n90);">Analysing &rarr; Awaiting DRI &rarr; Approved / Rejected &rarr; Output Review (CSR) &rarr; Resolved</strong></div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /CSR -->
+
+  <!-- DRI PANEL -->
+  <div class="p-panel" id="ip-dri">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:28px;">
+      <div>
+        <div class="pc-stitle">Role context</div>
+        <p style="font-size:13px;color:var(--g70);line-height:1.65;margin-bottom:12px;">Mandatory decision-authority gate (BR-05). The DRI receives the Analyst&rsquo;s decision-ready brief and must approve or reject before any output is generated. Approved outputs are then reviewed &amp; approved by the CSR before dispatch. DRI identity is stamped on every output (FR-10). Target decision time: <strong>&lt;5 min</strong> (NFR-01).</p>
+        <div class="pc-stitle" style="margin-top:16px;">Grounding requirements</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <span class="tag ta">FR-08 HITL approval</span>
+          <span class="tag ta">FR-09 Audit log</span>
+          <span class="tag ta">FR-10 DRI identity</span>
+          <span class="tag th2">BR-05 No dispatch without approval</span>
+          <span class="tag th2">BR-07 Conflicts surfaced</span>
+        </div>
+      </div>
+      <div>
+        <div class="pc-stitle">Notification behaviour</div>
+        <ul class="pc-list">
+          <li>Notified when Analyst brief is ready &mdash; badge on queue</li>
+          <li>Can see all unassigned tickets + tickets assigned to them</li>
+          <li>Rejection requires a mandatory written reason (logged to audit trail)</li>
+          <li>On approval, 3 output drafts are generated and routed to the CSR for review &amp; approval before dispatch &mdash; the DRI does not send manually</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+
+      <!-- Screen 1: Ticket Queue -->
+      <div style="border:1px solid var(--g10);border-top:3px solid var(--purple);">
+        <div style="padding:12px 16px;border-bottom:1px solid var(--g10);background:var(--pl);">
+          <div style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--purple);">Screen 1 &mdash; Ticket Queue</div>
+        </div>
+        <div style="padding:0;">
+          <div style="padding:11px 16px;border-bottom:1px solid var(--g10);background:var(--pl);">
+            <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;">
+              <div>
+                <div style="font-size:12px;font-weight:600;color:var(--n90);">UTL-00389204 &nbsp;<span style="font-family:var(--cond);font-size:9px;font-weight:700;background:var(--purple);color:var(--wht);padding:1px 7px;letter-spacing:.06em;text-transform:uppercase;">New</span></div>
+                <div style="font-size:11px;color:var(--g50);">Estimated read dispute &middot; Analyst brief ready</div>
+              </div>
+              <div style="font-size:11px;color:var(--purple);font-weight:600;cursor:pointer;">Review &rarr;</div>
+            </div>
+          </div>
+          <div style="padding:11px 16px;border-bottom:1px solid var(--g10);">
+            <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;">
+              <div>
+                <div style="font-size:12px;font-weight:600;color:var(--n90);">UTL-00421937</div>
+                <div style="font-size:11px;color:var(--g50);">Billing after disconnect &middot; Analysing&hellip;</div>
+              </div>
+              <span style="font-family:var(--cond);font-size:9px;font-weight:700;background:var(--pl);color:var(--purple);padding:2px 8px;text-transform:uppercase;letter-spacing:.06em;">Pending</span>
+            </div>
+          </div>
+          <div style="padding:11px 16px;">
+            <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;">
+              <div>
+                <div style="font-size:12px;font-weight:600;color:var(--g70);">UTL-00358811</div>
+                <div style="font-size:11px;color:var(--g50);">Post-disconnect billing &middot; Approved 2d ago</div>
+              </div>
+              <span style="font-family:var(--cond);font-size:9px;font-weight:700;background:var(--gl);color:var(--grn);padding:2px 8px;text-transform:uppercase;letter-spacing:.06em;">Resolved</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 2: Brief Review + Approve/Reject -->
+      <div style="border:1px solid var(--g10);border-top:3px solid var(--purple);">
+        <div style="padding:12px 16px;border-bottom:1px solid var(--g10);background:var(--pl);">
+          <div style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--purple);">Screen 2 &mdash; Analyst Brief + Decision</div>
+        </div>
+        <div style="padding:14px 16px;">
+          <!-- mini brief -->
+          <div style="background:var(--g05);border:1px solid var(--g10);border-left:3px solid var(--purple);padding:10px 12px;margin-bottom:10px;font-size:12px;color:var(--g70);line-height:1.6;">
+            <div style="font-family:var(--cond);font-size:9px;font-weight:700;color:var(--purple);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px;">Analyst brief &middot; UTL-00389204</div>
+            Billed full cycle [CC&amp;B]. Disconnect confirmed mid-cycle [OMS]. Post-disconnect reads estimated [MDM]. Prior complaint on file, no billing-hold triggered [CRM]. Revenue posted [GL].<br><strong style="color:var(--n90);">Recommend: suppress &amp; prorate.</strong>
+          </div>
+          <!-- 4 conflicts mini -->
+          <div style="background:var(--rl);border-left:3px solid var(--red);padding:8px 12px;margin-bottom:12px;">
+            <div style="font-family:var(--cond);font-size:9px;font-weight:700;color:var(--red);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px;">4 conflicts detected</div>
+            <div style="font-size:11px;color:var(--g70);line-height:1.7;">OMS &harr; CC&amp;B &nbsp;&middot;&nbsp; MDM &harr; OMS &nbsp;&middot;&nbsp; CRM &harr; CC&amp;B &nbsp;&middot;&nbsp; GL &harr; CRM</div>
+          </div>
+          <!-- approve / reject -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+            <div style="background:var(--purple);color:var(--wht);padding:9px;font-family:var(--cond);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;text-align:center;cursor:pointer;">Approve</div>
+            <div style="background:var(--wht);color:var(--red);border:2px solid var(--red);padding:8px;font-family:var(--cond);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;text-align:center;cursor:pointer;">Reject</div>
+          </div>
+          <div style="background:var(--g05);border:1px solid var(--g10);padding:8px 10px;">
+            <div style="font-size:10px;font-weight:700;color:var(--g50);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Rejection reason (required on reject)</div>
+            <div style="background:var(--wht);border:1px solid var(--g10);padding:6px 8px;font-size:11px;color:var(--g30);height:36px;"></div>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:var(--g50);line-height:1.5;">Approval logged with timestamp + DRI identity (FR-09) &middot; On approve, 3 output drafts are generated for CSR review before dispatch (FR-07)</div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /DRI -->
+
+  <!-- ANALYST MANAGER PANEL -->
+  <div class="p-panel" id="ip-am">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:28px;">
+      <div>
+        <div class="pc-stitle">Role context</div>
+        <p style="font-size:13px;color:var(--g70);line-height:1.65;margin-bottom:12px;">System oversight. Sees all Analyst executions, monitors NFR compliance in real time, queries the audit trail, and tracks overall system health. This role is accountable to FR-09 (queryable audit trail for regulatory submissions) and all NFR targets.</p>
+        <div class="pc-stitle" style="margin-top:16px;">Grounding requirements</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <span class="tag to">FR-09 Audit trail</span>
+          <span class="tag to">NFR-01 Speed</span>
+          <span class="tag to">NFR-02 Audit completeness</span>
+          <span class="tag to">NFR-03 Reg. consistency</span>
+          <span class="tag to">NFR-04 Recurrence</span>
+        </div>
+      </div>
+      <div>
+        <div class="pc-stitle">Notification behaviour</div>
+        <ul class="pc-list">
+          <li>Alert when any execution breaches NFR-01 assembly time target (&gt;7 min)</li>
+          <li>Alert when audit completeness drops below 100% (NFR-02)</li>
+          <li>Alert when DRI approval backlog exceeds threshold</li>
+          <li>Daily digest of executions, conflicts detected, and outputs dispatched</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+
+      <!-- Screen 1: Health Dashboard -->
+      <div style="border:1px solid var(--g10);border-top:3px solid var(--grn);">
+        <div style="padding:12px 16px;border-bottom:1px solid var(--g10);background:var(--gl);">
+          <div style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--grn);">Screen 1 &mdash; System Health Dashboard</div>
+        </div>
+        <div style="padding:14px 16px;">
+          <!-- KPI grid -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--g10);margin-bottom:12px;">
+            <div style="background:var(--wht);padding:12px;">
+              <div style="font-family:var(--cond);font-size:18px;font-weight:700;color:var(--grn);line-height:1;">6.2 min</div>
+              <div style="font-size:10px;color:var(--g50);margin-top:2px;">Avg assembly time &middot; target &lt;7 min</div>
+            </div>
+            <div style="background:var(--wht);padding:12px;">
+              <div style="font-family:var(--cond);font-size:18px;font-weight:700;color:var(--grn);line-height:1;">100%</div>
+              <div style="font-size:10px;color:var(--g50);margin-top:2px;">Audit trail completeness</div>
+            </div>
+            <div style="background:var(--wht);padding:12px;">
+              <div style="font-family:var(--cond);font-size:18px;font-weight:700;color:var(--grn);line-height:1;">98.4%</div>
+              <div style="font-size:10px;color:var(--g50);margin-top:2px;">Regulatory consistency &middot; target &gt;98%</div>
+            </div>
+            <div style="background:var(--wht);padding:12px;">
+              <div style="font-family:var(--cond);font-size:18px;font-weight:700;color:var(--purple);line-height:1;">3</div>
+              <div style="font-size:10px;color:var(--g50);margin-top:2px;">Pending DRI approval</div>
+            </div>
+          </div>
+          <!-- execution feed -->
+          <div style="font-family:var(--cond);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--g50);margin-bottom:7px;">Recent executions</div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;font-size:11px;background:var(--g05);padding:7px 10px;">
+              <span style="font-family:var(--cond);font-weight:700;color:var(--purple);">EX-0047</span>
+              <span style="color:var(--g70);">UTL-00421937 &middot; 4 conflicts &middot; 5.8 min</span>
+              <span style="font-family:var(--cond);font-size:9px;font-weight:700;background:var(--pl);color:var(--purple);padding:1px 6px;text-transform:uppercase;">Running</span>
+            </div>
+            <div style="display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;font-size:11px;background:var(--g05);padding:7px 10px;">
+              <span style="font-family:var(--cond);font-weight:700;color:var(--g70);">EX-0046</span>
+              <span style="color:var(--g70);">UTL-00389204 &middot; 4 conflicts &middot; 6.1 min</span>
+              <span style="font-family:var(--cond);font-size:9px;font-weight:700;background:var(--gl);color:var(--grn);padding:1px 6px;text-transform:uppercase;">Complete</span>
+            </div>
+            <div style="display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;font-size:11px;background:var(--g05);padding:7px 10px;">
+              <span style="font-family:var(--cond);font-weight:700;color:var(--g70);">EX-0045</span>
+              <span style="color:var(--g70);">UTL-00371055 &middot; 2 conflicts &middot; 4.9 min</span>
+              <span style="font-family:var(--cond);font-size:9px;font-weight:700;background:var(--gl);color:var(--grn);padding:1px 6px;text-transform:uppercase;">Complete</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 2: Audit Trail -->
+      <div style="border:1px solid var(--g10);border-top:3px solid var(--grn);">
+        <div style="padding:12px 16px;border-bottom:1px solid var(--g10);background:var(--gl);">
+          <div style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--grn);">Screen 2 &mdash; Audit Trail Query (FR-09)</div>
+        </div>
+        <div style="padding:14px 16px;">
+          <!-- search bar -->
+          <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:12px;">
+            <div style="background:var(--wht);border:1px solid var(--g10);padding:7px 10px;font-size:12px;color:var(--g30);">Filter by account, system, date&hellip;</div>
+            <div style="background:var(--grn);color:var(--wht);padding:7px 14px;font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;">Query</div>
+          </div>
+          <!-- audit rows -->
+          <div style="display:flex;flex-direction:column;gap:3px;">
+            <div style="font-family:var(--cond);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--g50);display:grid;grid-template-columns:80px 60px 1fr;gap:8px;padding:4px 8px;">
+              <span>Timestamp</span><span>System</span><span>Claim</span>
+            </div>
+            <div style="display:grid;grid-template-columns:80px 60px 1fr;gap:8px;font-size:11px;background:var(--g05);padding:7px 8px;border-left:2px solid var(--purple);">
+              <span style="color:var(--g50);font-family:var(--cond);">14:32:01</span>
+              <span style="color:var(--purple);font-weight:600;">OMS</span>
+              <span style="color:var(--g70);">Disconnect confirmed mid-cycle</span>
+            </div>
+            <div style="display:grid;grid-template-columns:80px 60px 1fr;gap:8px;font-size:11px;background:var(--g05);padding:7px 8px;border-left:2px solid var(--purple);">
+              <span style="color:var(--g50);font-family:var(--cond);">14:32:03</span>
+              <span style="color:var(--purple);font-weight:600;">MDM</span>
+              <span style="color:var(--g70);">Post-disconnect reads: estimated</span>
+            </div>
+            <div style="display:grid;grid-template-columns:80px 60px 1fr;gap:8px;font-size:11px;background:var(--g05);padding:7px 8px;border-left:2px solid var(--purple);">
+              <span style="color:var(--g50);font-family:var(--cond);">14:32:04</span>
+              <span style="color:var(--purple);font-weight:600;">CRM</span>
+              <span style="color:var(--g70);">Prior complaint, no billing-hold</span>
+            </div>
+            <div style="display:grid;grid-template-columns:80px 60px 1fr;gap:8px;font-size:11px;background:var(--g05);padding:7px 8px;border-left:2px solid var(--purple);">
+              <span style="color:var(--g50);font-family:var(--cond);">14:32:05</span>
+              <span style="color:var(--purple);font-weight:600;">GL</span>
+              <span style="color:var(--g70);">Revenue posted for disputed bill</span>
+            </div>
+            <div style="display:grid;grid-template-columns:80px 60px 1fr;gap:8px;font-size:11px;background:var(--bl);padding:7px 8px;border-left:2px solid var(--blu);">
+              <span style="color:var(--g50);font-family:var(--cond);">14:37:12</span>
+              <span style="color:var(--blu);font-weight:600;">DRI</span>
+              <span style="color:var(--g70);">Approved &middot; J.Okafor &middot; suppress &amp; prorate</span>
+            </div>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:var(--g50);">Every claim cites source system + timestamp. Queryable for regulatory submissions (FR-09).</div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /Analyst Manager -->
+
+  <!-- STATUS FLOW -->
+  <div style="margin-top:32px;padding-top:24px;border-top:2px solid var(--g10);">
+    <div style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--purple);margin-bottom:14px;">Ticket status flow &mdash; across all three roles</div>
+    <div style="display:flex;align-items:center;gap:0;flex-wrap:wrap;">
+      <div style="background:var(--al);border:1px solid rgba(180,80,0,.2);padding:8px 14px;font-family:var(--cond);font-size:11px;font-weight:700;color:var(--amb);text-transform:uppercase;letter-spacing:.06em;">CSR submits</div>
+      <div style="color:var(--g30);font-size:18px;padding:0 6px;">&rarr;</div>
+      <div style="background:var(--pl);border:1px solid rgba(161,0,255,.2);padding:8px 14px;font-family:var(--cond);font-size:11px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.06em;">Analyst: Analysing</div>
+      <div style="color:var(--g30);font-size:18px;padding:0 6px;">&rarr;</div>
+      <div style="background:var(--bl);border:1px solid rgba(0,79,159,.2);padding:8px 14px;font-family:var(--cond);font-size:11px;font-weight:700;color:var(--blu);text-transform:uppercase;letter-spacing:.06em;">DRI: Awaiting review</div>
+      <div style="color:var(--g30);font-size:18px;padding:0 6px;">&rarr;</div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <div style="background:var(--gl);border:1px solid rgba(0,122,61,.2);padding:6px 14px;font-family:var(--cond);font-size:11px;font-weight:700;color:var(--grn);text-transform:uppercase;letter-spacing:.06em;">Approved &rarr; Resolved</div>
+        <div style="background:var(--rl);border:1px solid rgba(200,0,29,.2);padding:6px 14px;font-family:var(--cond);font-size:11px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.06em;">Rejected &rarr; Back to CSR</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div><!-- /view-interface -->
+
+<!-- TAB 4: AGENT WORKFLOW -->
+<div class="view" id="view-workflow">
+<div class="journey-wrap">
+
+  <div class="j-header">
+    <div class="j-kicker">Agent Workflow &middot; 7-Step Pipeline &middot; Pattern &amp; Purpose</div>
+    <h2 class="j-title">The Analyst &mdash; Step by Step</h2>
+    <p class="j-sub">Each step in the agent pipeline is a distinct computational pattern with a defined input, process, output, and NFR target. Click any step to expand the full specification.</p>
+  </div>
+
+  <!-- PIPELINE LEGEND -->
+  <div class="legend" style="margin-bottom:28px;">
+    <div class="litem"><div class="lsw" style="background:var(--purple)"></div>Agent step</div>
+    <div class="litem"><div class="lsw" style="background:var(--blu)"></div>Human gate</div>
+    <div class="litem"><div class="lsw" style="background:var(--grn)"></div>Output dispatch</div>
+    <div class="litem"><div class="lsw" style="background:var(--amb)"></div>Trigger (external)</div>
+    <div class="litem"><div class="lsw" style="background:var(--red)"></div>Conflict / risk signal</div>
+    <div class="litem"><div class="lsw" style="background:var(--g30)"></div>Audit trail (continuous)</div>
+  </div>
+
+  <!-- PIPELINE -->
+  <div style="display:grid;grid-template-columns:1fr 180px;gap:20px;align-items:start;">
+
+    <!-- LEFT: STEPS -->
+    <div style="display:flex;flex-direction:column;gap:0;">
+
+      <!-- STEP 1: TRIGGER -->
+      <div class="wf-step" id="wfs-1" onclick="toggleStep(1)">
+        <div class="wf-step-hd" style="border-left:4px solid var(--amb);">
+          <div class="wf-step-num" style="background:var(--al);color:var(--amb);">01</div>
+          <div class="wf-step-body">
+            <div class="wf-pattern" style="color:var(--amb);">Event-driven trigger &middot; FR-02</div>
+            <div class="wf-title">Trigger &amp; DRI Assignment</div>
+            <div class="wf-summary">OMS disconnect event or CSR manual escalation initiates the pipeline. DRI named before any output is produced.</div>
+          </div>
+          <div class="wf-chevron" id="wfc-1">&#8250;</div>
+        </div>
+        <div class="wf-step-detail" id="wfd-1">
+          <div class="wf-detail-grid">
+            <div>
+              <div class="wf-dl">Pattern</div>
+              <div class="wf-dv"><strong>Event-driven trigger with dual entry points.</strong> Trigger A (proactive): OMS disconnect event fires automatically before the next CC&amp;B billing run. Trigger B (reactive): CSR or DRI manually initiates from the escalation screen when a dispute has already been filed.</div>
+            </div>
+            <div>
+              <div class="wf-dl">Purpose</div>
+              <div class="wf-dv">Close the window in which an invalid bill can be generated. Proactive trigger eliminates the dispute before it exists. Reactive trigger replaces the 45&ndash;90 min manual CSR investigation with an automated pipeline.</div>
+            </div>
+            <div>
+              <div class="wf-dl">Input</div>
+              <ul class="wf-list">
+                <li>Trigger A: OMS disconnect event payload &mdash; account ID, disconnect timestamp, work order type</li>
+                <li>Trigger B: CSR escalation form &mdash; account ID, dispute type, notes</li>
+              </ul>
+            </div>
+            <div>
+              <div class="wf-dl">Output</div>
+              <ul class="wf-list">
+                <li>Escalation ID created and logged to audit trail</li>
+                <li>DRI assigned and identity stamped on all subsequent outputs (FR-10, BR-01)</li>
+                <li>Pipeline state: <em>Initiated</em></li>
+                <li>Ticket status: <em>Analysing</em> &mdash; visible to CSR and DRI dashboards</li>
+              </ul>
+            </div>
+            <div>
+              <div class="wf-dl">Business rules</div>
+              <div class="wf-dv" style="display:flex;gap:6px;flex-wrap:wrap;">
+                <span class="tag ta">BR-01 DRI named before any output</span>
+                <span class="tag ta">FR-02 Trigger before next billing run</span>
+                <span class="tag ta">FR-10 DRI identity on all outputs</span>
+              </div>
+            </div>
+            <div>
+              <div class="wf-dl">NFR target</div>
+              <div class="wf-dv"><span class="wf-nfr">Immediate</span> &mdash; trigger latency must not delay billing run suppression</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="wf-connector"></div>
+
+      <!-- STEP 2: PARALLEL INGESTION -->
+      <div class="wf-step" id="wfs-2" onclick="toggleStep(2)">
+        <div class="wf-step-hd" style="border-left:4px solid var(--purple);">
+          <div class="wf-step-num" style="background:var(--pl);color:var(--purple);">02</div>
+          <div class="wf-step-body">
+            <div class="wf-pattern" style="color:var(--purple);">Parallel fan-out retrieval &middot; FR-01</div>
+            <div class="wf-title">5-System Parallel Ingestion</div>
+            <div class="wf-summary">Agent queries all 5 enterprise systems simultaneously. Every field extracted is stamped with source system and timestamp for the audit trail.</div>
+          </div>
+          <div class="wf-chevron" id="wfc-2">&#8250;</div>
+        </div>
+        <div class="wf-step-detail" id="wfd-2">
+          <div class="wf-detail-grid">
+            <div>
+              <div class="wf-dl">Pattern</div>
+              <div class="wf-dv"><strong>Parallel fan-out retrieval.</strong> All 5 system queries are issued concurrently, not sequentially. Results are collected and normalised into a unified evidence object before the next step begins. No system is treated as authoritative over another (BR-02).</div>
+            </div>
+            <div>
+              <div class="wf-dl">Purpose</div>
+              <div class="wf-dv">Assemble the complete cross-system evidence base in a single pass. Replace what previously required 4&ndash;6 separate manual data pulls across IT, Ops, and Finance teams taking 4&ndash;6 hours collectively.</div>
+            </div>
+            <div>
+              <div class="wf-dl">Input per system</div>
+              <ul class="wf-list">
+                <li><strong>CC&amp;B:</strong> Account status &middot; billing period start/end &middot; billing rules applied &middot; bill generation timestamp</li>
+                <li><strong>MDM:</strong> Meter read type (actual vs estimated) &middot; reads by date &middot; consumption values mapped to billing period</li>
+                <li><strong>OMS:</strong> Work order type &middot; disconnect/reconnect timestamps &middot; field technician confirmation records</li>
+                <li><strong>CRM:</strong> Prior complaint history &middot; complaint type &middot; billing-hold flags &middot; manual account notes</li>
+                <li><strong>GL:</strong> Revenue posting status &middot; period of posting &middot; reversal implications</li>
+              </ul>
+            </div>
+            <div>
+              <div class="wf-dl">Output</div>
+              <ul class="wf-list">
+                <li>Unified evidence object &mdash; all 5 system payloads normalised and timestamped</li>
+                <li>Every field written to audit trail with source system + extraction timestamp (FR-09)</li>
+                <li>Pipeline state: <em>Evidence assembled</em></li>
+              </ul>
+            </div>
+            <div>
+              <div class="wf-dl">Business rules</div>
+              <div class="wf-dv" style="display:flex;gap:6px;flex-wrap:wrap;">
+                <span class="tag ta">BR-02 CC&amp;B never sole input</span>
+                <span class="tag ta">FR-01 All 5 systems required</span>
+                <span class="tag ta">FR-09 100% audit citation</span>
+              </div>
+            </div>
+            <div>
+              <div class="wf-dl">NFR target</div>
+              <div class="wf-dv"><span class="wf-nfr">&lt;7 min total</span> &mdash; ingestion contributes the majority of the end-to-end assembly window (NFR-01)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="wf-connector"></div>
+
+      <!-- STEP 3: RECONCILIATION -->
+      <div class="wf-step" id="wfs-3" onclick="toggleStep(3)">
+        <div class="wf-step-hd" style="border-left:4px solid var(--purple);">
+          <div class="wf-step-num" style="background:var(--pl);color:var(--purple);">03</div>
+          <div class="wf-step-body">
+            <div class="wf-pattern" style="color:var(--purple);">Temporal cross-reference &middot; FR-03</div>
+            <div class="wf-title">Reconciliation &mdash; Period Classification</div>
+            <div class="wf-summary">OMS disconnect timestamp mapped against CC&amp;B billing period. Every day classified. MDM reads mapped to the same breakdown. The evidence base is reconciled before conflicts are checked.</div>
+          </div>
+          <div class="wf-chevron" id="wfc-3">&#8250;</div>
+        </div>
+        <div class="wf-step-detail" id="wfd-3">
+          <div class="wf-detail-grid">
+            <div>
+              <div class="wf-dl">Pattern</div>
+              <div class="wf-dv"><strong>Temporal cross-reference and day-level classification.</strong> The agent aligns three independent time axes &mdash; CC&amp;B billing period boundaries, OMS disconnect timestamp, and MDM read dates &mdash; into a single reconciled timeline. Every day in the billing period is assigned exactly one classification. This is the core analytical step from which all conflict detection follows.</div>
+            </div>
+            <div>
+              <div class="wf-dl">Purpose</div>
+              <div class="wf-dv">Establish the ground truth of what was billed vs what was physically delivered. Without reconciliation, conflict detection would compare raw system outputs that speak different time grammars. Reconciliation creates the shared reference frame.</div>
+            </div>
+            <div>
+              <div class="wf-dl">Input</div>
+              <ul class="wf-list">
+                <li>CC&amp;B billing period: start date, end date, total billed consumption</li>
+                <li>OMS disconnect timestamp + field tech confirmation record</li>
+                <li>MDM meter reads per date &mdash; flagged actual vs estimated</li>
+              </ul>
+            </div>
+            <div>
+              <div class="wf-dl">Output</div>
+              <ul class="wf-list">
+                <li>Day-level billing period map: each day labelled <em>Pre-disconnect (billable)</em>, <em>Post-disconnect (non-billable)</em>, or <em>Disconnect day (proration required)</em></li>
+                <li>MDM reads mapped to the same day-level breakdown &mdash; actual reads vs estimated reads per classification bucket</li>
+                <li>Billing overlap confirmed or denied &mdash; input to conflict detection</li>
+                <li>Reconciliation object written to audit trail (FR-09)</li>
+              </ul>
+            </div>
+            <div>
+              <div class="wf-dl">Business rules</div>
+              <div class="wf-dv" style="display:flex;gap:6px;flex-wrap:wrap;">
+                <span class="tag ta">FR-03 Day-level classification required</span>
+                <span class="tag ta">BR-03 Estimated reads on post-disconnect days = phantom consumption</span>
+              </div>
+            </div>
+            <div>
+              <div class="wf-dl">NFR target</div>
+              <div class="wf-dv"><span class="wf-nfr">Within &lt;7 min</span> &mdash; runs within the overall context assembly window (NFR-01)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="wf-connector"></div>
+
+      <!-- STEP 4: CONFLICT DETECTION -->
+      <div class="wf-step" id="wfs-4" onclick="toggleStep(4)">
+        <div class="wf-step-hd" style="border-left:4px solid var(--red);">
+          <div class="wf-step-num" style="background:var(--rl);color:var(--red);">04</div>
+          <div class="wf-step-body">
+            <div class="wf-pattern" style="color:var(--red);">Rule-based cross-system validation &middot; FR-04</div>
+            <div class="wf-title">Conflict Detection</div>
+            <div class="wf-summary">4 architectural conflict checks run against the reconciled evidence base. Every conflict is surfaced explicitly &mdash; never silently resolved. Completes in &lt;15 sec.</div>
+          </div>
+          <div class="wf-chevron" id="wfc-4">&#8250;</div>
+        </div>
+        <div class="wf-step-detail" id="wfd-4">
+          <div class="wf-detail-grid">
+            <div>
+              <div class="wf-dl">Pattern</div>
+              <div class="wf-dv"><strong>Rule-based cross-system validation against reconciled evidence.</strong> Four deterministic checks are applied to the reconciled evidence object. Each check compares a specific pair of systems against a defined invariant. A conflict is raised if the invariant is violated. No probabilistic scoring &mdash; conflicts are binary: present or absent. BR-07 prohibits silent resolution.</div>
+            </div>
+            <div>
+              <div class="wf-dl">Purpose</div>
+              <div class="wf-dv">Surface the architectural root causes that produced the invalid bill. Each conflict maps to a specific system integration gap that engineering must close. The conflict list is the input to both the recommendation engine and the engineering Jira handoff.</div>
+            </div>
+            <div>
+              <div class="wf-dl">Input</div>
+              <ul class="wf-list">
+                <li>Reconciled period map (from step 3)</li>
+                <li>Full unified evidence object (from step 2)</li>
+              </ul>
+            </div>
+            <div>
+              <div class="wf-dl">4 conflict checks</div>
+              <div style="display:flex;flex-direction:column;gap:5px;margin-top:4px;">
+                <div style="background:var(--rl);border-left:3px solid var(--red);padding:7px 10px;font-size:12px;">
+                  <strong style="color:var(--red);">C1 &middot; OMS &harr; CC&amp;B</strong> &mdash; Full-cycle bill generated despite mid-cycle disconnect. Invariant: if OMS disconnect timestamp falls within CC&amp;B billing period, bill must be prorated or suppressed.
+                </div>
+                <div style="background:var(--rl);border-left:3px solid var(--red);padding:7px 10px;font-size:12px;">
+                  <strong style="color:var(--red);">C2 &middot; MDM &harr; OMS</strong> &mdash; Estimated reads applied to post-disconnect days. Invariant: MDM read type for any post-disconnect day must be zero consumption, not estimated historical average (BR-03).
+                </div>
+                <div style="background:var(--rl);border-left:3px solid var(--red);padding:7px 10px;font-size:12px;">
+                  <strong style="color:var(--red);">C3 &middot; CRM &harr; CC&amp;B</strong> &mdash; Prior complaint on record with no billing-hold propagated. Invariant: any CRM complaint flag on a billing account must propagate a billing-hold to CC&amp;B (BR-04).
+                </div>
+                <div style="background:var(--rl);border-left:3px solid var(--red);padding:7px 10px;font-size:12px;">
+                  <strong style="color:var(--red);">C4 &middot; GL &harr; CRM</strong> &mdash; Revenue posted for a bill under formal dispute. Invariant: GL revenue should not be finalised while a CRM dispute is active (BR-06).
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="wf-dl">Output</div>
+              <ul class="wf-list">
+                <li>Conflict manifest &mdash; list of all triggered conflicts with systems named, invariant violated, and evidence cited</li>
+                <li>Each conflict written to audit trail with source citations (FR-09)</li>
+                <li>Confidence signal raised if any system data is missing or estimated (FR-06)</li>
+                <li>Pipeline state: <em>Conflicts detected</em></li>
+              </ul>
+            </div>
+            <div>
+              <div class="wf-dl">Business rules</div>
+              <div class="wf-dv" style="display:flex;gap:6px;flex-wrap:wrap;">
+                <span class="tag tr">BR-07 Never silently resolve</span>
+                <span class="tag tr">BR-03 Phantom consumption flag</span>
+                <span class="tag tr">BR-04 Billing-hold propagation</span>
+                <span class="tag tr">BR-06 GL reversal flag</span>
+              </div>
+            </div>
+            <div>
+              <div class="wf-dl">NFR target</div>
+              <div class="wf-dv"><span class="wf-nfr" style="background:var(--rl);color:var(--red);border-color:rgba(200,0,29,.3);">&lt;15 seconds</span> &mdash; conflict detection only (NFR-01). Runs within the overall &lt;7 min assembly window.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="wf-connector"></div>
+
+      <!-- STEP 5: RECOMMENDATION + BRIEF -->
+      <div class="wf-step" id="wfs-5" onclick="toggleStep(5)">
+        <div class="wf-step-hd" style="border-left:4px solid var(--purple);">
+          <div class="wf-step-num" style="background:var(--pl);color:var(--purple);">05</div>
+          <div class="wf-step-body">
+            <div class="wf-pattern" style="color:var(--purple);">LLM reasoning + structured assembly &middot; FR-05, FR-06</div>
+            <div class="wf-title">Recommendation &amp; Decision-Ready Brief</div>
+            <div class="wf-summary">Agent maps each conflict to a recommended action, then assembles the full cited brief. 100% citation coverage required. Readable by regulator, VP, or DRI without additional context.</div>
+          </div>
+          <div class="wf-chevron" id="wfc-5">&#8250;</div>
+        </div>
+        <div class="wf-step-detail" id="wfd-5">
+          <div class="wf-detail-grid">
+            <div>
+              <div class="wf-dl">Pattern</div>
+              <div class="wf-dv"><strong>LLM reasoning over structured evidence + deterministic brief assembly.</strong> Two sub-steps: (a) the LLM maps each detected conflict to the correct recommended action using the FR-05 scenario table &mdash; every recommendation cites the source system; (b) the brief assembler stitches confirmed facts, period breakdown, conflicts, and recommendations into the FR-06 structured format with 100% citation coverage.</div>
+            </div>
+            <div>
+              <div class="wf-dl">Purpose</div>
+              <div class="wf-dv">Produce a single document from which the DRI can make an informed, defensible decision in under 5 minutes without querying any system directly. Replace the 2&ndash;4 hour manual summary that was unstructured, uncited, and author-dependent.</div>
+            </div>
+            <div>
+              <div class="wf-dl">Input</div>
+              <ul class="wf-list">
+                <li>Conflict manifest (from step 4)</li>
+                <li>Unified evidence object (from step 2)</li>
+                <li>Reconciled period map (from step 3)</li>
+                <li>FR-05 scenario &rarr; action mapping table</li>
+              </ul>
+            </div>
+            <div>
+              <div class="wf-dl">Recommendation scenarios (FR-05)</div>
+              <div style="display:flex;flex-direction:column;gap:4px;margin-top:4px;">
+                <div style="background:var(--pl);border-left:3px solid var(--purple);padding:7px 10px;font-size:12px;"><strong style="color:var(--purple);">C1 &rarr;</strong> Suppress post-disconnect portion &middot; issue prorated credit</div>
+                <div style="background:var(--pl);border-left:3px solid var(--purple);padding:7px 10px;font-size:12px;"><strong style="color:var(--purple);">C2 &rarr;</strong> Flag phantom consumption &middot; adjust MDM to zero for non-billable days</div>
+                <div style="background:var(--pl);border-left:3px solid var(--purple);padding:7px 10px;font-size:12px;"><strong style="color:var(--purple);">C3 &rarr;</strong> Link CRM complaint &middot; apply billing-hold flag &middot; trigger review</div>
+                <div style="background:var(--pl);border-left:3px solid var(--purple);padding:7px 10px;font-size:12px;"><strong style="color:var(--purple);">C4 &rarr;</strong> Generate credit note &middot; flag GL for revenue adjustment &middot; regulatory filing</div>
+              </div>
+            </div>
+            <div>
+              <div class="wf-dl">Output</div>
+              <ul class="wf-list">
+                <li>Decision-ready context brief &mdash; confirmed facts, period breakdown, conflicts, recommendations, confidence signals (FR-06)</li>
+                <li>100% citation coverage &mdash; every claim cites source system + timestamp (FR-09, NFR-02)</li>
+                <li>Confidence signal included where data is incomplete or reads cannot be verified</li>
+                <li>Brief written to audit trail &middot; pipeline state: <em>Awaiting DRI</em></li>
+                <li>DRI and CSR dashboards updated with notification</li>
+              </ul>
+            </div>
+            <div>
+              <div class="wf-dl">Business rules</div>
+              <div class="wf-dv" style="display:flex;gap:6px;flex-wrap:wrap;">
+                <span class="tag ta">FR-05 Recommendation per scenario</span>
+                <span class="tag ta">FR-06 Structured brief format</span>
+                <span class="tag ta">FR-09 100% citations</span>
+                <span class="tag ta">NFR-02 Audit completeness</span>
+              </div>
+            </div>
+            <div>
+              <div class="wf-dl">NFR target</div>
+              <div class="wf-dv"><span class="wf-nfr">&lt;60 seconds</span> &mdash; brief generation within the overall &lt;7 min assembly window (NFR-01)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="wf-connector"></div>
+
+      <!-- STEP 6: DRI APPROVAL GATE -->
+      <div class="wf-step" id="wfs-6" onclick="toggleStep(6)">
+        <div class="wf-step-hd" style="border-left:4px solid var(--blu);">
+          <div class="wf-step-num" style="background:var(--bl);color:var(--blu);">06</div>
+          <div class="wf-step-body">
+            <div class="wf-pattern" style="color:var(--blu);">Human-in-the-loop gate &middot; FR-08, FR-09, FR-10</div>
+            <div class="wf-title">DRI Approval Gate</div>
+            <div class="wf-summary">Mandatory decision-authority gate. DRI reviews the brief, approves or rejects with logged reason. No output generated or dispatched without this gate. Logged to immutable audit trail.</div>
+          </div>
+          <div class="wf-chevron" id="wfc-6">&#8250;</div>
+        </div>
+        <div class="wf-step-detail" id="wfd-6">
+          <div class="wf-detail-grid">
+            <div>
+              <div class="wf-dl">Pattern</div>
+              <div class="wf-dv"><strong>Human-in-the-loop approval gate.</strong> The pipeline is paused at this step until explicit DRI action is taken. This is not a notification &mdash; it is a hard gate. The agent cannot proceed to step 7 without a DRI decision logged with timestamp and approver identity. Approve, reject with reason, or flag as exception &mdash; all three paths are valid and all three are logged.</div>
+            </div>
+            <div>
+              <div class="wf-dl">Purpose</div>
+              <div class="wf-dv">Ensure human judgment is applied at the single point where consequential action is authorised. The agent does all the analytical work; the DRI holds the authority. This separation is both an ethical requirement and a regulatory one &mdash; a human must be accountable for every credit note, proration adjustment, and regulatory submission.</div>
+            </div>
+            <div>
+              <div class="wf-dl">Input</div>
+              <ul class="wf-list">
+                <li>Decision-ready context brief (from step 5)</li>
+                <li>DRI identity (assigned at step 1)</li>
+                <li>Confidence signal from brief (flags cases warranting extra scrutiny)</li>
+              </ul>
+            </div>
+            <div>
+              <div class="wf-dl">DRI decision paths</div>
+              <div style="display:flex;flex-direction:column;gap:4px;margin-top:4px;">
+                <div style="background:var(--gl);border-left:3px solid var(--grn);padding:7px 10px;font-size:12px;"><strong style="color:var(--grn);">Approve</strong> &mdash; pipeline proceeds to step 7. The 3 outputs are generated as <strong>drafts for CSR review</strong> (not auto-dispatched). Approval logged with timestamp + DRI identity.</div>
+                <div style="background:var(--rl);border-left:3px solid var(--red);padding:7px 10px;font-size:12px;"><strong style="color:var(--red);">Reject</strong> &mdash; mandatory reason field required. Ticket returned to CSR with rejection note. Rejection logged with timestamp, DRI identity, and reason.</div>
+                <div style="background:var(--al);border-left:3px solid var(--amb);padding:7px 10px;font-size:12px;"><strong style="color:var(--amb);">Flag exception</strong> &mdash; case escalated for manual review. Logged with timestamp and exception rationale. Pipeline paused pending resolution.</div>
+              </div>
+            </div>
+            <div>
+              <div class="wf-dl">Output</div>
+              <ul class="wf-list">
+                <li>Approval / rejection / exception decision logged to immutable audit trail with timestamp + DRI identity (FR-09)</li>
+                <li>On approve: step 7 triggered &mdash; 3 output drafts generated, pipeline state &rarr; <em>Awaiting CSR output review</em></li>
+                <li>On reject: pipeline state &rarr; <em>Rejected</em>, CSR notified with reason</li>
+                <li>On exception: pipeline state &rarr; <em>Escalated</em>, Analyst Manager notified</li>
+              </ul>
+            </div>
+            <div>
+              <div class="wf-dl">Business rules</div>
+              <div class="wf-dv" style="display:flex;gap:6px;flex-wrap:wrap;">
+                <span class="tag th2">FR-08 HITL required</span>
+                <span class="tag th2">BR-05 No dispatch without DRI</span>
+                <span class="tag th2">FR-10 DRI identity on outputs</span>
+                <span class="tag th2">FR-09 Approval logged</span>
+              </div>
+            </div>
+            <div>
+              <div class="wf-dl">NFR target</div>
+              <div class="wf-dv"><span class="wf-nfr" style="background:var(--bl);color:var(--blu);border-color:rgba(0,79,159,.3);">&lt;5 min DRI decision</span> &mdash; requires brief to be actionable without further research (NFR-01)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="wf-connector"></div>
+
+      <!-- STEP 7: 3 OUTPUTS — CSR REVIEW & DISPATCH -->
+      <div class="wf-step" id="wfs-7" onclick="toggleStep(7)">
+        <div class="wf-step-hd" style="border-left:4px solid var(--grn);">
+          <div class="wf-step-num" style="background:var(--gl);color:var(--grn);">07</div>
+          <div class="wf-step-body">
+            <div class="wf-pattern" style="color:var(--grn);">Single-source multi-format generation + CSR review gate &middot; FR-07, BR-08</div>
+            <div class="wf-title">3 Outputs &mdash; CSR Review &amp; Dispatch</div>
+            <div class="wf-summary">Customer summary, executive brief, and engineering Jira handoff generated from the same evidence base as drafts. The CSR reviews, edits, and approves each one before it is sent. Divergent narratives structurally impossible. Audit trail finalised.</div>
+          </div>
+          <div class="wf-chevron" id="wfc-7">&#8250;</div>
+        </div>
+        <div class="wf-step-detail" id="wfd-7">
+          <div class="wf-detail-grid">
+            <div>
+              <div class="wf-dl">Pattern</div>
+              <div class="wf-dv"><strong>Single-source multi-format generation.</strong> All three outputs are rendered from the same reconciliation evidence object using audience-specific formatting templates. BR-08 makes divergent narratives structurally impossible &mdash; the regulatory response and customer summary are generated from identical facts. The agent does not write three independent documents; it renders one evidence object three ways.</div>
+            </div>
+            <div>
+              <div class="wf-dl">Purpose</div>
+              <div class="wf-dv">Eliminate the ~30% regulatory inconsistency rate produced by the manual process where Legal and CSR wrote independent documents from the same imprecise notes. Every stakeholder receives the same facts in the format appropriate to their role and action.</div>
+            </div>
+            <div>
+              <div class="wf-dl">Input</div>
+              <ul class="wf-list">
+                <li>Approved reconciliation evidence object (from step 5)</li>
+                <li>DRI approval record with timestamp and identity (from step 6)</li>
+                <li>Three audience-specific format templates (FR-07)</li>
+              </ul>
+            </div>
+            <div>
+              <div class="wf-dl">3 outputs (FR-07)</div>
+              <div style="display:flex;flex-direction:column;gap:4px;margin-top:4px;">
+                <div style="background:var(--al);border-left:3px solid var(--amb);padding:10px 12px;font-size:12px;">
+                  <div style="font-family:var(--cond);font-size:9px;font-weight:700;color:var(--amb);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;">Output 1 &middot; Customer &middot; &lt;2 min read</div>
+                  <strong>Customer Summary Letter</strong> &mdash; What we found &middot; What we have done &middot; What happens next &middot; Next update date. Plain language, non-technical. No jargon. No system names.
+                </div>
+                <div style="background:var(--bl);border-left:3px solid var(--blu);padding:10px 12px;font-size:12px;">
+                  <div style="font-family:var(--cond);font-size:9px;font-weight:700;color:var(--blu);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;">Output 2 &middot; Executive &middot; 1 page</div>
+                  <strong>Executive Brief</strong> &mdash; Situation &middot; Financial impact &middot; Findings &middot; Next steps. GL reversal implications included. Regulatory exposure stated. DRI identity and approval timestamp on cover.
+                </div>
+                <div style="background:var(--pl);border-left:3px solid var(--purple);padding:10px 12px;font-size:12px;">
+                  <div style="font-family:var(--cond);font-size:9px;font-weight:700;color:var(--purple);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;">Output 3 &middot; Engineering &middot; Jira story</div>
+                  <strong>Engineering Handoff BILL-NEW-1147</strong> &mdash; P1 priority &middot; Linked systems (OMS-DISCON, MDM-EST-READS) &middot; 6 acceptance criteria for CC&amp;B architectural fix &middot; Staged deploy with 4-week parallel validation.
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="wf-dl">CSR review gate (per output)</div>
+              <div class="wf-dv">Each of the 3 outputs is created in a <strong>pending-review</strong> state. The CSR opens each draft, edits the content if needed, and approves it. Nothing is sent until all 3 are approved &mdash; this is a second human-in-the-loop gate, complementing the DRI decision gate at step 6. Every approval (and any edit) is written to the immutable audit trail with the CSR&rsquo;s identity and timestamp.</div>
+              <div style="display:flex;flex-direction:column;gap:4px;margin-top:6px;">
+                <div style="background:var(--gl);border-left:3px solid var(--grn);padding:7px 10px;font-size:12px;"><strong style="color:var(--grn);">Review &amp; approve</strong> &mdash; CSR approves the draft as-is or after edits. Per-output approval logged (FR-09).</div>
+                <div style="background:var(--gl);border-left:3px solid var(--grn);padding:7px 10px;font-size:12px;"><strong style="color:var(--grn);">Dispatch on completion</strong> &mdash; once all 3 are approved, outputs are sent and the ticket resolves.</div>
+              </div>
+            </div>
+            <div>
+              <div class="wf-dl">Output</div>
+              <ul class="wf-list">
+                <li>3 draft outputs generated &mdash; ticket status: <em>Awaiting CSR output review</em></li>
+                <li>CSR reviews, edits and approves each output individually &mdash; one immutable audit entry per approval (FR-09)</li>
+                <li>On all 3 approved: outputs dispatched to respective audiences &middot; final dispatch record written</li>
+                <li>Ticket status: <em>Resolved</em> &mdash; visible across all dashboards</li>
+                <li>Analyst Manager execution log updated with completion record</li>
+                <li>First coherent stakeholder update delivered within <strong>&lt;24 hrs</strong> of escalation (NFR-01)</li>
+              </ul>
+            </div>
+            <div>
+              <div class="wf-dl">Business rules</div>
+              <div class="wf-dv" style="display:flex;gap:6px;flex-wrap:wrap;">
+                <span class="tag to">FR-07 3 outputs from same base</span>
+                <span class="tag to">BR-08 No divergent narratives</span>
+                <span class="tag to">BR-09 CSR approves each output before dispatch</span>
+                <span class="tag to">NFR-03 &gt;98% reg. consistency</span>
+                <span class="tag to">NFR-01 &lt;24 hrs first update</span>
+              </div>
+            </div>
+            <div>
+              <div class="wf-dl">NFR target</div>
+              <div class="wf-dv"><span class="wf-nfr" style="background:var(--gl);color:var(--grn);border-color:rgba(0,122,61,.3);">&lt;24 hrs</span> &mdash; first coherent stakeholder update from escalation opened (NFR-01)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /LEFT steps -->
+
+    <!-- RIGHT: NFR TIMELINE -->
+    <div style="position:sticky;top:76px;">
+      <div style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--purple);margin-bottom:12px;">NFR-01 Timing targets</div>
+      <div style="display:flex;flex-direction:column;gap:0;border:1px solid var(--g10);">
+        <div style="padding:10px 12px;border-bottom:1px solid var(--g10);background:var(--al);">
+          <div style="font-family:var(--cond);font-size:9px;font-weight:700;color:var(--amb);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px;">Steps 1&ndash;2</div>
+          <div style="font-family:var(--cond);font-size:16px;font-weight:700;color:var(--amb);">Immediate</div>
+          <div style="font-size:10px;color:var(--g50);">Trigger latency</div>
+        </div>
+        <div style="padding:10px 12px;border-bottom:1px solid var(--g10);background:var(--pl);">
+          <div style="font-family:var(--cond);font-size:9px;font-weight:700;color:var(--purple);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px;">Steps 2&ndash;5</div>
+          <div style="font-family:var(--cond);font-size:16px;font-weight:700;color:var(--purple);">&lt;7 min</div>
+          <div style="font-size:10px;color:var(--g50);">Full context assembly</div>
+        </div>
+        <div style="padding:10px 12px;border-bottom:1px solid var(--g10);background:var(--rl);">
+          <div style="font-family:var(--cond);font-size:9px;font-weight:700;color:var(--red);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px;">Step 4 only</div>
+          <div style="font-family:var(--cond);font-size:16px;font-weight:700;color:var(--red);">&lt;15 sec</div>
+          <div style="font-size:10px;color:var(--g50);">Conflict detection</div>
+        </div>
+        <div style="padding:10px 12px;border-bottom:1px solid var(--g10);background:var(--pl);">
+          <div style="font-family:var(--cond);font-size:9px;font-weight:700;color:var(--purple);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px;">Step 5 only</div>
+          <div style="font-family:var(--cond);font-size:16px;font-weight:700;color:var(--purple);">&lt;60 sec</div>
+          <div style="font-size:10px;color:var(--g50);">Brief generation</div>
+        </div>
+        <div style="padding:10px 12px;border-bottom:1px solid var(--g10);background:var(--bl);">
+          <div style="font-family:var(--cond);font-size:9px;font-weight:700;color:var(--blu);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px;">Step 6</div>
+          <div style="font-family:var(--cond);font-size:16px;font-weight:700;color:var(--blu);">&lt;5 min</div>
+          <div style="font-size:10px;color:var(--g50);">DRI decision</div>
+        </div>
+        <div style="padding:10px 12px;background:var(--gl);">
+          <div style="font-family:var(--cond);font-size:9px;font-weight:700;color:var(--grn);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px;">Step 7</div>
+          <div style="font-family:var(--cond);font-size:16px;font-weight:700;color:var(--grn);">&lt;24 hrs</div>
+          <div style="font-size:10px;color:var(--g50);">First stakeholder update</div>
+        </div>
+      </div>
+
+      <div style="margin-top:14px;padding:12px;border:1px solid var(--g10);background:var(--g05);">
+        <div style="font-family:var(--cond);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g50);margin-bottom:6px;">Audit trail</div>
+        <div style="font-size:11px;color:var(--g70);line-height:1.6;">Writes at <strong>every step.</strong> 100% coverage required (NFR-02). Queryable for regulatory submissions (FR-09).</div>
+      </div>
+    </div>
+
+  </div><!-- /grid -->
+
+</div>
+</div><!-- /view-workflow -->
+
+<!-- TAB 5: MONGODB SCHEMA -->
+<div class="view" id="view-schema">
+<div class="journey-wrap">
+
+  <div class="j-header">
+    <div class="j-kicker">Data Architecture &middot; MongoDB &middot; 10 Collections</div>
+    <h2 class="j-title">Schema Design</h2>
+    <p class="j-sub">10 collections across three logical groups: mock source system data (5 stubs + accounts), transactional pipeline data (escalations), and operational data (audit trail, execution metrics, users). Click any collection to expand the full document schema.</p>
+  </div>
+
+  <!-- GROUP TABS -->
+  <div class="p-tabs" style="margin-bottom:28px;">
+    <div class="p-tab active" id="sgtab-mock" onclick="setSGroup('mock',this)">Mock Source Systems &nbsp;<span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--bl);color:var(--blu);padding:2px 7px;pointer-events:none;">6 collections</span></div>
+    <div class="p-tab" id="sgtab-txn" onclick="setSGroup('txn',this)">Transactional &nbsp;<span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--pl);color:var(--purple);padding:2px 7px;pointer-events:none;">1 collection</span></div>
+    <div class="p-tab" id="sgtab-ops" onclick="setSGroup('ops',this)">Operational &nbsp;<span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--gl);color:var(--grn);padding:2px 7px;pointer-events:none;">3 collections</span></div>
+  </div>
+
+  <!-- GROUP: MOCK SOURCE SYSTEMS -->
+  <div class="p-panel active" id="sg-mock">
+
+    <div style="background:var(--bl);border-left:4px solid var(--blu);padding:12px 16px;margin-bottom:20px;font-size:13px;color:var(--g70);line-height:1.65;">
+      <strong style="color:var(--blu);">Design principle:</strong> Each collection mirrors one independent enterprise system integration. All 5 stub collections share <code style="background:var(--g05);padding:1px 5px;font-size:11px;">account_id</code> as the join key so the agent can fan out across all 5 in parallel during step 2 ingestion (FR-01). <code style="background:var(--g05);padding:1px 5px;font-size:11px;">accounts</code> is the master reference document.
+    </div>
+
+    <!-- ACCOUNTS -->
+    <div class="sc-coll" id="sc-accounts" onclick="toggleColl('accounts')">
+      <div class="sc-hd" style="border-left:4px solid var(--blu);">
+        <div class="sc-icon" style="background:var(--bl);color:var(--blu);">AC</div>
+        <div class="sc-meta">
+          <div class="sc-name">accounts</div>
+          <div class="sc-desc">Master customer data &mdash; shared reference across all 5 stub systems. One document per customer account.</div>
+        </div>
+        <div class="sc-chevron" id="scc-accounts">&#8250;</div>
+      </div>
+      <div class="sc-detail" id="scd-accounts">
+<pre class="sc-code">{
+  <span class="sf">_id</span>: <span class="sv">ObjectId</span>,
+  <span class="sf">account_id</span>: <span class="sv">"UTL-00421937"</span>,          <span class="sc2">// unique, indexed</span>
+  <span class="sf">account_type</span>: <span class="sv">"commercial_large"</span>,
+  <span class="sf">customer_name</span>: <span class="sv">"Acme Manufacturing Ltd"</span>,
+  <span class="sf">address</span>: {
+    <span class="sf">street</span>: <span class="sv">"14 Industrial Park Rd"</span>,
+    <span class="sf">city</span>: <span class="sv">"Melbourne"</span>,
+    <span class="sf">state</span>: <span class="sv">"VIC"</span>,
+    <span class="sf">postcode</span>: <span class="sv">"3000"</span>
+  },
+  <span class="sf">billing_cycle</span>: <span class="sv">"monthly"</span>,
+  <span class="sf">tariff_code</span>: <span class="sv">"COMM-LG-TOU"</span>,
+  <span class="sf">dri_pool</span>: [<span class="sv">"USR-DRI-001"</span>, <span class="sv">"USR-DRI-002"</span>],  <span class="sc2">// eligible DRIs</span>
+  <span class="sf">regulatory_tier</span>: <span class="sv">"tier_1"</span>,
+  <span class="sf">created_at</span>: <span class="sv">ISODate("2019-03-15")</span>,
+  <span class="sf">updated_at</span>: <span class="sv">ISODate("2024-10-01")</span>
+}</pre>
+        <div class="sc-indexes">
+          <span class="sc-idx-label">Indexes:</span>
+          <span class="sc-idx">account_id (unique)</span>
+          <span class="sc-idx">regulatory_tier</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CCB_STUBS -->
+    <div class="sc-coll" id="sc-ccb" onclick="toggleColl('ccb')">
+      <div class="sc-hd" style="border-left:4px solid var(--blu);">
+        <div class="sc-icon" style="background:var(--bl);color:var(--blu);">CB</div>
+        <div class="sc-meta">
+          <div class="sc-name">ccb_stubs</div>
+          <div class="sc-desc">Oracle CC&amp;B mock &mdash; billing period boundaries, billing rules applied, bill generation timestamp. FR-01 source 1.</div>
+        </div>
+        <div class="sc-chevron" id="scc-ccb">&#8250;</div>
+      </div>
+      <div class="sc-detail" id="scd-ccb">
+<pre class="sc-code">{
+  <span class="sf">_id</span>: <span class="sv">ObjectId</span>,
+  <span class="sf">account_id</span>: <span class="sv">"UTL-00421937"</span>,          <span class="sc2">// FK → accounts</span>
+  <span class="sf">account_status</span>: <span class="sv">"active"</span>,
+  <span class="sf">billing_period</span>: {
+    <span class="sf">start</span>: <span class="sv">ISODate("2024-10-01")</span>,
+    <span class="sf">end</span>: <span class="sv">ISODate("2024-10-31")</span>,
+    <span class="sf">cycle_days</span>: <span class="sv">31</span>
+  },
+  <span class="sf">billing_rules</span>: {
+    <span class="sf">tariff</span>: <span class="sv">"COMM-LG-TOU"</span>,
+    <span class="sf">proration_enabled</span>: <span class="sv">false</span>,        <span class="sc2">// conflict source: BR-02</span>
+    <span class="sf">disconnect_suppression</span>: <span class="sv">false</span>   <span class="sc2">// architectural gap</span>
+  },
+  <span class="sf">bill</span>: {
+    <span class="sf">generated_at</span>: <span class="sv">ISODate("2024-11-01T02:15:00Z")</span>,
+    <span class="sf">total_kwh</span>: <span class="sv">48420</span>,
+    <span class="sf">total_amount</span>: <span class="sv">9284.40</span>,
+    <span class="sf">currency</span>: <span class="sv">"AUD"</span>,
+    <span class="sf">status</span>: <span class="sv">"issued"</span>
+  },
+  <span class="sf">stub_version</span>: <span class="sv">1</span>,
+  <span class="sf">seeded_at</span>: <span class="sv">ISODate("2024-11-01")</span>
+}</pre>
+        <div class="sc-indexes">
+          <span class="sc-idx-label">Indexes:</span>
+          <span class="sc-idx">account_id (unique)</span>
+          <span class="sc-idx">billing_period.start</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MDM_STUBS -->
+    <div class="sc-coll" id="sc-mdm" onclick="toggleColl('mdm')">
+      <div class="sc-hd" style="border-left:4px solid var(--blu);">
+        <div class="sc-icon" style="background:var(--bl);color:var(--blu);">MD</div>
+        <div class="sc-meta">
+          <div class="sc-name">mdm_stubs</div>
+          <div class="sc-desc">MDM mock &mdash; meter reads per date, actual vs estimated flag, consumption values. FR-01 source 2.</div>
+        </div>
+        <div class="sc-chevron" id="scc-mdm">&#8250;</div>
+      </div>
+      <div class="sc-detail" id="scd-mdm">
+<pre class="sc-code">{
+  <span class="sf">_id</span>: <span class="sv">ObjectId</span>,
+  <span class="sf">account_id</span>: <span class="sv">"UTL-00421937"</span>,          <span class="sc2">// FK → accounts</span>
+  <span class="sf">meter_id</span>: <span class="sv">"MTR-88291"</span>,
+  <span class="sf">reads</span>: [                              <span class="sc2">// one entry per day in billing period</span>
+    {
+      <span class="sf">date</span>: <span class="sv">ISODate("2024-10-01")</span>,
+      <span class="sf">kwh</span>: <span class="sv">1560</span>,
+      <span class="sf">read_type</span>: <span class="sv">"actual"</span>
+    },
+    {
+      <span class="sf">date</span>: <span class="sv">ISODate("2024-10-19")</span>,    <span class="sc2">// post-disconnect</span>
+      <span class="sf">kwh</span>: <span class="sv">1540</span>,
+      <span class="sf">read_type</span>: <span class="sv">"estimated"</span>,           <span class="sc2">// phantom — BR-03</span>
+      <span class="sf">estimation_basis</span>: <span class="sv">"historical_avg"</span>
+    }
+    <span class="sc2">// ... remaining days</span>
+  ],
+  <span class="sf">period_summary</span>: {
+    <span class="sf">total_actual_kwh</span>: <span class="sv">28080</span>,
+    <span class="sf">total_estimated_kwh</span>: <span class="sv">20340</span>,       <span class="sc2">// post-disconnect phantom</span>
+    <span class="sf">estimated_days</span>: <span class="sv">13</span>
+  },
+  <span class="sf">stub_version</span>: <span class="sv">1</span>,
+  <span class="sf">seeded_at</span>: <span class="sv">ISODate("2024-11-01")</span>
+}</pre>
+        <div class="sc-indexes">
+          <span class="sc-idx-label">Indexes:</span>
+          <span class="sc-idx">account_id (unique)</span>
+          <span class="sc-idx">reads.date</span>
+          <span class="sc-idx">reads.read_type</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- OMS_STUBS -->
+    <div class="sc-coll" id="sc-oms" onclick="toggleColl('oms')">
+      <div class="sc-hd" style="border-left:4px solid var(--blu);">
+        <div class="sc-icon" style="background:var(--bl);color:var(--blu);">OM</div>
+        <div class="sc-meta">
+          <div class="sc-name">oms_stubs</div>
+          <div class="sc-desc">OMS / Field Service mock &mdash; work orders, disconnect timestamp, field technician confirmation. FR-01 source 3.</div>
+        </div>
+        <div class="sc-chevron" id="scc-oms">&#8250;</div>
+      </div>
+      <div class="sc-detail" id="scd-oms">
+<pre class="sc-code">{
+  <span class="sf">_id</span>: <span class="sv">ObjectId</span>,
+  <span class="sf">account_id</span>: <span class="sv">"UTL-00421937"</span>,          <span class="sc2">// FK → accounts</span>
+  <span class="sf">work_orders</span>: [
+    {
+      <span class="sf">work_order_id</span>: <span class="sv">"WO-2024-18841"</span>,
+      <span class="sf">type</span>: <span class="sv">"disconnect"</span>,
+      <span class="sf">status</span>: <span class="sv">"completed"</span>,
+      <span class="sf">scheduled_at</span>: <span class="sv">ISODate("2024-10-18T09:00:00Z")</span>,
+      <span class="sf">completed_at</span>: <span class="sv">ISODate("2024-10-18T14:32:00Z")</span>,  <span class="sc2">// disconnect ts</span>
+      <span class="sf">technician</span>: {
+        <span class="sf">id</span>: <span class="sv">"TECH-441"</span>,
+        <span class="sf">name</span>: <span class="sv">"R. Patel"</span>,
+        <span class="sf">confirmed</span>: <span class="sv">true</span>
+      },
+      <span class="sf">notes</span>: <span class="sv">"Disconnected at meter. Lock applied."</span>
+    }
+  ],
+  <span class="sf">current_service_status</span>: <span class="sv">"disconnected"</span>,
+  <span class="sf">stub_version</span>: <span class="sv">1</span>,
+  <span class="sf">seeded_at</span>: <span class="sv">ISODate("2024-11-01")</span>
+}</pre>
+        <div class="sc-indexes">
+          <span class="sc-idx-label">Indexes:</span>
+          <span class="sc-idx">account_id (unique)</span>
+          <span class="sc-idx">work_orders.completed_at</span>
+          <span class="sc-idx">work_orders.type</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CRM_STUBS -->
+    <div class="sc-coll" id="sc-crm" onclick="toggleColl('crm')">
+      <div class="sc-hd" style="border-left:4px solid var(--blu);">
+        <div class="sc-icon" style="background:var(--bl);color:var(--blu);">CR</div>
+        <div class="sc-meta">
+          <div class="sc-name">crm_stubs</div>
+          <div class="sc-desc">CRM mock &mdash; complaint history, billing-hold flags, manual notes. FR-01 source 4.</div>
+        </div>
+        <div class="sc-chevron" id="scc-crm">&#8250;</div>
+      </div>
+      <div class="sc-detail" id="scd-crm">
+<pre class="sc-code">{
+  <span class="sf">_id</span>: <span class="sv">ObjectId</span>,
+  <span class="sf">account_id</span>: <span class="sv">"UTL-00421937"</span>,          <span class="sc2">// FK → accounts</span>
+  <span class="sf">billing_hold</span>: <span class="sv">false</span>,                  <span class="sc2">// conflict source: BR-04</span>
+  <span class="sf">complaints</span>: [
+    {
+      <span class="sf">complaint_id</span>: <span class="sv">"CMP-2024-0392"</span>,
+      <span class="sf">type</span>: <span class="sv">"billing_dispute"</span>,
+      <span class="sf">status</span>: <span class="sv">"open"</span>,
+      <span class="sf">filed_at</span>: <span class="sv">ISODate("2024-10-22T10:14:00Z")</span>,
+      <span class="sf">channel</span>: <span class="sv">"phone"</span>,
+      <span class="sf">description</span>: <span class="sv">"Billed after service disconnected"</span>,
+      <span class="sf">regulatory_dispute</span>: <span class="sv">true</span>          <span class="sc2">// formal regulatory flag</span>
+    }
+  ],
+  <span class="sf">notes</span>: [
+    {
+      <span class="sf">added_at</span>: <span class="sv">ISODate("2024-10-22T10:20:00Z")</span>,
+      <span class="sf">author</span>: <span class="sv">"CSR-112"</span>,
+      <span class="sf">text</span>: <span class="sv">"Customer states disconnect mid-cycle"</span>
+    }
+  ],
+  <span class="sf">stub_version</span>: <span class="sv">1</span>,
+  <span class="sf">seeded_at</span>: <span class="sv">ISODate("2024-11-01")</span>
+}</pre>
+        <div class="sc-indexes">
+          <span class="sc-idx-label">Indexes:</span>
+          <span class="sc-idx">account_id (unique)</span>
+          <span class="sc-idx">complaints.status</span>
+          <span class="sc-idx">complaints.regulatory_dispute</span>
+          <span class="sc-idx">billing_hold</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- GL_STUBS -->
+    <div class="sc-coll" id="sc-gl" onclick="toggleColl('gl')">
+      <div class="sc-hd" style="border-left:4px solid var(--blu);">
+        <div class="sc-icon" style="background:var(--bl);color:var(--blu);">GL</div>
+        <div class="sc-meta">
+          <div class="sc-name">gl_stubs</div>
+          <div class="sc-desc">GL / Financials mock &mdash; revenue posting status, period, reversal implications. FR-01 source 5.</div>
+        </div>
+        <div class="sc-chevron" id="scc-gl">&#8250;</div>
+      </div>
+      <div class="sc-detail" id="scd-gl">
+<pre class="sc-code">{
+  <span class="sf">_id</span>: <span class="sv">ObjectId</span>,
+  <span class="sf">account_id</span>: <span class="sv">"UTL-00421937"</span>,          <span class="sc2">// FK → accounts</span>
+  <span class="sf">revenue_entries</span>: [
+    {
+      <span class="sf">entry_id</span>: <span class="sv">"GL-2024-88201"</span>,
+      <span class="sf">period</span>: <span class="sv">"2024-10"</span>,
+      <span class="sf">amount</span>: <span class="sv">9284.40</span>,
+      <span class="sf">currency</span>: <span class="sv">"AUD"</span>,
+      <span class="sf">status</span>: <span class="sv">"posted"</span>,                  <span class="sc2">// conflict source: BR-06</span>
+      <span class="sf">posted_at</span>: <span class="sv">ISODate("2024-11-02T00:30:00Z")</span>,
+      <span class="sf">source_bill_id</span>: <span class="sv">"BILL-2024-421937-10"</span>,
+      <span class="sf">reversal_required</span>: <span class="sv">false</span>,         <span class="sc2">// agent sets to true on C4</span>
+      <span class="sf">reversal_amount</span>: <span class="sv">null</span>
+    }
+  ],
+  <span class="sf">stub_version</span>: <span class="sv">1</span>,
+  <span class="sf">seeded_at</span>: <span class="sv">ISODate("2024-11-01")</span>
+}</pre>
+        <div class="sc-indexes">
+          <span class="sc-idx-label">Indexes:</span>
+          <span class="sc-idx">account_id (unique)</span>
+          <span class="sc-idx">revenue_entries.status</span>
+          <span class="sc-idx">revenue_entries.period</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /sg-mock -->
+
+  <!-- GROUP: TRANSACTIONAL -->
+  <div class="p-panel" id="sg-txn">
+
+    <div style="background:var(--pl);border-left:4px solid var(--purple);padding:12px 16px;margin-bottom:20px;font-size:13px;color:var(--g70);line-height:1.65;">
+      <strong style="color:var(--purple);">Design principle:</strong> Single document per escalation. All 7 pipeline step outputs are embedded as sub-documents under a <code style="background:var(--g05);padding:1px 5px;font-size:11px;">pipeline</code> object. Enables a single document read to assemble the full DRI brief (NFR-01 &lt;7 min). Audit trail and execution metrics stored in separate collections.
+    </div>
+
+    <!-- ESCALATIONS -->
+    <div class="sc-coll" id="sc-esc" onclick="toggleColl('esc')">
+      <div class="sc-hd" style="border-left:4px solid var(--purple);">
+        <div class="sc-icon" style="background:var(--pl);color:var(--purple);">ES</div>
+        <div class="sc-meta">
+          <div class="sc-name">escalations</div>
+          <div class="sc-desc">Core transactional collection. One document per escalation. All 7 pipeline step outputs embedded. Single read for full DRI brief.</div>
+        </div>
+        <div class="sc-chevron" id="scc-esc">&#8250;</div>
+      </div>
+      <div class="sc-detail" id="scd-esc">
+<pre class="sc-code">{
+  <span class="sf">_id</span>: <span class="sv">ObjectId</span>,
+  <span class="sf">escalation_id</span>: <span class="sv">"ESC-0047"</span>,             <span class="sc2">// unique, indexed</span>
+  <span class="sf">account_id</span>: <span class="sv">"UTL-00421937"</span>,            <span class="sc2">// FK → accounts</span>
+  <span class="sf">status</span>: <span class="sv">"awaiting_dri"</span>,               <span class="sc2">// initiated|analysing|awaiting_dri|approved|rejected|resolved</span>
+  <span class="sf">dri_id</span>: <span class="sv">"USR-DRI-001"</span>,                <span class="sc2">// FR-10, BR-01</span>
+  <span class="sf">csr_id</span>: <span class="sv">"USR-CSR-112"</span>,
+  <span class="sf">opened_at</span>: <span class="sv">ISODate("2024-11-04T09:14:00Z")</span>,
+  <span class="sf">resolved_at</span>: <span class="sv">null</span>,
+
+  <span class="sf">pipeline</span>: {
+
+    <span class="sf">step_1_trigger</span>: {
+      <span class="sf">trigger_type</span>: <span class="sv">"manual_csr"</span>,         <span class="sc2">// oms_auto | manual_csr | manual_dri</span>
+      <span class="sf">dispute_type</span>: <span class="sv">"billing_after_disconnect"</span>,
+      <span class="sf">notes</span>: <span class="sv">"Customer disputes post-disconnect charges"</span>,
+      <span class="sf">triggered_at</span>: <span class="sv">ISODate("2024-11-04T09:14:00Z")</span>
+    },
+
+    <span class="sf">step_2_ingestion</span>: {
+      <span class="sf">completed_at</span>: <span class="sv">ISODate("2024-11-04T09:19:12Z")</span>,
+      <span class="sf">duration_ms</span>: <span class="sv">312000</span>,
+      <span class="sf">sources</span>: {
+        <span class="sf">ccb</span>: { <span class="sf">extracted_at</span>: <span class="sv">ISODate("...")</span>, <span class="sf">snapshot</span>: { <span class="sc2">/* ccb_stubs payload */</span> } },
+        <span class="sf">mdm</span>: { <span class="sf">extracted_at</span>: <span class="sv">ISODate("...")</span>, <span class="sf">snapshot</span>: { <span class="sc2">/* mdm_stubs payload */</span> } },
+        <span class="sf">oms</span>: { <span class="sf">extracted_at</span>: <span class="sv">ISODate("...")</span>, <span class="sf">snapshot</span>: { <span class="sc2">/* oms_stubs payload */</span> } },
+        <span class="sf">crm</span>: { <span class="sf">extracted_at</span>: <span class="sv">ISODate("...")</span>, <span class="sf">snapshot</span>: { <span class="sc2">/* crm_stubs payload */</span> } },
+        <span class="sf">gl</span>:  { <span class="sf">extracted_at</span>: <span class="sv">ISODate("...")</span>, <span class="sf">snapshot</span>: { <span class="sc2">/* gl_stubs payload */</span> } }
+      }
+    },
+
+    <span class="sf">step_3_reconciliation</span>: {
+      <span class="sf">completed_at</span>: <span class="sv">ISODate("2024-11-04T09:19:18Z")</span>,
+      <span class="sf">disconnect_timestamp</span>: <span class="sv">ISODate("2024-10-18T14:32:00Z")</span>,
+      <span class="sf">billing_period</span>: { <span class="sf">start</span>: <span class="sv">ISODate("2024-10-01")</span>, <span class="sf">end</span>: <span class="sv">ISODate("2024-10-31")</span> },
+      <span class="sf">period_map</span>: [           <span class="sc2">// one entry per day — FR-03</span>
+        { <span class="sf">date</span>: <span class="sv">"2024-10-01"</span>, <span class="sf">classification</span>: <span class="sv">"pre_disconnect"</span>, <span class="sf">mdm_read_type</span>: <span class="sv">"actual"</span> },
+        { <span class="sf">date</span>: <span class="sv">"2024-10-18"</span>, <span class="sf">classification</span>: <span class="sv">"disconnect_day"</span>, <span class="sf">mdm_read_type</span>: <span class="sv">"actual"</span> },
+        { <span class="sf">date</span>: <span class="sv">"2024-10-19"</span>, <span class="sf">classification</span>: <span class="sv">"post_disconnect"</span>, <span class="sf">mdm_read_type</span>: <span class="sv">"estimated"</span> }
+        <span class="sc2">// ... remaining days</span>
+      ],
+      <span class="sf">summary</span>: {
+        <span class="sf">pre_disconnect_days</span>: <span class="sv">18</span>,
+        <span class="sf">post_disconnect_days</span>: <span class="sv">13</span>,
+        <span class="sf">disconnect_day</span>: <span class="sv">1</span>,
+        <span class="sf">estimated_read_days_post_disconnect</span>: <span class="sv">13</span>  <span class="sc2">// phantom — BR-03</span>
+      }
+    },
+
+    <span class="sf">step_4_conflicts</span>: {
+      <span class="sf">completed_at</span>: <span class="sv">ISODate("2024-11-04T09:19:24Z")</span>,
+      <span class="sf">duration_ms</span>: <span class="sv">6200</span>,                   <span class="sc2">// must be &lt;15s — NFR-01</span>
+      <span class="sf">conflicts</span>: [
+        { <span class="sf">id</span>: <span class="sv">"C1"</span>, <span class="sf">systems</span>: [<span class="sv">"oms"</span>,<span class="sv">"ccb"</span>],  <span class="sf">detected</span>: <span class="sv">true</span>,  <span class="sf">invariant</span>: <span class="sv">"full_cycle_post_disconnect"</span> },
+        { <span class="sf">id</span>: <span class="sv">"C2"</span>, <span class="sf">systems</span>: [<span class="sv">"mdm"</span>,<span class="sv">"oms"</span>],  <span class="sf">detected</span>: <span class="sv">true</span>,  <span class="sf">invariant</span>: <span class="sv">"phantom_consumption"</span> },
+        { <span class="sf">id</span>: <span class="sv">"C3"</span>, <span class="sf">systems</span>: [<span class="sv">"crm"</span>,<span class="sv">"ccb"</span>],  <span class="sf">detected</span>: <span class="sv">true</span>,  <span class="sf">invariant</span>: <span class="sv">"billing_hold_not_propagated"</span> },
+        { <span class="sf">id</span>: <span class="sv">"C4"</span>, <span class="sf">systems</span>: [<span class="sv">"gl"</span>, <span class="sv">"crm"</span>],  <span class="sf">detected</span>: <span class="sv">true</span>,  <span class="sf">invariant</span>: <span class="sv">"revenue_posted_under_dispute"</span> }
+      ]
+    },
+
+    <span class="sf">step_5_brief</span>: {
+      <span class="sf">completed_at</span>: <span class="sv">ISODate("2024-11-04T09:19:51Z")</span>,
+      <span class="sf">duration_ms</span>: <span class="sv">27000</span>,
+      <span class="sf">recommendations</span>: [
+        { <span class="sf">conflict_id</span>: <span class="sv">"C1"</span>, <span class="sf">action</span>: <span class="sv">"suppress_and_prorate"</span>,    <span class="sf">cited_system</span>: <span class="sv">"oms"</span> },
+        { <span class="sf">conflict_id</span>: <span class="sv">"C2"</span>, <span class="sf">action</span>: <span class="sv">"adjust_mdm_to_zero"</span>,       <span class="sf">cited_system</span>: <span class="sv">"mdm"</span> },
+        { <span class="sf">conflict_id</span>: <span class="sv">"C3"</span>, <span class="sf">action</span>: <span class="sv">"apply_billing_hold"</span>,       <span class="sf">cited_system</span>: <span class="sv">"crm"</span> },
+        { <span class="sf">conflict_id</span>: <span class="sv">"C4"</span>, <span class="sf">action</span>: <span class="sv">"flag_gl_reversal"</span>,         <span class="sf">cited_system</span>: <span class="sv">"gl"</span>  }
+      ],
+      <span class="sf">brief_text</span>: <span class="sv">"Utilico commercial customer billed full cycle [CC&amp;B]..."</span>,
+      <span class="sf">confidence_signal</span>: <span class="sv">null</span>,            <span class="sc2">// set if data incomplete — FR-06</span>
+      <span class="sf">citation_coverage</span>: <span class="sv">1.0</span>             <span class="sc2">// 100% — NFR-02</span>
+    },
+
+    <span class="sf">step_6_dri</span>: {
+      <span class="sf">decision</span>: <span class="sv">"approved"</span>,               <span class="sc2">// approved | rejected | exception</span>
+      <span class="sf">decided_at</span>: <span class="sv">ISODate("2024-11-04T09:23:41Z")</span>,
+      <span class="sf">decided_by</span>: <span class="sv">"USR-DRI-001"</span>,
+      <span class="sf">reason</span>: <span class="sv">null</span>,                       <span class="sc2">// required on reject</span>
+      <span class="sf">decision_latency_ms</span>: <span class="sv">270000</span>         <span class="sc2">// 4.5 min — target &lt;5 min NFR-01</span>
+    },
+
+    <span class="sf">step_7_outputs</span>: {
+      <span class="sf">dispatched_at</span>: <span class="sv">ISODate("2024-11-04T09:23:55Z")</span>,
+      <span class="sf">customer_summary</span>: {
+        <span class="sf">format</span>: <span class="sv">"plain_text"</span>,
+        <span class="sf">audience</span>: <span class="sv">"customer"</span>,
+        <span class="sf">content</span>: <span class="sv">"Dear valued customer..."</span>
+      },
+      <span class="sf">executive_brief</span>: {
+        <span class="sf">format</span>: <span class="sv">"structured"</span>,
+        <span class="sf">audience</span>: <span class="sv">"executive"</span>,
+        <span class="sf">content</span>: { <span class="sf">situation</span>: <span class="sv">"..."</span>, <span class="sf">impact</span>: <span class="sv">"..."</span>, <span class="sf">findings</span>: <span class="sv">"..."</span>, <span class="sf">next_steps</span>: <span class="sv">"..."</span> }
+      },
+      <span class="sf">engineering_handoff</span>: {
+        <span class="sf">format</span>: <span class="sv">"jira_story"</span>,
+        <span class="sf">audience</span>: <span class="sv">"engineering"</span>,
+        <span class="sf">jira_id</span>: <span class="sv">"BILL-NEW-1147"</span>,
+        <span class="sf">content</span>: { <span class="sf">priority</span>: <span class="sv">"P1"</span>, <span class="sf">linked_systems</span>: [<span class="sv">"OMS-DISCON"</span>,<span class="sv">"MDM-EST-READS"</span>], <span class="sf">acceptance_criteria</span>: [<span class="sv">"..."</span>] }
+      }
+    }
+
+  },  <span class="sc2">// end pipeline</span>
+
+  <span class="sf">created_at</span>: <span class="sv">ISODate("2024-11-04T09:14:00Z")</span>,
+  <span class="sf">updated_at</span>: <span class="sv">ISODate("2024-11-04T09:23:55Z")</span>
+}</pre>
+        <div class="sc-indexes">
+          <span class="sc-idx-label">Indexes:</span>
+          <span class="sc-idx">escalation_id (unique)</span>
+          <span class="sc-idx">account_id</span>
+          <span class="sc-idx">status</span>
+          <span class="sc-idx">dri_id</span>
+          <span class="sc-idx">csr_id</span>
+          <span class="sc-idx">opened_at</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /sg-txn -->
+
+  <!-- GROUP: OPERATIONAL -->
+  <div class="p-panel" id="sg-ops">
+
+    <div style="background:var(--gl);border-left:4px solid var(--grn);padding:12px 16px;margin-bottom:20px;font-size:13px;color:var(--g70);line-height:1.65;">
+      <strong style="color:var(--grn);">Design principle:</strong> Three supporting collections kept separate from the escalation document. <code style="background:var(--g05);padding:1px 5px;font-size:11px;">audit_trail</code> is append-only and independently queryable for regulatory submissions (FR-09). <code style="background:var(--g05);padding:1px 5px;font-size:11px;">analyst_executions</code> tracks step-level timing against NFR-01. <code style="background:var(--g05);padding:1px 5px;font-size:11px;">users</code> holds role and identity for DRI assignment (FR-10).
+    </div>
+
+    <!-- AUDIT TRAIL -->
+    <div class="sc-coll" id="sc-audit" onclick="toggleColl('audit')">
+      <div class="sc-hd" style="border-left:4px solid var(--grn);">
+        <div class="sc-icon" style="background:var(--gl);color:var(--grn);">AT</div>
+        <div class="sc-meta">
+          <div class="sc-name">audit_trail</div>
+          <div class="sc-desc">Append-only. One document per claim. Every fact the agent asserts, cited to source system and timestamp. 100% coverage required (NFR-02). Queryable for regulatory submissions (FR-09).</div>
+        </div>
+        <div class="sc-chevron" id="scc-audit">&#8250;</div>
+      </div>
+      <div class="sc-detail" id="scd-audit">
+<pre class="sc-code">{
+  <span class="sf">_id</span>: <span class="sv">ObjectId</span>,
+  <span class="sf">escalation_id</span>: <span class="sv">"ESC-0047"</span>,             <span class="sc2">// FK → escalations</span>
+  <span class="sf">pipeline_step</span>: <span class="sv">2</span>,                       <span class="sc2">// 1–7</span>
+  <span class="sf">step_name</span>: <span class="sv">"ingestion"</span>,
+  <span class="sf">claim_type</span>: <span class="sv">"system_fact"</span>,              <span class="sc2">// system_fact | conflict | recommendation | dri_decision | output_dispatch</span>
+  <span class="sf">source_system</span>: <span class="sv">"oms"</span>,                   <span class="sc2">// ccb | mdm | oms | crm | gl | agent | dri</span>
+  <span class="sf">field</span>: <span class="sv">"work_orders.completed_at"</span>,
+  <span class="sf">value</span>: <span class="sv">"2024-10-18T14:32:00Z"</span>,
+  <span class="sf">extracted_at</span>: <span class="sv">ISODate("2024-11-04T09:19:08Z")</span>,
+  <span class="sf">recorded_at</span>: <span class="sv">ISODate("2024-11-04T09:19:09Z")</span>,
+  <span class="sf">actor</span>: <span class="sv">"analyst_agent"</span>,                 <span class="sc2">// analyst_agent | dri | system</span>
+  <span class="sf">immutable</span>: <span class="sv">true</span>                         <span class="sc2">// never updated — append only</span>
+}</pre>
+        <div class="sc-indexes">
+          <span class="sc-idx-label">Indexes:</span>
+          <span class="sc-idx">escalation_id</span>
+          <span class="sc-idx">source_system</span>
+          <span class="sc-idx">claim_type</span>
+          <span class="sc-idx">pipeline_step</span>
+          <span class="sc-idx">recorded_at</span>
+          <span class="sc-idx">{ escalation_id, pipeline_step } (compound)</span>
+        </div>
+        <div style="margin-top:10px;padding:10px 12px;background:var(--al);border-left:3px solid var(--amb);font-size:12px;color:var(--g70);">
+          <strong style="color:var(--amb);">Write pattern:</strong> Insert only — never update or delete. MongoDB write concern <code style="background:var(--g05);padding:1px 5px;font-size:11px;">majority</code> on all inserts to guarantee durability for regulatory defensibility.
+        </div>
+      </div>
+    </div>
+
+    <!-- ANALYST EXECUTIONS -->
+    <div class="sc-coll" id="sc-exec" onclick="toggleColl('exec')">
+      <div class="sc-hd" style="border-left:4px solid var(--grn);">
+        <div class="sc-icon" style="background:var(--gl);color:var(--grn);">AE</div>
+        <div class="sc-meta">
+          <div class="sc-name">analyst_executions</div>
+          <div class="sc-desc">One document per agent run. Step-level timing tracked against NFR-01 targets. Powers the Analyst Manager health dashboard.</div>
+        </div>
+        <div class="sc-chevron" id="scc-exec">&#8250;</div>
+      </div>
+      <div class="sc-detail" id="scd-exec">
+<pre class="sc-code">{
+  <span class="sf">_id</span>: <span class="sv">ObjectId</span>,
+  <span class="sf">execution_id</span>: <span class="sv">"EX-0047"</span>,
+  <span class="sf">escalation_id</span>: <span class="sv">"ESC-0047"</span>,             <span class="sc2">// FK → escalations</span>
+  <span class="sf">account_id</span>: <span class="sv">"UTL-00421937"</span>,
+  <span class="sf">trigger_type</span>: <span class="sv">"manual_csr"</span>,
+  <span class="sf">overall_status</span>: <span class="sv">"complete"</span>,            <span class="sc2">// running | complete | failed | timeout</span>
+  <span class="sf">steps</span>: [
+    { <span class="sf">step</span>: <span class="sv">1</span>, <span class="sf">name</span>: <span class="sv">"trigger"</span>,          <span class="sf">started_at</span>: <span class="sv">ISODate("...")</span>, <span class="sf">duration_ms</span>: <span class="sv">120</span>,    <span class="sf">nfr_target_ms</span>: <span class="sv">null</span>,   <span class="sf">breach</span>: <span class="sv">false</span> },
+    { <span class="sf">step</span>: <span class="sv">2</span>, <span class="sf">name</span>: <span class="sv">"ingestion"</span>,        <span class="sf">started_at</span>: <span class="sv">ISODate("...")</span>, <span class="sf">duration_ms</span>: <span class="sv">312000</span>, <span class="sf">nfr_target_ms</span>: <span class="sv">420000</span>, <span class="sf">breach</span>: <span class="sv">false</span> },
+    { <span class="sf">step</span>: <span class="sv">3</span>, <span class="sf">name</span>: <span class="sv">"reconciliation"</span>,   <span class="sf">started_at</span>: <span class="sv">ISODate("...")</span>, <span class="sf">duration_ms</span>: <span class="sv">5800</span>,  <span class="sf">nfr_target_ms</span>: <span class="sv">420000</span>, <span class="sf">breach</span>: <span class="sv">false</span> },
+    { <span class="sf">step</span>: <span class="sv">4</span>, <span class="sf">name</span>: <span class="sv">"conflict_detection"</span>,<span class="sf">started_at</span>: <span class="sv">ISODate("...")</span>, <span class="sf">duration_ms</span>: <span class="sv">6200</span>,  <span class="sf">nfr_target_ms</span>: <span class="sv">15000</span>,  <span class="sf">breach</span>: <span class="sv">false</span> },
+    { <span class="sf">step</span>: <span class="sv">5</span>, <span class="sf">name</span>: <span class="sv">"brief"</span>,             <span class="sf">started_at</span>: <span class="sv">ISODate("...")</span>, <span class="sf">duration_ms</span>: <span class="sv">27000</span>, <span class="sf">nfr_target_ms</span>: <span class="sv">60000</span>,  <span class="sf">breach</span>: <span class="sv">false</span> },
+    { <span class="sf">step</span>: <span class="sv">6</span>, <span class="sf">name</span>: <span class="sv">"dri_gate"</span>,          <span class="sf">started_at</span>: <span class="sv">ISODate("...")</span>, <span class="sf">duration_ms</span>: <span class="sv">270000</span>, <span class="sf">nfr_target_ms</span>: <span class="sv">300000</span>, <span class="sf">breach</span>: <span class="sv">false</span> },
+    { <span class="sf">step</span>: <span class="sv">7</span>, <span class="sf">name</span>: <span class="sv">"outputs"</span>,           <span class="sf">started_at</span>: <span class="sv">ISODate("...")</span>, <span class="sf">duration_ms</span>: <span class="sv">14000</span>, <span class="sf">nfr_target_ms</span>: <span class="sv">null</span>,   <span class="sf">breach</span>: <span class="sv">false</span> }
+  ],
+  <span class="sf">total_duration_ms</span>: <span class="sv">635120</span>,             <span class="sc2">// 10.6 min total including DRI wait</span>
+  <span class="sf">agent_duration_ms</span>: <span class="sv">351120</span>,             <span class="sc2">// steps 2–5 only = 5.85 min — target &lt;7 min</span>
+  <span class="sf">conflicts_detected</span>: <span class="sv">4</span>,
+  <span class="sf">citation_coverage</span>: <span class="sv">1.0</span>,
+  <span class="sf">nfr_breaches</span>: <span class="sv">0</span>,
+  <span class="sf">created_at</span>: <span class="sv">ISODate("2024-11-04T09:14:00Z")</span>,
+  <span class="sf">completed_at</span>: <span class="sv">ISODate("2024-11-04T09:34:55Z")</span>
+}</pre>
+        <div class="sc-indexes">
+          <span class="sc-idx-label">Indexes:</span>
+          <span class="sc-idx">execution_id (unique)</span>
+          <span class="sc-idx">escalation_id (unique)</span>
+          <span class="sc-idx">overall_status</span>
+          <span class="sc-idx">nfr_breaches</span>
+          <span class="sc-idx">created_at</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- USERS -->
+    <div class="sc-coll" id="sc-users" onclick="toggleColl('users')">
+      <div class="sc-hd" style="border-left:4px solid var(--grn);">
+        <div class="sc-icon" style="background:var(--gl);color:var(--grn);">US</div>
+        <div class="sc-meta">
+          <div class="sc-name">users</div>
+          <div class="sc-desc">CSR, DRI, and Analyst Manager roles. DRI identity required for FR-10 and BR-01. Role-based access for application interface.</div>
+        </div>
+        <div class="sc-chevron" id="scc-users">&#8250;</div>
+      </div>
+      <div class="sc-detail" id="scd-users">
+<pre class="sc-code">{
+  <span class="sf">_id</span>: <span class="sv">ObjectId</span>,
+  <span class="sf">user_id</span>: <span class="sv">"USR-DRI-001"</span>,                <span class="sc2">// unique, indexed</span>
+  <span class="sf">name</span>: <span class="sv">"J. Okafor"</span>,
+  <span class="sf">role</span>: <span class="sv">"dri"</span>,                           <span class="sc2">// csr | dri | analyst_manager</span>
+  <span class="sf">email</span>: <span class="sv">"j.okafor@utilico.com"</span>,
+  <span class="sf">active</span>: <span class="sv">true</span>,
+  <span class="sf">assigned_escalations</span>: [<span class="sv">"ESC-0047"</span>, <span class="sv">"ESC-0046"</span>],  <span class="sc2">// DRI queue</span>
+  <span class="sf">created_at</span>: <span class="sv">ISODate("2023-01-15")</span>
+}</pre>
+        <div class="sc-indexes">
+          <span class="sc-idx-label">Indexes:</span>
+          <span class="sc-idx">user_id (unique)</span>
+          <span class="sc-idx">role</span>
+          <span class="sc-idx">active</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /sg-ops -->
+
+  <!-- COLLECTION SUMMARY -->
+  <div style="margin-top:32px;padding-top:24px;border-top:2px solid var(--g10);">
+    <div style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--purple);margin-bottom:14px;">All 10 collections at a glance</div>
+    <div class="mrow">
+      <div class="mbox"><div class="mv" style="color:var(--blu);">6</div><div class="ml">Mock source system collections</div></div>
+      <div class="mbox"><div class="mv" style="color:var(--purple);">1</div><div class="ml">Transactional (escalations)</div></div>
+      <div class="mbox"><div class="mv" style="color:var(--grn);">3</div><div class="ml">Operational (audit, executions, users)</div></div>
+      <div class="mbox"><div class="mv" style="color:var(--n90);">7</div><div class="ml">Pipeline steps embedded in escalation</div></div>
+      <div class="mbox"><div class="mv" style="color:var(--red);">0</div><div class="ml">Joins required for DRI brief read</div></div>
+      <div class="mbox"><div class="mv" style="color:var(--grn);">100%</div><div class="ml">Audit trail coverage per escalation</div></div>
+    </div>
+  </div>
+
+</div>
+</div><!-- /view-schema -->
+
+
+<!-- ============================ TARGET ARCHITECTURE ============================ -->
+<style>
+#view-architecture .arch-row{display:grid;grid-template-columns:148px 1fr;border:1px solid var(--g10);border-left:4px solid var(--g30);margin-bottom:6px;align-items:center;}
+#view-architecture .arch-row .arch-lab{font-family:var(--cond);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:10px 12px;border-right:1px solid var(--g10);background:var(--g05);line-height:1.1;}
+#view-architecture .arch-chips{display:flex;gap:7px;flex-wrap:wrap;padding:9px 12px;}
+#view-architecture .arch-chip{font-family:var(--cond);font-size:12.5px;font-weight:600;border:1px solid var(--g10);background:var(--wht);padding:5px 11px;display:flex;align-items:center;gap:6px;white-space:nowrap;}
+#view-architecture .arch-chip .i{font-size:13px;}
+#view-architecture .arch-ux{border-left-color:var(--amb);}    #view-architecture .arch-ux .arch-lab{color:var(--amb);}
+#view-architecture .arch-api{border-left-color:var(--blu);}    #view-architecture .arch-api .arch-lab{color:var(--blu);}
+#view-architecture .arch-orc{border-left-color:var(--purple);} #view-architecture .arch-orc .arch-lab{color:var(--purple);}
+#view-architecture .arch-ag{border-left-color:var(--purple);}  #view-architecture .arch-ag .arch-lab{color:var(--purple);}
+#view-architecture .arch-llm{border-left-color:var(--grn);}    #view-architecture .arch-llm .arch-lab{color:var(--grn);}
+#view-architecture .arch-sys{border-left-color:var(--g30);}    #view-architecture .arch-sys .arch-lab{color:var(--g70);}
+#view-architecture .arch-kl{border-left-color:var(--red);}     #view-architecture .arch-kl .arch-lab{color:var(--red);}
+#view-architecture .arch-chip.hot{border:1.5px solid var(--purple);background:var(--pl);color:var(--purple);font-weight:700;}
+#view-architecture .arch-chip.dash{border:1.5px dashed var(--purple);color:var(--purple);font-weight:700;}
+#view-architecture .arch-chip.gate{border-left:3px solid var(--grn);}
+#view-architecture .arch-pill{font-family:var(--cond);font-size:8.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:var(--purple);color:#fff;padding:1px 5px;}
+#view-architecture .arch-bus{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:linear-gradient(90deg,#7a00c2,#A100FF);color:#fff;padding:9px 14px;margin:6px 0;}
+#view-architecture .arch-bus b{font-family:var(--cond);font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
+#view-architecture .arch-bus .t{font-family:var(--cond);font-size:9.5px;font-weight:600;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);padding:2px 8px;border-radius:10px;}
+#view-architecture .arch-xstrip{display:flex;gap:8px;flex-wrap:wrap;align-items:center;border:1.5px dashed var(--purple);background:#fbf5ff;padding:9px 13px;margin-top:10px;}
+#view-architecture .arch-xstrip b{font-family:var(--cond);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--purple);margin-right:4px;}
+#view-architecture .arch-xstrip .x{font-family:var(--cond);font-size:12px;font-weight:600;color:var(--g70);display:flex;align-items:center;gap:5px;}
+#view-architecture .arch-xstrip .x + .x::before{content:"·";color:var(--g30);margin-right:8px;}
+#view-architecture .arch-loop{border:1.5px dashed var(--red);background:#FFF0F2;padding:8px 14px;margin-top:8px;font-size:12px;color:var(--g70);}
+#view-architecture .arch-loop b{font-family:var(--cond);font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--red);margin-right:6px;}
+#view-architecture .arch-loop .a{color:var(--red);font-weight:700;}
+</style>
+<div class="view" id="view-architecture">
+<div class="journey-wrap">
+
+  <div class="j-header">
+    <div class="j-kicker">Target State &middot; Event-Driven &amp; Agentic Platform</div>
+    <h2 class="j-title">Target Architecture</h2>
+    <p class="j-sub">Every step integrates over an event bus, agents scale independently, and all audit flows to a Knowledge Layer that identifies problem statements and learns from DRI &amp; CSR activity &mdash; under human-in-the-loop governance.</p>
+  </div>
+
+  <div class="arch-row arch-ux"><div class="arch-lab">Experience · UI</div>
+    <div class="arch-chips">
+      <span class="arch-chip gate"><span class="i">🧑‍💼</span>CSR — approves 3 outputs</span>
+      <span class="arch-chip gate"><span class="i">✅</span>DRI — decision gate</span>
+      <span class="arch-chip"><span class="i">📊</span>Analyst Manager</span>
+    </div>
+  </div>
+
+  <div class="arch-row arch-api"><div class="arch-lab">API</div>
+    <div class="arch-chips">
+      <span class="arch-chip"><span class="i">🚪</span>Gateway</span>
+      <span class="arch-chip"><span class="i">🔐</span>Identity &amp; Access</span>
+    </div>
+  </div>
+
+  <div class="arch-row arch-orc"><div class="arch-lab">Orchestration</div>
+    <div class="arch-chips">
+      <span class="arch-chip"><span class="i">🧭</span>Pipeline Orchestrator</span>
+      <span class="arch-chip"><span class="i">⏱️</span>NFR / SLA Timers</span>
+    </div>
+  </div>
+
+  <div class="arch-bus">
+    <b>🔀 Event Bus</b>
+    <span class="t">escalation.opened</span><span class="t">conflicts.detected</span><span class="t">brief.ready</span>
+    <span class="t">dri.decided</span><span class="t">output.approved</span><span class="t">dispatched</span>
+  </div>
+
+  <div class="arch-row arch-ag"><div class="arch-lab">Agents · scaled independently</div>
+    <div class="arch-chips">
+      <span class="arch-chip"><span class="i">📥</span>Ingestion</span>
+      <span class="arch-chip"><span class="i">🧮</span>Reconciliation</span>
+      <span class="arch-chip"><span class="i">⚖️</span>Conflict (rules)</span>
+      <span class="arch-chip hot"><span class="i">✨</span>Probabilistic — brief · 3 outputs · narrative<span class="arch-pill">LLM</span></span>
+      <span class="arch-chip dash"><span class="i">🔁</span>Learning — DRI/CSR</span>
+    </div>
+  </div>
+
+  <div class="arch-row arch-llm"><div class="arch-lab">LLM</div>
+    <div class="arch-chips">
+      <span class="arch-chip"><span class="i">🧠</span>Model Gateway — Bedrock / Anthropic</span>
+      <span class="arch-chip"><span class="i">🛡️</span>Prompts &amp; Guardrails</span>
+    </div>
+  </div>
+
+  <div class="arch-row arch-sys"><div class="arch-lab">Systems</div>
+    <div class="arch-chips">
+      <span class="arch-chip">🏦 CC&amp;B</span><span class="arch-chip">📟 MDM</span><span class="arch-chip">🔌 OMS</span><span class="arch-chip">📞 CRM</span><span class="arch-chip">💰 GL</span>
+    </div>
+  </div>
+
+  <div class="arch-row arch-kl"><div class="arch-lab">Knowledge Layer</div>
+    <div class="arch-chips">
+      <span class="arch-chip"><span class="i">📚</span>Immutable Audit</span>
+      <span class="arch-chip"><span class="i">🕸️</span>Vector + Graph KB</span>
+      <span class="arch-chip"><span class="i">🔎</span>Problem-Statement ID</span>
+      <span class="arch-chip"><span class="i">🧑‍⚖️</span>DRI/CSR Decision Patterns</span>
+    </div>
+  </div>
+
+  <div class="arch-xstrip">
+    <b>Cross-cutting</b>
+    <span class="x">🏛️ Governance (HITL · audit)</span>
+    <span class="x">💵 Cost</span>
+    <span class="x">📈 Observability</span>
+    <span class="x">🔒 Security</span>
+    <span class="x">⚙️ Autoscale / CI-CD</span>
+  </div>
+
+  <div class="arch-loop">
+    <b>Learning loop</b>All layers <span class="a">→</span> audit to Knowledge Layer <span class="a">→</span> problem-statement &amp; decision-pattern analysis <span class="a">→</span> Learning Agent improves briefs &amp; drafts.
+  </div>
+
+</div>
+</div><!-- /view-architecture -->
+
+
+
+
+<footer>
+  <span class="facc">Accenture</span>
+  <span>Utilico Energy &middot; AI Agentification &middot; Billing Reconciliation &middot; June 2026</span>
+  <span>Confidential &mdash; Engagement Use Only</span>
+</footer>
+
+<script>
+
+
+function setSGroup(id,el){
+  const tab = el.closest('.p-tab') || el;
+  document.querySelectorAll("#view-schema .p-tab").forEach(t=>t.classList.remove("active"));
+  document.querySelectorAll("#view-schema .p-panel").forEach(p=>p.classList.remove("active"));
+  tab.classList.add("active");
+  document.getElementById("sg-"+id).classList.add("active");
+}
+function toggleColl(id){
+  const detail = document.getElementById("scd-"+id);
+  const chevron = document.getElementById("scc-"+id);
+  const isOpen = detail.classList.contains("open");
+  detail.classList.toggle("open",!isOpen);
+  chevron.classList.toggle("open",!isOpen);
+}
+
+function toggleStep(n){
+  const detail = document.getElementById('wfd-'+n);
+  const chevron = document.getElementById('wfc-'+n);
+  const isOpen = detail.classList.contains('open');
+  detail.classList.toggle('open', !isOpen);
+  chevron.classList.toggle('open', !isOpen);
+}
+
+function setTab(tab){
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+  document.getElementById("view-"+tab).classList.add("active");
+  const idx=tab==="journey"?0:tab==="personas"?1:tab==="interface"?2:tab==="workflow"?3:tab==="schema"?4:5;
+  document.querySelectorAll(".nav-btn")[idx].classList.add("active");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function setIface(id,el){
+  const tab = el.closest('.p-tab') || el;
+  document.querySelectorAll("#view-interface .p-tab").forEach(t=>t.classList.remove("active"));
+  document.querySelectorAll("#view-interface .p-panel").forEach(p=>p.classList.remove("active"));
+  tab.classList.add("active");
+  document.getElementById("ip-"+id).classList.add("active");
+}
+function activateAnalyst(){
+  document.querySelectorAll(".p-tab").forEach(t=>t.classList.remove("active"));
+  document.querySelectorAll(".p-panel").forEach(p=>p.classList.remove("active"));
+  document.getElementById("tab-ai").classList.add("active");
+  document.getElementById("pp-ai").classList.add("active");
+}
+function setPersona(id,el){
+  const tab = el.closest('.p-tab') || el;
+  document.querySelectorAll(".p-tab").forEach(t=>t.classList.remove("active"));
+  document.querySelectorAll(".p-panel").forEach(p=>p.classList.remove("active"));
+  tab.classList.add("active");
+  document.getElementById("pp-"+id).classList.add("active");
+}
+</script>
+</body>
+</html>

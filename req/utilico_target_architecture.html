@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Utilico Energy — Target Architecture · Accenture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --purple:#A100FF;--pl:#F3E5FF;--blk:#000;--n90:#1C1C1C;--g70:#4A4A4A;--g50:#767676;--g30:#B8B8B8;--g10:#E8E8E8;--g05:#F5F5F5;--wht:#FFF;
+  --red:#C8001D;--grn:#007A3D;--amb:#B45000;--blu:#004F9F;
+  --sans:"Barlow",sans-serif;--cond:"Barlow Condensed",sans-serif;
+}
+body{font-family:var(--sans);background:var(--wht);color:var(--n90);font-size:14px;}
+
+.site-header{background:var(--blk);color:var(--wht);display:grid;grid-template-columns:6px 1fr;}
+.hstripe{background:var(--purple);}
+.hinner{padding:24px 56px 22px;}
+.acn-logo{font-family:var(--cond);font-size:11px;letter-spacing:.18em;font-weight:700;color:var(--purple);text-transform:uppercase;margin-bottom:8px;}
+.h-title{font-family:var(--cond);font-size:34px;font-weight:700;line-height:1;letter-spacing:-.01em;text-transform:uppercase;}
+.h-title em{color:var(--purple);font-style:normal;}
+.h-sub{font-size:12px;color:var(--g30);max-width:760px;font-weight:300;margin-top:9px;line-height:1.55;}
+
+.wrap{padding:24px 56px 48px;max-width:1180px;margin:0 auto;}
+
+/* a layer row: colored label + chip row */
+.row{display:grid;grid-template-columns:140px 1fr;border:1px solid var(--g10);border-left:4px solid var(--g30);margin-bottom:6px;align-items:center;}
+.row .lab{font-family:var(--cond);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:10px 12px;border-right:1px solid var(--g10);background:var(--g05);}
+.chips{display:flex;gap:7px;flex-wrap:wrap;padding:9px 12px;}
+.chip{font-family:var(--cond);font-size:12.5px;font-weight:600;border:1px solid var(--g10);background:var(--wht);padding:5px 11px;display:flex;align-items:center;gap:6px;white-space:nowrap;}
+.chip .i{font-size:13px;}
+
+/* layer accents (left border + label colour) */
+.r-ux{border-left-color:var(--amb);}    .r-ux .lab{color:var(--amb);}
+.r-api{border-left-color:var(--blu);}    .r-api .lab{color:var(--blu);}
+.r-orc{border-left-color:var(--purple);} .r-orc .lab{color:var(--purple);}
+.r-ag{border-left-color:var(--purple);}  .r-ag .lab{color:var(--purple);}
+.r-llm{border-left-color:var(--grn);}    .r-llm .lab{color:var(--grn);}
+.r-sys{border-left-color:var(--g30);}    .r-sys .lab{color:var(--g70);}
+.r-kl{border-left-color:var(--red);}     .r-kl .lab{color:var(--red);}
+
+.chip.hot{border:1.5px solid var(--purple);background:var(--pl);color:var(--purple);font-weight:700;}
+.chip.dash{border:1.5px dashed var(--purple);color:var(--purple);font-weight:700;}
+.chip.gate{border-left:3px solid var(--grn);}
+.tag{font-family:var(--cond);font-size:8.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:var(--purple);color:#fff;padding:1px 5px;}
+
+/* event bus spine */
+.bus{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:linear-gradient(90deg,#7a00c2,#A100FF);color:#fff;padding:9px 14px;margin:6px 0;}
+.bus b{font-family:var(--cond);font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
+.bus .t{font-family:var(--cond);font-size:9.5px;font-weight:600;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);padding:2px 8px;border-radius:10px;}
+
+/* cross-cutting strip */
+.xstrip{display:flex;gap:8px;flex-wrap:wrap;align-items:center;border:1.5px dashed var(--purple);background:#fbf5ff;padding:9px 13px;margin-top:10px;}
+.xstrip b{font-family:var(--cond);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--purple);margin-right:4px;}
+.xstrip .x{font-family:var(--cond);font-size:12px;font-weight:600;color:var(--g70);display:flex;align-items:center;gap:5px;}
+.xstrip .x + .x::before{content:"·";color:var(--g30);margin-right:8px;}
+
+.loop{border:1.5px dashed var(--red);background:#FFF0F2;padding:8px 14px;margin-top:8px;font-size:12px;color:var(--g70);}
+.loop b{font-family:var(--cond);font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--red);margin-right:6px;}
+.loop .a{color:var(--red);font-weight:700;}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="hstripe"></div>
+  <div class="hinner">
+    <div class="acn-logo">&gt; Accenture · Utilico Energy</div>
+    <h1 class="h-title">Target <em>Architecture</em></h1>
+    <p class="h-sub">Event-driven &amp; agentic — every step on an <strong>event bus</strong>, agents scale independently, all audit flows to a <strong>Knowledge Layer</strong> that learns from DRI &amp; CSR activity.</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="row r-ux"><div class="lab">Experience · UI</div>
+    <div class="chips">
+      <span class="chip gate"><span class="i">🧑‍💼</span>CSR — approves 3 outputs</span>
+      <span class="chip gate"><span class="i">✅</span>DRI — decision gate</span>
+      <span class="chip"><span class="i">📊</span>Analyst Manager</span>
+    </div>
+  </div>
+
+  <div class="row r-api"><div class="lab">API</div>
+    <div class="chips">
+      <span class="chip"><span class="i">🚪</span>Gateway</span>
+      <span class="chip"><span class="i">🔐</span>Identity &amp; Access</span>
+    </div>
+  </div>
+
+  <div class="row r-orc"><div class="lab">Orchestration</div>
+    <div class="chips">
+      <span class="chip"><span class="i">🧭</span>Pipeline Orchestrator</span>
+      <span class="chip"><span class="i">⏱️</span>NFR / SLA Timers</span>
+    </div>
+  </div>
+
+  <div class="bus">
+    <b>🔀 Event Bus</b>
+    <span class="t">escalation.opened</span><span class="t">conflicts.detected</span><span class="t">brief.ready</span>
+    <span class="t">dri.decided</span><span class="t">output.approved</span><span class="t">dispatched</span>
+  </div>
+
+  <div class="row r-ag"><div class="lab">Agents · scaled independently</div>
+    <div class="chips">
+      <span class="chip"><span class="i">📥</span>Ingestion</span>
+      <span class="chip"><span class="i">🧮</span>Reconciliation</span>
+      <span class="chip"><span class="i">⚖️</span>Conflict (rules)</span>
+      <span class="chip hot"><span class="i">✨</span>Probabilistic — brief · 3 outputs · narrative<span class="tag">LLM</span></span>
+      <span class="chip dash"><span class="i">🔁</span>Learning — DRI/CSR</span>
+    </div>
+  </div>
+
+  <div class="row r-llm"><div class="lab">LLM</div>
+    <div class="chips">
+      <span class="chip"><span class="i">🧠</span>Model Gateway — Bedrock / Anthropic</span>
+      <span class="chip"><span class="i">🛡️</span>Prompts &amp; Guardrails</span>
+    </div>
+  </div>
+
+  <div class="row r-sys"><div class="lab">Systems</div>
+    <div class="chips">
+      <span class="chip">🏦 CC&amp;B</span><span class="chip">📟 MDM</span><span class="chip">🔌 OMS</span><span class="chip">📞 CRM</span><span class="chip">💰 GL</span>
+    </div>
+  </div>
+
+  <div class="row r-kl"><div class="lab">Knowledge Layer</div>
+    <div class="chips">
+      <span class="chip"><span class="i">📚</span>Immutable Audit</span>
+      <span class="chip"><span class="i">🕸️</span>Vector + Graph KB</span>
+      <span class="chip"><span class="i">🔎</span>Problem-Statement ID</span>
+      <span class="chip"><span class="i">🧑‍⚖️</span>DRI/CSR Decision Patterns</span>
+    </div>
+  </div>
+
+  <div class="xstrip">
+    <b>Cross-cutting</b>
+    <span class="x">🏛️ Governance (HITL · audit)</span>
+    <span class="x">💵 Cost</span>
+    <span class="x">📈 Observability</span>
+    <span class="x">🔒 Security</span>
+    <span class="x">⚙️ Autoscale / CI-CD</span>
+  </div>
+
+  <div class="loop">
+    <b>Learning loop</b>All layers <span class="a">→</span> audit to Knowledge Layer <span class="a">→</span> problem-statement &amp; decision-pattern analysis <span class="a">→</span> Learning Agent improves briefs &amp; drafts.
+  </div>
+
+</div>
+</body>
+</html>

@@ -24,5 +24,8 @@ Python mock application simulating an AI-driven billing reconciliation agent for
 - No tests, no logging frameworks, no CI — only what is needed to make the demo work
 - Every output must cite its source system — audit trail is a visible demo feature, not a background concern
 - No output may proceed without the DRI approval step — the human-in-the-loop gate must be visible in the UI
-
+- test files should created only under tests folder
+- all UI changes to accompanied by playwrite ui test case.
+- all UI will be accenture style with white background
+- all mock data should be injected through database/mock_data.json.
 

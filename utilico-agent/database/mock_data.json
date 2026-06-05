@@ -1,0 +1,521 @@
+{
+  "_readme": "Mock data for Utilico Energy Billing Reconciliation Agent. Add accounts, users, or system stubs here. Dates must be ISO 8601 strings (UTC). Re-seed via GET /seed after edits.",
+  "accounts": [
+    {
+      "account_id": "UTL-00421937",
+      "account_type": "commercial",
+      "customer_name": "Acme Manufacturing",
+      "address": { "street": "45 Industrial Blvd", "city": "Springfield", "state": "IL", "postcode": "62701" },
+      "billing_cycle": "monthly",
+      "tariff_code": "C2-LV",
+      "dri_pool": ["USR-DRI-001"],
+      "regulatory_tier": "tier_2",
+      "created_at": "2020-03-15T00:00:00",
+      "updated_at": "2024-10-31T00:00:00"
+    },
+    {
+      "account_id": "UTL-00389204",
+      "account_type": "commercial",
+      "customer_name": "Riverside Commercial",
+      "address": { "street": "200 River Road", "city": "Riverside", "state": "CA", "postcode": "92501" },
+      "billing_cycle": "monthly",
+      "tariff_code": "C1-GS",
+      "dri_pool": ["USR-DRI-001"],
+      "regulatory_tier": "tier_1",
+      "created_at": "2019-07-20T00:00:00",
+      "updated_at": "2024-11-30T00:00:00"
+    },
+    {
+      "account_id": "UTL-00371055",
+      "account_type": "commercial",
+      "customer_name": "Metro Offices",
+      "address": { "street": "1 Metro Plaza", "city": "Chicago", "state": "IL", "postcode": "60601" },
+      "billing_cycle": "monthly",
+      "tariff_code": "C1-GS",
+      "dri_pool": ["USR-DRI-001"],
+      "regulatory_tier": "tier_1",
+      "created_at": "2021-01-10T00:00:00",
+      "updated_at": "2024-12-31T00:00:00"
+    }
+  ],
+  "users": [
+    {
+      "user_id": "USR-CSR-112",
+      "name": "Sarah Chen",
+      "role": "csr",
+      "email": "sarah.chen@utilico.com",
+      "active": true,
+      "assigned_escalations": [],
+      "created_at": "2022-01-15T00:00:00"
+    },
+    {
+      "user_id": "USR-DRI-001",
+      "name": "James Okafor",
+      "role": "dri",
+      "email": "james.okafor@utilico.com",
+      "active": true,
+      "assigned_escalations": [],
+      "created_at": "2021-06-01T00:00:00"
+    },
+    {
+      "user_id": "USR-AM-001",
+      "name": "Priya Nair",
+      "role": "analyst_manager",
+      "email": "priya.nair@utilico.com",
+      "active": true,
+      "assigned_escalations": [],
+      "created_at": "2020-09-10T00:00:00"
+    }
+  ],
+  "ccb_stubs": [
+    {
+      "account_id": "UTL-00421937",
+      "account_status": "active",
+      "billing_period": { "start": "2024-10-01", "end": "2024-10-31", "cycle_days": 31 },
+      "billing_rules": { "tariff": "C2-LV", "proration_enabled": false, "disconnect_suppression": false },
+      "bill": { "generated_at": "2024-11-01T02:00:00", "total_kwh": 4200.0, "total_amount": 1134.00, "currency": "USD", "status": "issued" },
+      "stub_version": "1.0"
+    },
+    {
+      "account_id": "UTL-00389204",
+      "account_status": "active",
+      "billing_period": { "start": "2024-11-01", "end": "2024-11-30", "cycle_days": 30 },
+      "billing_rules": { "tariff": "C1-GS", "proration_enabled": false, "disconnect_suppression": false },
+      "bill": { "generated_at": "2024-12-01T02:00:00", "total_kwh": 2800.0, "total_amount": 756.00, "currency": "USD", "status": "issued" },
+      "stub_version": "1.0"
+    },
+    {
+      "account_id": "UTL-00371055",
+      "account_status": "active",
+      "billing_period": { "start": "2024-12-01", "end": "2024-12-31", "cycle_days": 31 },
+      "billing_rules": { "tariff": "C1-GS", "proration_enabled": true, "disconnect_suppression": true },
+      "bill": { "generated_at": "2025-01-01T02:00:00", "total_kwh": 3100.0, "total_amount": 837.00, "currency": "USD", "status": "issued" },
+      "stub_version": "1.0"
+    }
+  ],
+  "mdm_stubs": [
+    {
+      "account_id": "UTL-00421937",
+      "meter_id": "MTR-421937-A",
+      "_mdm_config": { "start_date": "2024-10-01", "actual_days": 18, "estimated_days": 13, "kwh_per_day": 145.0, "estimation_basis": "historical_avg" },
+      "stub_version": "1.0"
+    },
+    {
+      "account_id": "UTL-00389204",
+      "meter_id": "MTR-389204-A",
+      "_mdm_config": { "start_date": "2024-11-01", "actual_days": 15, "estimated_days": 15, "kwh_per_day": 93.0, "estimation_basis": "historical_avg" },
+      "stub_version": "1.0"
+    },
+    {
+      "account_id": "UTL-00371055",
+      "meter_id": "MTR-371055-A",
+      "_mdm_config": { "start_date": "2024-12-01", "actual_days": 31, "estimated_days": 0, "kwh_per_day": 100.0, "estimation_basis": null },
+      "stub_version": "1.0"
+    }
+  ],
+  "oms_stubs": [
+    {
+      "account_id": "UTL-00421937",
+      "current_service_status": "disconnected",
+      "work_orders": [
+        {
+          "work_order_id": "WO-88441",
+          "type": "disconnect",
+          "status": "completed",
+          "scheduled_at": "2024-10-18T08:00:00",
+          "completed_at": "2024-10-18T14:32:00",
+          "technician": { "id": "TECH-221", "name": "Marcus Webb", "confirmed": true },
+          "notes": "Non-payment disconnect executed per order."
+        }
+      ],
+      "stub_version": "1.0"
+    },
+    {
+      "account_id": "UTL-00389204",
+      "current_service_status": "disconnected",
+      "work_orders": [
+        {
+          "work_order_id": "WO-88502",
+          "type": "disconnect",
+          "status": "completed",
+          "scheduled_at": "2024-11-15T07:00:00",
+          "completed_at": "2024-11-15T09:15:00",
+          "technician": { "id": "TECH-219", "name": "Linda Park", "confirmed": true },
+          "notes": "Disconnect completed, no issues."
+        }
+      ],
+      "stub_version": "1.0"
+    },
+    {
+      "account_id": "UTL-00371055",
+      "current_service_status": "active",
+      "work_orders": [
+        {
+          "work_order_id": "WO-88600",
+          "type": "maintenance",
+          "status": "completed",
+          "scheduled_at": "2024-12-10T09:00:00",
+          "completed_at": "2024-12-10T11:00:00",
+          "technician": { "id": "TECH-230", "name": "Tom Nguyen", "confirmed": true },
+          "notes": "Routine meter inspection."
+        }
+      ],
+      "stub_version": "1.0"
+    }
+  ],
+  "crm_stubs": [
+    {
+      "account_id": "UTL-00421937",
+      "billing_hold": false,
+      "complaints": [
+        {
+          "complaint_id": "CMP-44821",
+          "type": "billing_dispute",
+          "status": "open",
+          "filed_at": "2024-10-22T10:30:00",
+          "channel": "email",
+          "description": "Customer disputes charges after reported service disconnection on Oct 18.",
+          "regulatory_dispute": true
+        }
+      ],
+      "notes": [
+        { "added_at": "2024-10-22T11:00:00", "author": "Sarah Chen", "text": "Customer contacted via email disputing full-cycle billing after disconnect." }
+      ],
+      "stub_version": "1.0"
+    },
+    {
+      "account_id": "UTL-00389204",
+      "billing_hold": false,
+      "complaints": [],
+      "notes": [],
+      "stub_version": "1.0"
+    },
+    {
+      "account_id": "UTL-00371055",
+      "billing_hold": false,
+      "complaints": [],
+      "notes": [],
+      "stub_version": "1.0"
+    }
+  ],
+  "gl_stubs": [
+    {
+      "account_id": "UTL-00421937",
+      "revenue_entries": [
+        {
+          "entry_id": "RE-2024-0421",
+          "period": "2024-10",
+          "amount": 1134.00,
+          "currency": "USD",
+          "status": "posted",
+          "posted_at": "2024-11-02T00:00:00",
+          "source_bill_id": "BILL-421937-2024-10",
+          "reversal_required": false,
+          "reversal_amount": null
+        }
+      ],
+      "stub_version": "1.0"
+    },
+    {
+      "account_id": "UTL-00389204",
+      "revenue_entries": [
+        {
+          "entry_id": "RE-2024-0389",
+          "period": "2024-11",
+          "amount": 756.00,
+          "currency": "USD",
+          "status": "pending",
+          "posted_at": null,
+          "source_bill_id": "BILL-389204-2024-11",
+          "reversal_required": false,
+          "reversal_amount": null
+        }
+      ],
+      "stub_version": "1.0"
+    },
+    {
+      "account_id": "UTL-00371055",
+      "revenue_entries": [
+        {
+          "entry_id": "RE-2024-0371",
+          "period": "2024-12",
+          "amount": 837.00,
+          "currency": "USD",
+          "status": "posted",
+          "posted_at": "2025-01-02T00:00:00",
+          "source_bill_id": "BILL-371055-2024-12",
+          "reversal_required": false,
+          "reversal_amount": null
+        }
+      ],
+      "stub_version": "1.0"
+    }
+  ],
+  "escalations": [
+    {
+      "escalation_id": "ESC-0001",
+      "account_id": "UTL-00389204",
+      "csr_id": "USR-CSR-112",
+      "dri_id": "USR-DRI-001",
+      "status": "awaiting_dri",
+      "opened_at": "2024-11-28T07:00:00",
+      "resolved_at": null,
+      "pipeline": {
+        "step_1_trigger": {
+          "trigger_type": "manual_csr",
+          "dispute_type": "estimated_read_dispute",
+          "notes": "Customer disputes estimated reads after service disconnection.",
+          "triggered_at": "2024-11-28T07:00:00",
+          "completed_at": "2024-11-28T07:00:00"
+        },
+        "step_2_ingestion": { "completed_at": "2024-11-28T07:05:00", "systems_queried": ["ccb", "mdm", "oms", "crm", "gl"] },
+        "step_3_reconciliation": { "completed_at": "2024-11-28T07:10:00" },
+        "step_4_conflicts": {
+          "completed_at": "2024-11-28T07:15:00",
+          "conflicts": [
+            { "id": "C1", "systems": ["oms", "ccb"], "detected": true,  "invariant": "billing_suppression_missing", "evidence": "OMS disconnect 2024-11-15 not reflected in CC&B billing cycle end" },
+            { "id": "C2", "systems": ["mdm", "oms"], "detected": true,  "invariant": "phantom_consumption",          "evidence": "MDM shows 12 estimated reads after OMS disconnect date 2024-11-15" },
+            { "id": "C3", "systems": ["crm", "ccb"], "detected": false, "invariant": "billing_hold_missing",          "evidence": null },
+            { "id": "C4", "systems": ["gl",  "crm"], "detected": false, "invariant": "gl_revenue_dispute",            "evidence": null }
+          ]
+        },
+        "step_5_brief": {
+          "completed_at": "2024-11-28T07:20:00",
+          "brief_text": "Billed full cycle [CC&B]. Disconnect confirmed mid-cycle [OMS]. Post-disconnect reads estimated [MDM]. Prior complaint on file, no billing-hold triggered [CRM]. Revenue posted [GL].\n\nRecommend: suppress & prorate.",
+          "citation_coverage": 1.0,
+          "confidence_signal": "high",
+          "recommendations": [
+            { "conflict_id": "C1", "action": "suppress_post_disconnect_billing", "cited_system": "oms" },
+            { "conflict_id": "C2", "action": "zero_estimated_reads",             "cited_system": "mdm" }
+          ]
+        },
+        "step_6_dri": null,
+        "step_7_outputs": null
+      },
+      "created_at": "2024-11-28T07:00:00",
+      "updated_at": "2024-11-28T07:20:00"
+    },
+    {
+      "escalation_id": "ESC-0002",
+      "account_id": "UTL-00421937",
+      "csr_id": "USR-CSR-112",
+      "dri_id": "USR-DRI-001",
+      "status": "analysing",
+      "opened_at": "2024-11-28T08:40:00",
+      "resolved_at": null,
+      "pipeline": {
+        "step_1_trigger": {
+          "trigger_type": "manual_csr",
+          "dispute_type": "billing_after_disconnect",
+          "notes": "Customer disputes full October bill. Service disconnected mid-cycle.",
+          "triggered_at": "2024-11-28T08:40:00",
+          "completed_at": "2024-11-28T08:40:00"
+        },
+        "step_2_ingestion": { "completed_at": "2024-11-28T08:45:00", "systems_queried": ["ccb", "mdm", "oms", "crm", "gl"] },
+        "step_3_reconciliation": null,
+        "step_4_conflicts": null,
+        "step_5_brief": null,
+        "step_6_dri": null,
+        "step_7_outputs": null
+      },
+      "created_at": "2024-11-28T08:40:00",
+      "updated_at": "2024-11-28T08:45:00"
+    },
+    {
+      "escalation_id": "ESC-0003",
+      "account_id": "UTL-00371055",
+      "csr_id": "USR-CSR-112",
+      "dri_id": "USR-DRI-001",
+      "status": "resolved",
+      "opened_at": "2024-11-26T09:00:00",
+      "resolved_at": "2024-11-26T11:00:00",
+      "pipeline": {
+        "step_1_trigger": {
+          "trigger_type": "manual_csr",
+          "dispute_type": "billing_after_disconnect",
+          "notes": "Routine check.",
+          "triggered_at": "2024-11-26T09:00:00",
+          "completed_at": "2024-11-26T09:00:00"
+        },
+        "step_2_ingestion": { "completed_at": "2024-11-26T09:03:00", "systems_queried": ["ccb", "mdm", "oms", "crm", "gl"] },
+        "step_3_reconciliation": { "completed_at": "2024-11-26T09:05:00" },
+        "step_4_conflicts": {
+          "completed_at": "2024-11-26T09:08:00",
+          "conflicts": [
+            { "id": "C1", "systems": ["oms", "ccb"], "detected": false, "invariant": "billing_suppression_missing", "evidence": null },
+            { "id": "C2", "systems": ["mdm", "oms"], "detected": false, "invariant": "phantom_consumption",          "evidence": null },
+            { "id": "C3", "systems": ["crm", "ccb"], "detected": false, "invariant": "billing_hold_missing",          "evidence": null },
+            { "id": "C4", "systems": ["gl",  "crm"], "detected": false, "invariant": "gl_revenue_dispute",            "evidence": null }
+          ]
+        },
+        "step_5_brief": {
+          "completed_at": "2024-11-26T09:10:00",
+          "brief_text": "No billing anomalies detected for UTL-00371055. All 4 invariants clear across CC&B, MDM, OMS, CRM, and GL. No disconnect event in OMS. No action required.",
+          "citation_coverage": 1.0,
+          "confidence_signal": "high",
+          "recommendations": []
+        },
+        "step_6_dri": {
+          "decision": "approved",
+          "decided_by": "USR-DRI-001",
+          "reason": null,
+          "decided_at": "2024-11-26T11:00:00"
+        },
+        "step_7_outputs": {
+          "dispatched_at": "2024-11-26T11:05:00",
+          "customer_summary": {
+            "format": "json", "audience": "customer",
+            "content": {
+              "what_we_found": "We reviewed account UTL-00371055 and found no billing discrepancies. All system records are consistent.",
+              "what_we_done": "Full reconciliation completed across all 5 systems. No adjustments required.",
+              "what_happens_next": "No action needed. Your next bill will be issued on schedule.",
+              "next_update_date": "2024-12-05"
+            }
+          },
+          "executive_brief": {
+            "format": "json", "audience": "executive",
+            "content": {
+              "situation": "Routine reconciliation for Metro Offices (UTL-00371055). No anomalies detected.",
+              "financial_impact": "No adjustments required. No revenue at risk.",
+              "findings": [],
+              "next_steps": ["No action required."],
+              "gl_reversal_note": null,
+              "regulatory_exposure": "No regulatory exposure identified."
+            }
+          },
+          "engineering_handoff": {
+            "format": "jira_story", "audience": "engineering",
+            "content": {
+              "priority": "P3",
+              "title": "[UTL-00371055] Billing Reconciliation — 0 conflicts detected",
+              "linked_systems": [],
+              "description": "Routine check. No action required.",
+              "acceptance_criteria": ["AC1: Confirm no billing anomalies in CC&B — verified"],
+              "escalation_id": "ESC-0003",
+              "dri_approved": true
+            }
+          }
+        }
+      },
+      "created_at": "2024-11-26T09:00:00",
+      "updated_at": "2024-11-26T11:05:00"
+    },
+    {
+      "escalation_id": "ESC-0004",
+      "account_id": "UTL-00421937",
+      "csr_id": "USR-CSR-112",
+      "dri_id": "USR-DRI-001",
+      "status": "awaiting_output_review",
+      "opened_at": "2024-11-29T09:15:00",
+      "resolved_at": null,
+      "pipeline": {
+        "step_1_trigger": {
+          "trigger_type": "manual_csr",
+          "dispute_type": "billing_after_disconnect",
+          "notes": "Customer disputes full-cycle bill after mid-cycle disconnect.",
+          "triggered_at": "2024-11-29T09:15:00",
+          "completed_at": "2024-11-29T09:15:00"
+        },
+        "step_2_ingestion": { "completed_at": "2024-11-29T09:18:00", "systems_queried": ["ccb", "mdm", "oms", "crm", "gl"] },
+        "step_3_reconciliation": { "completed_at": "2024-11-29T09:20:00" },
+        "step_4_conflicts": {
+          "completed_at": "2024-11-29T09:22:00",
+          "conflicts": [
+            { "id": "C1", "systems": ["oms", "ccb"], "detected": true, "invariant": "billing_suppression_missing", "evidence": "OMS disconnect 2024-10-18 not reflected in CC&B billing cycle end" },
+            { "id": "C2", "systems": ["mdm", "oms"], "detected": true, "invariant": "phantom_consumption",          "evidence": "MDM shows estimated reads for 13 days after OMS disconnect date 2024-10-18" },
+            { "id": "C3", "systems": ["crm", "ccb"], "detected": true, "invariant": "billing_hold_missing",          "evidence": "CRM complaint CMP-44821 open but CC&B billing_hold=false" },
+            { "id": "C4", "systems": ["gl",  "crm"], "detected": true, "invariant": "gl_revenue_dispute",            "evidence": "GL revenue entry RE-2024-0421 posted while CRM complaint is open" }
+          ]
+        },
+        "step_5_brief": {
+          "completed_at": "2024-11-29T09:24:00",
+          "brief_text": "Commercial customer billed $1134.0 for 4200.0 kWh over full 31-day cycle [CC&B]. Service disconnected 2024-10-18 with technician confirmation [OMS]. MDM recorded 1885.0 kWh estimated consumption over 13 post-disconnect days [MDM]. Open regulatory billing dispute complaint CMP-44821 with billing_hold=false [CRM]. Revenue entry RE-2024-0421 posted for $1134.0 [GL]. Recommend: suppress post-disconnect billing, eliminate phantom consumption, apply billing hold, and adjust revenue recognition.",
+          "citation_coverage": 1.0,
+          "confidence_signal": "high",
+          "recommendations": [
+            { "conflict_id": "C1", "action": "Suppress post-disconnect portion; issue prorated credit", "cited_system": "OMS", "rationale": "OMS confirmed disconnect 2024-10-18 but CC&B billed full 31-day cycle." },
+            { "conflict_id": "C2", "action": "Flag phantom consumption; adjust MDM reads to zero for post-disconnect days", "cited_system": "MDM", "rationale": "MDM shows estimated consumption after OMS-confirmed disconnect." },
+            { "conflict_id": "C3", "action": "Link CRM complaint; apply billing-hold flag; trigger review", "cited_system": "CRM", "rationale": "Open regulatory complaint CMP-44821 with billing_hold=false." },
+            { "conflict_id": "C4", "action": "Generate credit note; flag GL for revenue adjustment and regulatory filing", "cited_system": "GL", "rationale": "Revenue posted while dispute is open." }
+          ]
+        },
+        "step_6_dri": {
+          "decision": "approved",
+          "decided_by": "USR-DRI-001",
+          "reason": null,
+          "decided_at": "2024-11-29T09:40:00"
+        },
+        "step_7_outputs": {
+          "dispatched_at": null,
+          "customer_summary": {
+            "format": "json", "audience": "customer",
+            "review_status": "pending_review", "reviewed_by": null, "reviewed_at": null, "edited": false,
+            "content": {
+              "what_we_found": "We identified 4 billing discrepancies on your account (UTL-00421937). A service disconnection on 2024-10-18 was cross-referenced against your meter reads and billing records, and the full monthly cycle was billed despite the mid-cycle disconnect.",
+              "what_we_done": "Our reconciliation system flagged the affected charges and escalated to a Designated Review Individual, who approved the resolution. Recommended actions: suppress post-disconnect billing; zero estimated reads; apply billing hold; adjust revenue.",
+              "what_happens_next": "Applicable credits and adjustments will be applied to your account within 3-5 business days. You will receive a revised statement.",
+              "next_update_date": "2024-12-04"
+            }
+          },
+          "executive_brief": {
+            "format": "json", "audience": "executive",
+            "review_status": "pending_review", "reviewed_by": null, "reviewed_at": null, "edited": false,
+            "content": {
+              "situation": "Post-disconnect billing dispute for Acme Manufacturing (UTL-00421937). Full 31-day cycle billed after a confirmed mid-cycle disconnect; 4 cross-system conflicts detected.",
+              "financial_impact": "Potential billing adjustment of up to $1,134.00. 4 conflict(s) detected across billing systems.",
+              "findings": [
+                "C1: billing_suppression_missing — OMS disconnect 2024-10-18 not reflected in CC&B cycle end",
+                "C2: phantom_consumption — MDM estimated reads for 13 post-disconnect days",
+                "C3: billing_hold_missing — CRM complaint CMP-44821 open but billing_hold=false",
+                "C4: gl_revenue_dispute — GL entry RE-2024-0421 posted while complaint open"
+              ],
+              "next_steps": [
+                "Suppress post-disconnect portion; issue prorated credit",
+                "Adjust MDM estimated reads to zero for post-disconnect days",
+                "Apply CRM billing-hold and link complaint",
+                "Generate credit note and flag GL entry for reversal [GL]"
+              ],
+              "gl_reversal_note": "GL revenue entry RE-2024-0421 flagged for reversal pending regulatory filing.",
+              "regulatory_exposure": "Regulatory dispute on file. Tier-2 regulatory review may apply."
+            }
+          },
+          "engineering_handoff": {
+            "format": "jira_story", "audience": "engineering",
+            "review_status": "pending_review", "reviewed_by": null, "reviewed_at": null, "edited": false,
+            "content": {
+              "priority": "P1",
+              "title": "[UTL-00421937] Billing Reconciliation — 4 conflict(s) detected: C1, C2, C3, C4",
+              "linked_systems": ["ccb", "crm", "gl", "mdm", "oms"],
+              "description": "Full-cycle bill issued after confirmed mid-cycle disconnect. Suppress post-disconnect billing, zero phantom reads, apply billing hold, and adjust revenue recognition.",
+              "acceptance_criteria": [
+                "AC1: Post-disconnect billing suppression applied for UTL-00421937 — verified in CC&B",
+                "AC2: MDM estimated reads zeroed for all post-disconnect days — verified in MDM",
+                "AC3: CRM billing_hold flag propagated to CC&B billing rules — verified in CRM",
+                "AC4: GL revenue entry flagged for reversal; credit note generated — verified in GL",
+                "AC5: Audit trail complete with >=1 entry per pipeline step — verified in audit_trail",
+                "AC6: All 3 output documents reviewed and approved by CSR before dispatch"
+              ],
+              "escalation_id": "ESC-0004",
+              "dri_approved": true
+            }
+          }
+        }
+      },
+      "created_at": "2024-11-29T09:15:00",
+      "updated_at": "2024-11-29T09:40:00"
+    }
+  ],
+  "analyst_executions": [
+    { "execution_id": "EX-0004", "escalation_id": "ESC-0004", "account_id": "UTL-00421937", "trigger_type": "manual_csr", "overall_status": "running", "pipeline_stage": 6, "conflicts_detected": 4, "citation_coverage": 1.0, "agent_duration_ms": 22400, "total_duration_ms": null, "nfr_breaches": 0, "created_at": "2024-11-29T09:15:00", "completed_at": null },
+    { "execution_id": "EX-0001", "escalation_id": "ESC-0001", "account_id": "UTL-00389204", "trigger_type": "manual_csr", "overall_status": "running",  "pipeline_stage": 5, "conflicts_detected": 2, "citation_coverage": 1.0, "agent_duration_ms": 19200, "total_duration_ms": null,   "nfr_breaches": 0, "created_at": "2024-11-28T07:00:00", "completed_at": null },
+    { "execution_id": "EX-0002", "escalation_id": "ESC-0002", "account_id": "UTL-00421937", "trigger_type": "manual_csr", "overall_status": "running",  "pipeline_stage": 2, "conflicts_detected": 0, "citation_coverage": 0.0, "agent_duration_ms": null,  "total_duration_ms": null,   "nfr_breaches": 0, "created_at": "2024-11-28T08:40:00", "completed_at": null },
+    { "execution_id": "EX-0003", "escalation_id": "ESC-0003", "account_id": "UTL-00371055", "trigger_type": "manual_csr", "overall_status": "complete", "pipeline_stage": 7, "conflicts_detected": 0, "citation_coverage": 1.0, "agent_duration_ms": 17600, "total_duration_ms": 318000,  "nfr_breaches": 0, "created_at": "2024-11-26T09:00:00", "completed_at": "2024-11-26T11:05:00" },
+    { "execution_id": "EX-0042", "escalation_id": "ESC-0042", "account_id": "UTL-00421937", "trigger_type": "oms_auto",   "overall_status": "complete", "pipeline_stage": 7, "conflicts_detected": 4, "citation_coverage": 1.0, "agent_duration_ms": 23400, "total_duration_ms": 289000,  "nfr_breaches": 0, "created_at": "2024-11-21T10:30:00", "completed_at": "2024-11-21T10:36:00" },
+    { "execution_id": "EX-0039", "escalation_id": "ESC-0039", "account_id": "UTL-00389204", "trigger_type": "manual_csr", "overall_status": "complete", "pipeline_stage": 7, "conflicts_detected": 2, "citation_coverage": 1.0, "agent_duration_ms": 19800, "total_duration_ms": 271000,  "nfr_breaches": 0, "created_at": "2024-11-19T13:45:00", "completed_at": "2024-11-19T13:51:00" },
+    { "execution_id": "EX-0036", "escalation_id": "ESC-0036", "account_id": "UTL-00421937", "trigger_type": "manual_dri", "overall_status": "complete", "pipeline_stage": 7, "conflicts_detected": 4, "citation_coverage": 1.0, "agent_duration_ms": 41200, "total_duration_ms": 452000,  "nfr_breaches": 1, "created_at": "2024-11-16T09:00:00", "completed_at": "2024-11-16T09:08:00" },
+    { "execution_id": "EX-0033", "escalation_id": "ESC-0033", "account_id": "UTL-00371055", "trigger_type": "manual_csr", "overall_status": "complete", "pipeline_stage": 7, "conflicts_detected": 1, "citation_coverage": 1.0, "agent_duration_ms": 16900, "total_duration_ms": 254000,  "nfr_breaches": 0, "created_at": "2024-11-12T15:20:00", "completed_at": "2024-11-12T15:25:00" },
+    { "execution_id": "EX-0029", "escalation_id": "ESC-0029", "account_id": "UTL-00389204", "trigger_type": "oms_auto",   "overall_status": "complete", "pipeline_stage": 7, "conflicts_detected": 3, "citation_coverage": 1.0, "agent_duration_ms": 25600, "total_duration_ms": 301000,  "nfr_breaches": 0, "created_at": "2024-11-08T11:10:00", "completed_at": "2024-11-08T11:16:00" },
+    { "execution_id": "EX-0025", "escalation_id": "ESC-0025", "account_id": "UTL-00371055", "trigger_type": "manual_csr", "overall_status": "complete", "pipeline_stage": 7, "conflicts_detected": 0, "citation_coverage": 1.0, "agent_duration_ms": 17300, "total_duration_ms": 248000,  "nfr_breaches": 0, "created_at": "2024-11-05T08:50:00", "completed_at": "2024-11-05T08:55:00" },
+    { "execution_id": "EX-0019", "escalation_id": "ESC-0019", "account_id": "UTL-00421937", "trigger_type": "manual_csr", "overall_status": "complete", "pipeline_stage": 7, "conflicts_detected": 4, "citation_coverage": 1.0, "agent_duration_ms": 21800, "total_duration_ms": 278000,  "nfr_breaches": 0, "created_at": "2024-11-01T14:20:00", "completed_at": "2024-11-01T14:26:00" }
+  ]
+}

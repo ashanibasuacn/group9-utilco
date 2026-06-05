@@ -1,0 +1,2540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Utilico Energy — Billing Reconciliation Agent</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ─────────────────────────────────────────────────────────────── */
+:root {
+  --purple:  #A100FF;
+  --lpurple: #F3E5FF;
+  --mpurple: #D580FF;
+  --black:   #000000;
+  --n90:     #1C1C1C;
+  --red:     #C8001D;
+  --lred:    #FFF0F2;
+  --green:   #007A3D;
+  --lgreen:  #E5F5ED;
+  --blue:    #004F9F;
+  --lblue:   #E5EEF8;
+  --amber:   #B45000;
+  --g1:      #F5F5F5;
+  --g2:      #E8E8E8;
+  --g3:      #B8B8B8;
+  --g4:      #767676;
+  --g5:      #4A4A4A;
+  --white:   #FFFFFF;
+  --sans:    'Barlow', sans-serif;
+  --cond:    'Barlow Condensed', sans-serif;
+  /* login panel */
+  --lbg:   #0E1824;
+  --lcard: #162030;
+  --lborder: #243040;
+}
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--sans); font-size: 14px; color: var(--n90); background: var(--white); min-height: 100vh; line-height: 1.5; }
+h1,h2,h3 { font-family: var(--cond); font-weight: 700; }
+
+/* ── LOGIN PAGE ────────────────────────────────────────────────────────── */
+.login-wrap {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  min-height: 100vh;
+}
+
+/* LEFT PANEL — role selector */
+.login-left {
+  background: var(--white);
+  padding: 48px 28px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--g2);
+}
+.login-left-title {
+  font-family: var(--cond);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--g4);
+  margin-bottom: 4px;
+}
+.login-left-sub {
+  font-size: 12px;
+  color: var(--g4);
+  margin-bottom: 32px;
+}
+.role-list { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+
+.role-card {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 12px 14px;
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.role-card:hover { background: var(--g1); }
+.role-card.selected {
+  background: var(--lpurple);
+  border-color: var(--purple);
+}
+
+.role-avatar {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--cond); font-size: 13px; font-weight: 700; color: var(--white);
+  opacity: .85;
+}
+.role-card.selected .role-avatar { opacity: 1; }
+.role-card-body { flex: 1; min-width: 0; }
+.role-card-name { font-size: 13px; font-weight: 600; color: var(--g5); margin-bottom: 3px; }
+.role-tag {
+  display: inline-block;
+  font-family: var(--cond);
+  font-size: 9px; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  padding: 2px 7px; border-radius: 3px;
+  margin-bottom: 2px;
+}
+.role-card-desc { font-size: 11px; color: var(--g4); margin-top: 2px; }
+
+.role-radio {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--g3);
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+  flex-shrink: 0;
+}
+.role-card.selected .role-radio {
+  border-color: var(--purple);
+  background: var(--purple);
+}
+.role-radio-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--white);
+  display: none;
+}
+.role-card.selected .role-radio-dot { display: block; }
+
+/* RIGHT PANEL — credentials */
+.login-right {
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  border-left: 1px solid var(--g2);
+}
+.login-right-inner { width: 100%; max-width: 440px; }
+
+.login-brand {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 36px;
+}
+.login-brand-icon {
+  width: 52px; height: 52px;
+  background: var(--lbg);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+}
+.login-brand-icon svg { width: 28px; height: 28px; }
+.login-brand-text { }
+.login-brand-name {
+  font-family: var(--cond);
+  font-size: 22px; font-weight: 700;
+  color: var(--n90); letter-spacing: .01em;
+}
+.login-brand-sub {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--g4);
+}
+
+.login-role-hint {
+  display: flex; align-items: center; gap: 8px;
+  background: #fef9ec;
+  border: 1px solid #f5d87a;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--amber);
+  margin-bottom: 28px;
+  min-height: 42px;
+}
+.login-role-hint .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--amber);
+  flex-shrink: 0;
+}
+.login-role-hint.active { background: #f0fdf4; border-color: #86efac; color: var(--green); }
+.login-role-hint.active .dot { background: var(--green); }
+
+.cred-label {
+  font-size: 11px; font-weight: 600;
+  color: var(--g4);
+  text-transform: uppercase; letter-spacing: .06em;
+  margin-bottom: 6px; display: block;
+}
+.cred-input {
+  width: 100%; padding: 11px 14px;
+  border: 1.5px solid var(--g2);
+  border-radius: 6px;
+  font: 400 14px var(--sans);
+  color: var(--n90);
+  background: var(--white);
+  margin-bottom: 16px;
+  transition: border .15s;
+}
+.cred-input:focus { outline: none; border-color: var(--purple); }
+.cred-input.filled { border-color: var(--g3); background: #fafafa; }
+
+.pw-wrap { position: relative; margin-bottom: 6px; }
+.pw-wrap .cred-input { margin-bottom: 0; padding-right: 44px; }
+.pw-eye {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  cursor: pointer; color: var(--g4);
+}
+.pw-hint { font-size: 11px; color: var(--amber); margin-bottom: 20px; margin-top: 6px; }
+.pw-hint span { font-weight: 600; }
+
+.btn-signin {
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, #00c6fb 0%, #005bea 100%);
+  border: none; border-radius: 6px;
+  color: var(--white);
+  font: 700 15px var(--cond);
+  letter-spacing: .08em;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.btn-signin:hover { opacity: .9; }
+.btn-signin:disabled { opacity: .45; cursor: not-allowed; }
+
+.login-divider { border: none; border-top: 1px solid var(--g2); margin: 28px 0 20px; }
+
+.role-matrix-title {
+  font-family: var(--cond);
+  font-size: 10px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--g4); margin-bottom: 12px;
+}
+.role-matrix { display: flex; flex-direction: column; gap: 6px; }
+.role-matrix-row {
+  display: grid; grid-template-columns: 90px 1fr;
+  gap: 10px; align-items: start;
+  font-size: 12px;
+}
+.rmt { font-weight: 600; color: var(--g5); }
+.rmd { color: var(--g4); line-height: 1.5; }
+
+/* ── NAVBAR (post-login) ────────────────────────────────────────────────── */
+.navbar {
+  background: var(--black);
+  border-bottom: 3px solid var(--purple);
+  display: flex; align-items: center;
+  padding: 0 28px; height: 52px; gap: 4px;
+  position: sticky; top: 0; z-index: 100;
+}
+.navbar .brand {
+  color: var(--purple); font-family: var(--cond);
+  font-size: 17px; font-weight: 700; letter-spacing: 1px;
+  margin-right: 24px;
+}
+.navbar .brand span {
+  color: #666; font-weight: 400;
+  font-size: 11px; margin-left: 8px;
+  text-transform: uppercase; letter-spacing: .08em;
+}
+.nav-tab {
+  color: var(--g4); background: none; border: none;
+  cursor: pointer; font: 600 11px var(--cond);
+  padding: 0 16px; height: 52px;
+  letter-spacing: .08em; text-transform: uppercase;
+  border-bottom: 3px solid transparent; margin-bottom: -3px;
+  transition: all .15s;
+}
+.nav-tab:hover { color: var(--white); }
+.nav-tab.active { color: var(--purple); border-bottom-color: var(--purple); }
+.nav-spacer { flex: 1; }
+.nav-user {
+  display: flex; align-items: center; gap: 10px;
+}
+.nav-avatar {
+  width: 28px; height: 28px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--cond); font-size: 11px; font-weight: 700; color: var(--white);
+}
+.nav-name { font-size: 12px; color: var(--g3); font-weight: 500; }
+.nav-role-tag {
+  font-family: var(--cond); font-size: 9px; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  padding: 2px 6px; border-radius: 2px;
+}
+.btn-logout {
+  background: none; border: 1px solid #333; color: var(--g4);
+  padding: 4px 12px; border-radius: 4px; cursor: pointer;
+  font: 600 11px var(--cond); letter-spacing: .06em; text-transform: uppercase;
+  margin-left: 12px;
+}
+.btn-logout:hover { border-color: var(--g3); color: var(--white); }
+
+/* ── PAGE SHELL ─────────────────────────────────────────────────────────── */
+.page-header {
+  background: var(--white);
+  border-bottom: 2px solid var(--g2);
+  padding: 20px 32px 18px;
+}
+.page-kicker {
+  font-family: var(--cond); font-size: 10px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--purple); margin-bottom: 4px;
+}
+.page-title {
+  font-family: var(--cond); font-size: 24px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: -.01em;
+  color: var(--n90);
+}
+.page-title em { color: var(--purple); font-style: normal; }
+.main { max-width: 1140px; margin: 0 auto; padding: 28px 32px; }
+
+/* ── CARDS & PANELS ─────────────────────────────────────────────────────── */
+.card {
+  background: var(--white); border-radius: 0;
+  border: 1px solid var(--g2); border-top: 3px solid var(--purple);
+  padding: 20px 24px; margin-bottom: 16px;
+}
+.card.green  { border-top-color: var(--green); }
+.card.blue   { border-top-color: var(--blue); }
+.card.red    { border-top-color: var(--red); }
+.card.gray   { border-top-color: var(--g3); }
+.card-title {
+  font-family: var(--cond); font-size: 13px; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--g4); margin-bottom: 14px;
+}
+.panel {
+  background: var(--white); border-left: 3px solid var(--purple);
+  padding: 14px 18px; margin-bottom: 12px;
+  border-top: 1px solid var(--g2); border-right: 1px solid var(--g2); border-bottom: 1px solid var(--g2);
+}
+.panel.green  { border-left-color: var(--green); }
+.panel.red    { border-left-color: var(--red); background: var(--lred); }
+.panel.blue   { border-left-color: var(--blue); background: var(--lblue); }
+.panel.amber  { border-left-color: var(--amber); }
+
+/* ── BADGES ────────────────────────────────────────────────────────────── */
+.badge {
+  display: inline-block; font-family: var(--cond);
+  font-size: 9px; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  padding: 2px 8px; border-radius: 2px;
+}
+.badge-analysing  { background: var(--lpurple); color: var(--purple); }
+.badge-awaiting   { background: var(--lblue); color: var(--blue); }
+.badge-approved   { background: var(--lgreen); color: var(--green); }
+.badge-rejected   { background: var(--lred); color: var(--red); }
+.badge-resolved   { background: var(--lgreen); color: var(--green); }
+.badge-review     { background: #FFF3E5; color: var(--amber); }
+.badge-initiated  { background: var(--g2); color: var(--g4); }
+.badge-running    { background: var(--lpurple); color: var(--purple); }
+.badge-complete   { background: var(--lgreen); color: var(--green); }
+.badge-conflict   { background: var(--lred); color: var(--red); }
+.badge-clear      { background: var(--lgreen); color: var(--green); }
+.badge-new        { background: var(--purple); color: var(--white); }
+
+/* ── BUTTONS ────────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-block; padding: 9px 20px;
+  border: none; cursor: pointer;
+  font: 700 11px var(--cond);
+  letter-spacing: .1em; text-transform: uppercase;
+  transition: all .15s;
+}
+.btn-primary  { background: var(--purple); color: var(--white); }
+.btn-primary:hover { background: #8800d4; }
+.btn-approve  { background: var(--purple); color: var(--white); }
+.btn-approve:hover { background: #8800d4; }
+.btn-reject   { background: var(--white); color: var(--red); border: 1.5px solid var(--red); }
+.btn-reject:hover { background: var(--red); color: var(--white); }
+.btn-exception { background: var(--white); color: var(--amber); border: 1.5px solid var(--amber); }
+.btn-exception:hover { background: var(--amber); color: var(--white); }
+.btn-ghost { background: var(--white); color: var(--purple); border: 1.5px solid var(--purple); }
+.btn-ghost:hover { background: var(--lpurple); }
+.btn-sm { padding: 5px 12px; font-size: 10px; }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ── FORMS ──────────────────────────────────────────────────────────────── */
+.form-group { margin-bottom: 14px; }
+label {
+  display: block; font-family: var(--cond);
+  font-size: 10px; font-weight: 700;
+  color: var(--g4); margin-bottom: 5px;
+  text-transform: uppercase; letter-spacing: .08em;
+}
+input, select, textarea {
+  width: 100%; padding: 9px 12px;
+  border: 1.5px solid var(--g2);
+  font: 400 13px var(--sans);
+  background: var(--white); color: var(--n90);
+  transition: border .15s;
+}
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--purple); }
+textarea { resize: vertical; min-height: 72px; }
+
+/* ── TABLES ─────────────────────────────────────────────────────────────── */
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th {
+  background: var(--g1); padding: 8px 12px; text-align: left;
+  font-family: var(--cond); font-size: 10px; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--g4); border-bottom: 2px solid var(--g2);
+}
+td { padding: 10px 12px; border-bottom: 1px solid var(--g2); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #fafafa; }
+
+/* ── METRICS ────────────────────────────────────────────────────────────── */
+.metrics-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: var(--g2); margin-bottom: 24px; border: 1px solid var(--g2); }
+.metric-card { background: var(--white); padding: 18px 20px; }
+.metric-label { font-family: var(--cond); font-size: 10px; font-weight: 700; color: var(--g4); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
+.metric-value { font-family: var(--cond); font-size: 26px; font-weight: 700; line-height: 1; }
+.metric-sub   { font-size: 11px; color: var(--g4); margin-top: 3px; }
+.metric-good  { color: var(--green); }
+.metric-warn  { color: var(--amber); }
+.metric-bad   { color: var(--red); }
+.metric-purple { color: var(--purple); }
+
+/* ── MISC ───────────────────────────────────────────────────────────────── */
+.section-title {
+  font-family: var(--cond); font-size: 22px; font-weight: 700;
+  text-transform: uppercase; margin-bottom: 20px;
+}
+.section-title span { color: var(--purple); }
+.empty { text-align: center; color: var(--g4); padding: 40px 0; font-size: 13px; }
+.alert { padding: 10px 14px; margin-bottom: 14px; font-size: 13px; border-left: 3px solid; }
+.alert-ok   { background: var(--lgreen); color: var(--green); border-color: var(--green); }
+.alert-err  { background: var(--lred);   color: var(--red);   border-color: var(--red); }
+.alert-info { background: var(--lpurple); color: var(--purple); border-color: var(--purple); }
+.flex { display: flex; align-items: center; gap: 10px; }
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.tag { font-size: 11px; background: var(--g1); border: 1px solid var(--g2); padding: 2px 6px; color: var(--g5); font-family: monospace; }
+.brief-box {
+  background: var(--lpurple); border-left: 3px solid var(--purple);
+  padding: 16px 20px; margin-bottom: 14px;
+  font-size: 13px; line-height: 1.7; white-space: pre-wrap;
+}
+.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--g2); border-top-color: var(--purple); border-radius: 50%; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fadein { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes pulsering { 0% { box-shadow: 0 0 0 0 rgba(161,0,255,.45); } 70% { box-shadow: 0 0 0 8px rgba(161,0,255,0); } 100% { box-shadow: 0 0 0 0 rgba(161,0,255,0); } }
+@keyframes barslide { 0% { left: -40%; } 100% { left: 100%; } }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+.live-pulse { animation: pulsering 1.4s infinite; }
+.prog-track { position: relative; height: 6px; background: var(--g2); border-radius: 3px; overflow: hidden; }
+.prog-track::after { content: ''; position: absolute; top: 0; left: -40%; width: 40%; height: 100%; background: linear-gradient(90deg, transparent, var(--purple), transparent); animation: barslide 1.3s linear infinite; }
+.divider { height: 1px; background: var(--g2); margin: 20px 0; }
+.kicker { font-family: var(--cond); font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--purple); margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+const API = '';
+const USERS = {
+  csr: {
+    id: 'USR-CSR-112', name: 'Sarah Chen', role: 'csr',
+    initials: 'SC', color: '#004F9F',
+    tag: 'CSR', tagBg: '#E5EEF8', tagColor: '#004F9F',
+    desc: 'Customer Service Representative',
+    email: 'sarah.chen@utilico.com', pw: 'password123',
+  },
+  dri: {
+    id: 'USR-DRI-001', name: 'James Okafor', role: 'dri',
+    initials: 'JO', color: '#A100FF',
+    tag: 'DRI', tagBg: '#F3E5FF', tagColor: '#A100FF',
+    desc: 'Directly Responsible Individual',
+    email: 'james.okafor@utilico.com', pw: 'password123',
+  },
+  analyst_manager: {
+    id: 'USR-AM-001', name: 'Priya Nair', role: 'analyst_manager',
+    initials: 'PN', color: '#007A3D',
+    tag: 'SUP', tagBg: '#E5F5ED', tagColor: '#007A3D',
+    desc: 'Regulatory Affairs Supervisor',
+    email: 'priya.nair@utilico.com', pw: 'password123',
+  },
+};
+const ACCOUNTS = [
+  { id: 'UTL-00421937', name: 'Acme Manufacturing',  amount: 1134.00, tariff: 'C2-LV', expected_conflicts: 4, label: 'UTL-00421937 — Acme Manufacturing (all 4 conflicts)' },
+  { id: 'UTL-00389204', name: 'Riverside Commercial', amount: 756.00,  tariff: 'C1-GS', expected_conflicts: 2, label: 'UTL-00389204 — Riverside Commercial (2 conflicts)' },
+  { id: 'UTL-00371055', name: 'Metro Offices',         amount: 837.00,  tariff: 'C1-GS', expected_conflicts: 0, label: 'UTL-00371055 — Metro Offices (no conflicts)' },
+];
+const ACCT_MAP = Object.fromEntries(ACCOUNTS.map(a => [a.id, a]));
+function acctName(id)   { return ACCT_MAP[id]?.name || id; }
+function acctAmount(id) { const a = ACCT_MAP[id]; return a ? `$${a.amount.toLocaleString('en-US',{minimumFractionDigits:2})}` : '—'; }
+function money(n) { return `$${Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2})}`; }
+
+let state = { user: null, tab: null, dri_escalation: null, poll_timer: null, selected_role: null, ticket_info: {}, stubs: null, dri_timer: null };
+
+// ── SOURCE-SYSTEM DATA (for conflict evidence drill-down) ────────────────────
+async function loadStubs() {
+  if (state.stubs) return state.stubs;
+  const cols = ['ccb_stubs','mdm_stubs','oms_stubs','crm_stubs','gl_stubs'];
+  const out = { ccb:{}, mdm:{}, oms:{}, crm:{}, gl:{} };
+  try {
+    const results = await Promise.all(cols.map(c => get(`/data/${c}?limit=50`)));
+    cols.forEach((c, i) => {
+      const key = c.replace('_stubs','');
+      (results[i] || []).forEach(doc => { out[key][doc.account_id] = doc; });
+    });
+  } catch(_) {}
+  state.stubs = out;
+  return out;
+}
+
+// ── NORTH STAR / ROI RIBBON ──────────────────────────────────────────────────
+function roiRibbon({ minutes, protectedUsd, auditPct = 100, conflicts = null }) {
+  const cell = (val, lab, color, first) => `
+    <div style="flex:1;padding:0 18px;${first ? '' : 'border-left:1px solid rgba(255,255,255,.15)'}">
+      <div style="font-family:var(--cond);font-size:20px;font-weight:700;color:${color};line-height:1.1">${val}</div>
+      <div style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#9fb0c4;margin-top:2px">${lab}</div>
+    </div>`;
+  return `
+    <div style="display:flex;align-items:center;background:var(--lbg);padding:12px 8px 12px 4px;margin-bottom:16px;border-radius:4px">
+      ${cell(minutes, 'Resolution time', '#fff', true)}
+      ${cell('6–8 hr', 'Manual baseline', '#6b7a8d')}
+      ${cell(protectedUsd, 'Revenue protected', '#46d68a')}
+      ${cell(auditPct + '%', 'Audit coverage', '#46d68a')}
+      ${conflicts != null ? cell(conflicts, 'Conflicts surfaced', conflicts > 0 ? '#ff6b81' : '#46d68a') : ''}
+    </div>`;
+}
+
+// ── CONFLICT EVIDENCE DRILL-DOWN ─────────────────────────────────────────────
+const SYS_COLOR = { ccb:'var(--blue)', oms:'var(--amber)', mdm:'var(--purple)', crm:'var(--green)', gl:'var(--red)' };
+
+function evCard(system, color, title, rows) {
+  return `
+    <div style="flex:1;border:1px solid var(--g2);border-top:3px solid ${color};min-width:0">
+      <div style="padding:7px 12px;background:var(--g1);border-bottom:1px solid var(--g2);font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:${color}">${system} — ${title}</div>
+      <div style="padding:10px 12px">
+        ${rows.map(r=>`<div style="display:flex;justify-content:space-between;gap:12px;padding:3px 0;font-size:12px;border-bottom:1px dotted var(--g2)"><span style="color:var(--g4)">${r[0]}</span><span style="font-weight:600;color:${r[2]||'var(--n90)'};text-align:right">${r[1]}</span></div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function evContradiction(text) {
+  return `<div style="background:var(--lred);border-left:3px solid var(--red);padding:10px 14px;margin-top:10px;font-size:12px;line-height:1.6;color:var(--g5)"><strong style="color:var(--red);font-family:var(--cond);text-transform:uppercase;font-size:10px;letter-spacing:.08em">Why this is a conflict&nbsp;</strong><br>${text}</div>`;
+}
+
+function daysBetween(a, b) {
+  const d = (new Date(b) - new Date(a)) / 86400000;
+  return Math.max(0, Math.round(d));
+}
+
+function buildConflictEvidence(cid, accountId, stubs) {
+  const ccb = stubs.ccb[accountId], oms = stubs.oms[accountId];
+  const mdm = stubs.mdm[accountId], crm = stubs.crm[accountId], gl = stubs.gl[accountId];
+  const dWO = (oms?.work_orders || []).find(w => w.type === 'disconnect');
+  let cards = '', why = '';
+
+  if (cid === 'C1') {
+    const billedAfter = (dWO && ccb) ? daysBetween(dWO.completed_at, ccb.billing_period?.end) : null;
+    cards = evCard('CC&B', SYS_COLOR.ccb, 'Billing', [
+      ['Billing period', ccb ? `${ccb.billing_period.start} → ${ccb.billing_period.end}` : '—'],
+      ['Disconnect suppression', ccb ? (ccb.billing_rules.disconnect_suppression ? 'ON' : 'OFF') : '—', ccb && !ccb.billing_rules.disconnect_suppression ? 'var(--red)' : 'var(--green)'],
+      ['Bill issued', ccb ? `${money(ccb.bill.total_amount)} · ${ccb.bill.status}` : '—'],
+      ['Generated', ccb ? ts(ccb.bill.generated_at) : '—'],
+    ]) + evCard('OMS', SYS_COLOR.oms, 'Field Service', [
+      ['Service status', oms ? oms.current_service_status : '—', 'var(--red)'],
+      ['Disconnect WO', dWO ? dWO.work_order_id : '—'],
+      ['Completed', dWO ? ts(dWO.completed_at) : '—', 'var(--red)'],
+      ['Technician', dWO ? `${dWO.technician.name} ${dWO.technician.confirmed ? '✓' : ''}` : '—'],
+    ]);
+    why = `CC&B billed the full cycle through <strong>${ccb?.billing_period?.end||'—'}</strong> with disconnect suppression <strong>OFF</strong>, but OMS confirms the meter was disconnected on <strong>${dWO?ts(dWO.completed_at):'—'}</strong>${billedAfter!=null?` — roughly <strong>${billedAfter} days billed after service ended</strong>`:''}.`;
+  }
+  else if (cid === 'C2') {
+    const ps = mdm?.period_summary || {};
+    cards = evCard('MDM', SYS_COLOR.mdm, 'Meter Data', [
+      ['Meter', mdm ? mdm.meter_id : '—'],
+      ['Estimated read days', ps.estimated_days != null ? ps.estimated_days : '—', 'var(--red)'],
+      ['Estimated kWh', ps.total_estimated_kwh != null ? `${ps.total_estimated_kwh} kWh` : '—', 'var(--red)'],
+      ['Actual kWh', ps.total_actual_kwh != null ? `${ps.total_actual_kwh} kWh` : '—'],
+    ]) + evCard('OMS', SYS_COLOR.oms, 'Field Service', [
+      ['Disconnect date', dWO ? ts(dWO.completed_at) : '—', 'var(--red)'],
+      ['Service status', oms ? oms.current_service_status : '—'],
+    ]);
+    why = `MDM applied <strong>${ps.estimated_days||0} estimated read day(s)</strong> totalling <strong>${ps.total_estimated_kwh||0} kWh</strong> after the OMS disconnect on <strong>${dWO?ts(dWO.completed_at):'—'}</strong> — phantom consumption billed on a meter that was already dead.`;
+  }
+  else if (cid === 'C3') {
+    const cmp = (crm?.complaints || [])[0];
+    cards = evCard('CRM', SYS_COLOR.crm, 'Customer Complaint', [
+      ['Complaint', cmp ? cmp.complaint_id : '—'],
+      ['Status', cmp ? cmp.status : '—', 'var(--red)'],
+      ['Filed', cmp ? ts(cmp.filed_at) : '—'],
+      ['Regulatory dispute', cmp ? (cmp.regulatory_dispute ? 'YES' : 'no') : '—', cmp && cmp.regulatory_dispute ? 'var(--red)' : 'var(--n90)'],
+    ]) + evCard('CC&B', SYS_COLOR.ccb, 'Billing', [
+      ['Billing hold', crm ? (crm.billing_hold ? 'ON' : 'OFF') : '—', crm && !crm.billing_hold ? 'var(--red)' : 'var(--green)'],
+      ['Bill status', ccb ? ccb.bill.status : '—', 'var(--red)'],
+      ['Proration', ccb ? (ccb.billing_rules.proration_enabled ? 'ON' : 'OFF') : '—'],
+    ]);
+    why = `CRM has an <strong>open ${cmp?.regulatory_dispute?'regulatory ':''}billing dispute</strong> filed <strong>${cmp?ts(cmp.filed_at):'—'}</strong>, yet no billing hold was propagated to CC&B — the bill was issued anyway.`;
+  }
+  else if (cid === 'C4') {
+    const re = (gl?.revenue_entries || [])[0];
+    const cmp = (crm?.complaints || [])[0];
+    cards = evCard('GL', SYS_COLOR.gl, 'Financials', [
+      ['Revenue entry', re ? re.entry_id : '—'],
+      ['Amount', re ? money(re.amount) : '—', 'var(--red)'],
+      ['Status', re ? re.status : '—', 'var(--red)'],
+      ['Reversal required', re ? (re.reversal_required ? 'YES' : 'no') : '—'],
+    ]) + evCard('CRM', SYS_COLOR.crm, 'Customer Complaint', [
+      ['Dispute status', cmp ? cmp.status : '—', 'var(--red)'],
+      ['Regulatory', cmp ? (cmp.regulatory_dispute ? 'YES' : 'no') : '—'],
+    ]);
+    why = `GL recognised <strong>${re?money(re.amount):'—'}</strong> as <strong>${re?re.status:'—'}</strong> revenue while CRM shows an <strong>active dispute</strong> — revenue posted against a contested bill, exposing a restatement risk.`;
+  }
+  return `<div style="display:flex;gap:10px;flex-wrap:wrap">${cards}</div>${evContradiction(why)}`;
+}
+
+async function toggleEvidence(boxId, cid, accountId) {
+  const box = document.getElementById(boxId);
+  if (!box) return;
+  if (box.dataset.open === '1') { box.style.display = 'none'; box.dataset.open = '0'; return; }
+  box.style.display = 'block'; box.dataset.open = '1';
+  if (box.dataset.filled !== '1') {
+    box.innerHTML = '<div style="padding:12px;color:var(--g4);font-size:12px"><span class="spinner"></span> Pulling source records…</div>';
+    const stubs = await loadStubs();
+    box.innerHTML = buildConflictEvidence(cid, accountId, stubs);
+    box.dataset.filled = '1';
+  }
+}
+
+// ── API ─────────────────────────────────────────────────────────────────────
+async function api(method, path, body) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(API + path, opts);
+  if (!r.ok) {
+    const e = await r.json().catch(() => ({ detail: r.statusText }));
+    throw new Error(e.detail || r.statusText);
+  }
+  return r.json();
+}
+const get  = p => api('GET', p);
+const post = (p, b) => api('POST', p, b);
+
+// ── HELPERS ─────────────────────────────────────────────────────────────────
+function badge(status) {
+  const map = {
+    analysing:    ['analysing',  'Analysing'],
+    awaiting_dri: ['awaiting',   'Awaiting DRI'],
+    approved:     ['approved',   'Approved'],
+    rejected:     ['rejected',   'Rejected'],
+    awaiting_output_review: ['review', 'Output Review'],
+    resolved:     ['resolved',   'Resolved'],
+    initiated:    ['initiated',  'Initiated'],
+    running:      ['running',    'Running'],
+    complete:     ['complete',   'Complete'],
+  };
+  const [cls, label] = map[status] || ['initiated', status];
+  return `<span class="badge badge-${cls}">${label}</span>`;
+}
+function conflictBadge(d) {
+  return d ? `<span class="badge badge-conflict">● Conflict</span>`
+           : `<span class="badge badge-clear">✓ Clear</span>`;
+}
+// AI confidence for the analyst brief — derived from the agent's confidence_signal,
+// nudged by citation coverage. Returns a 0-100 score + qualitative label + colour.
+function confidenceScore(brief) {
+  const sig = (brief.confidence_signal || '').toLowerCase();
+  const base = sig === 'low' ? 62 : (sig === 'medium' || sig === 'moderate') ? 79 : 95;
+  const cov = brief.citation_coverage != null ? brief.citation_coverage : 1;
+  const score = Math.round(base * (0.85 + 0.15 * cov));
+  const label = score >= 90 ? 'High' : score >= 75 ? 'Medium' : 'Low';
+  const color = score >= 90 ? 'var(--green)' : score >= 75 ? 'var(--amber)' : 'var(--red)';
+  return { score, label, color };
+}
+function ts(v) {
+  if (!v) return '—';
+  return new Date(v).toLocaleString('en-AU', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+}
+function timeAgo(v) {
+  if (!v) return '—';
+  const diff = (Date.now() - new Date(v).getTime()) / 1000;
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return `${Math.floor(diff/60)} min ago`;
+  if (diff < 86400) return `${Math.floor(diff/3600)} hr ago`;
+  if (diff < 172800) return 'Yesterday';
+  return `${Math.floor(diff/86400)} days ago`;
+}
+const DISPUTE_LABELS = {
+  billing_after_disconnect: 'Billing after disconnect',
+  estimated_read_dispute:   'Estimated read dispute',
+  billing_hold_missing:     'Billing hold missing',
+  gl_reversal_required:     'GL revenue dispute',
+};
+function render(html) { document.getElementById('app').innerHTML = html; }
+function showAlert(id, msg, type='ok') {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+}
+function clearPoll() {
+  if (state.poll_timer) { clearInterval(state.poll_timer); state.poll_timer = null; }
+  if (state.dri_timer) { clearInterval(state.dri_timer); state.dri_timer = null; }
+  if (state.anim_timer) { clearInterval(state.anim_timer); state.anim_timer = null; }
+}
+function escapeHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── LOGIN ────────────────────────────────────────────────────────────────────
+function renderLogin() {
+  const roleKeys = ['csr', 'dri', 'analyst_manager'];
+  const roleCards = roleKeys.map(k => {
+    const u = USERS[k];
+    const sel = state.selected_role === k;
+    return `
+      <div class="role-card ${sel ? 'selected' : ''}" onclick="selectRole('${k}')">
+        <div class="role-avatar" style="background:${u.color}">${u.initials}</div>
+        <div class="role-card-body">
+          <div class="role-card-name">${u.name}</div>
+          <span class="role-tag" style="background:${u.tagBg};color:${u.tagColor}">${u.tag}</span>
+          <div class="role-card-desc">${u.desc}</div>
+        </div>
+        <div class="role-radio"><div class="role-radio-dot"></div></div>
+      </div>`;
+  }).join('');
+
+  const sel = state.selected_role ? USERS[state.selected_role] : null;
+  const hintActive = sel ? 'active' : '';
+  const hintText = sel
+    ? `Signing in as ${sel.name} — ${sel.desc}`
+    : 'Select a role to continue';
+
+  const emailVal = sel ? sel.email : '';
+  const emailFilled = sel ? 'filled' : '';
+
+  render(`
+    <div class="login-wrap">
+      <div class="login-left">
+        <div class="login-left-title">Select your role</div>
+        <div class="login-left-sub">Choose your account to continue</div>
+        <div class="role-list">${roleCards}</div>
+      </div>
+
+      <div class="login-right">
+        <div class="login-right-inner">
+
+          <div class="login-brand">
+            <div class="login-brand-icon">
+              <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M14 2L3 8v12l11 6 11-6V8L14 2z" fill="#A100FF" opacity=".15"/>
+                <path d="M14 2L3 8v12l11 6 11-6V8L14 2z" stroke="#A100FF" stroke-width="1.5"/>
+                <path d="M16 9l-5 5h4l-3 6 6-7h-4l2-4z" fill="#A100FF"/>
+              </svg>
+            </div>
+            <div class="login-brand-text">
+              <div class="login-brand-name">UTILICO ENERGY</div>
+              <div class="login-brand-sub">Billing Intelligence Platform</div>
+            </div>
+          </div>
+
+          <div class="login-role-hint ${hintActive}">
+            <div class="dot"></div>
+            <span>${hintText}</span>
+          </div>
+
+          <label class="cred-label">Email address</label>
+          <input id="login-email" class="cred-input ${emailFilled}" type="email"
+            value="${emailVal}" placeholder="Select a role above"
+            ${sel ? '' : 'readonly'} />
+
+          <label class="cred-label">Password</label>
+          <div class="pw-wrap">
+            <input id="login-pw" class="cred-input ${emailFilled}" type="password"
+              value="${sel ? sel.pw : ''}" placeholder="••••••••••"
+              ${sel ? '' : 'readonly'} />
+            <span class="pw-eye" onclick="togglePw()">
+              <svg width="16" height="16" fill="none" stroke="#888" stroke-width="1.5" viewBox="0 0 24 24">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </span>
+          </div>
+          <div class="pw-hint">⚠ Demo password: <span>password123</span></div>
+
+          <button class="btn-signin" ${sel ? '' : 'disabled'} onclick="login()">
+            Sign in →
+          </button>
+
+          <hr class="login-divider"/>
+          <div class="role-matrix-title">Role Access Matrix</div>
+          <div class="role-matrix">
+            <div class="role-matrix-row">
+              <div class="rmt"><span class="role-tag" style="background:#E5EEF8;color:#004F9F">CSR</span></div>
+              <div class="rmd">Raise tickets · Track escalation status</div>
+            </div>
+            <div class="role-matrix-row">
+              <div class="rmt"><span class="role-tag" style="background:#F3E5FF;color:#A100FF">DRI</span></div>
+              <div class="rmd">Review AI briefs · Approve or reject decisions</div>
+            </div>
+            <div class="role-matrix-row">
+              <div class="rmt"><span class="role-tag" style="background:#E5F5ED;color:#007A3D">SUP</span></div>
+              <div class="rmd">System health · NFR compliance · Audit trail</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>`);
+}
+
+function selectRole(roleKey) {
+  state.selected_role = roleKey;
+  renderLogin();
+}
+
+function togglePw() {
+  const pw = document.getElementById('login-pw');
+  if (pw) pw.type = pw.type === 'password' ? 'text' : 'password';
+}
+
+function login() {
+  if (!state.selected_role) return;
+  const roleKey = state.selected_role;
+  state.user = USERS[roleKey];
+  state.selected_role = null;
+  if (roleKey === 'csr') { state.tab = 'raise'; renderCSR(); }
+  else if (roleKey === 'dri') { state.tab = 'queue'; renderDRI(); }
+  else { state.tab = 'tactical'; renderAM(); }
+}
+
+function logout() {
+  clearPoll();
+  state = { user: null, tab: null, dri_escalation: null, poll_timer: null, selected_role: null, ticket_info: {} };
+  renderLogin();
+}
+
+// ── NAVBAR ───────────────────────────────────────────────────────────────────
+function navbar(tabs) {
+  const u = state.user;
+  const tabsHtml = tabs.map(([id, label]) =>
+    `<button class="nav-tab ${state.tab === id ? 'active' : ''}" onclick="switchTab('${id}')">${label}</button>`
+  ).join('');
+  return `
+    <nav class="navbar">
+      <div class="brand">UTILICO <span>Billing Agent</span></div>
+      ${tabsHtml}
+      <div class="nav-spacer"></div>
+      <div class="nav-user">
+        <div class="nav-avatar" style="background:${u.color}">${u.initials}</div>
+        <div>
+          <div class="nav-name">${u.name}</div>
+        </div>
+        <span class="nav-role-tag" style="background:${u.tagBg};color:${u.tagColor}">${u.tag}</span>
+      </div>
+      <button class="btn-logout" onclick="logout()">Sign out</button>
+    </nav>`;
+}
+
+function switchTab(tab) {
+  clearPoll();
+  state.tab = tab;
+  if (state.user.role === 'csr') renderCSR();
+  else if (state.user.role === 'dri') { state.dri_escalation = null; renderDRI(); }
+  else renderAM();
+}
+
+// ── CSR DUMMY HISTORY (pre-seeded display data) ──────────────────────────────
+const DUMMY_TICKETS = [
+  { escalation_id:'ESC-0041', account_id:'UTL-00421937', status:'awaiting_dri',  dispute_label:'Billing after disconnect',  opened_at:'2024-11-30T08:42:00', conflicts_detected:4 },
+  { escalation_id:'ESC-0038', account_id:'UTL-00389204', status:'resolved',      dispute_label:'Estimated read dispute',     opened_at:'2024-11-28T14:10:00', conflicts_detected:2 },
+  { escalation_id:'ESC-0035', account_id:'UTL-00421937', status:'resolved',      dispute_label:'Billing after disconnect',  opened_at:'2024-11-26T09:55:00', conflicts_detected:4 },
+  { escalation_id:'ESC-0033', account_id:'UTL-00371055', status:'rejected',      dispute_label:'GL revenue dispute',         opened_at:'2024-11-25T11:20:00', conflicts_detected:1 },
+  { escalation_id:'ESC-0031', account_id:'UTL-00389204', status:'resolved',      dispute_label:'Billing hold missing',       opened_at:'2024-11-23T16:05:00', conflicts_detected:3 },
+  { escalation_id:'ESC-0028', account_id:'UTL-00421937', status:'approved',      dispute_label:'Billing after disconnect',  opened_at:'2024-11-21T10:30:00', conflicts_detected:4 },
+  { escalation_id:'ESC-0025', account_id:'UTL-00371055', status:'resolved',      dispute_label:'Estimated read dispute',     opened_at:'2024-11-19T13:45:00', conflicts_detected:0 },
+  { escalation_id:'ESC-0022', account_id:'UTL-00389204', status:'rejected',      dispute_label:'Billing after disconnect',  opened_at:'2024-11-16T09:00:00', conflicts_detected:2 },
+  { escalation_id:'ESC-0019', account_id:'UTL-00421937', status:'resolved',      dispute_label:'GL revenue dispute',         opened_at:'2024-11-13T15:15:00', conflicts_detected:4 },
+  { escalation_id:'ESC-0016', account_id:'UTL-00371055', status:'resolved',      dispute_label:'Billing hold missing',       opened_at:'2024-11-10T08:50:00', conflicts_detected:1 },
+  { escalation_id:'ESC-0012', account_id:'UTL-00389204', status:'resolved',      dispute_label:'Estimated read dispute',     opened_at:'2024-11-07T11:30:00', conflicts_detected:2 },
+  { escalation_id:'ESC-0008', account_id:'UTL-00421937', status:'resolved',      dispute_label:'Billing after disconnect',  opened_at:'2024-11-04T14:20:00', conflicts_detected:4 },
+];
+
+// Demo quick-fill scenarios
+const DEMO_SCENARIOS = [
+  { label:'All 4 Conflicts',  account:'UTL-00421937', type:'billing_after_disconnect', notes:'Customer disputes full-cycle October bill. Service was disconnected mid-cycle. All 4 cross-system conflicts expected.' },
+  { label:'2 Conflicts',      account:'UTL-00389204', type:'billing_after_disconnect', notes:'Estimated reads applied post-disconnect. Billing suppression not triggered. Expecting C1 + C2.' },
+  { label:'No Conflicts',     account:'UTL-00371055', type:'estimated_read_dispute',   notes:'Routine check — no disconnect event on record. Expect clean pipeline run.' },
+];
+
+// ── CSR ──────────────────────────────────────────────────────────────────────
+function renderCSR() {
+  renderCSRTickets();
+}
+
+function renderCSRTickets() {
+  const nav = navbar([]);
+  render(`${nav}
+    <div style="background:var(--white);border-bottom:2px solid var(--g2);padding:18px 32px;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div class="kicker">Customer Service Representative</div>
+        <div style="font-family:var(--cond);font-size:22px;font-weight:700;text-transform:uppercase">Escalation Tickets</div>
+      </div>
+      <button onclick="openNewTicketModal()"
+        style="display:flex;align-items:center;gap:8px;background:var(--purple);color:var(--white);border:none;padding:10px 20px;font:700 12px var(--cond);letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background .15s"
+        onmouseover="this.style.background='#8800d4'" onmouseout="this.style.background='var(--purple)'">
+        <span style="font-size:18px;line-height:1">+</span> New Ticket
+      </button>
+    </div>
+    <div class="main">
+      <div id="csr-msg"></div>
+      <div id="tickets-body">
+        <div style="padding:24px;text-align:center"><span class="spinner"></span></div>
+      </div>
+    </div>`);
+  loadCSRTickets();
+  clearPoll();
+  state.poll_timer = setInterval(loadCSRTickets, 5000);
+}
+
+async function loadCSRTickets() {
+  const el = document.getElementById('tickets-body');
+  if (!el) return;
+  let live = [];
+  try { live = await get(`/csr/tickets/${state.user.id}`); } catch(_) {}
+
+  // Live tickets appear first (most recent on top), then dummy history
+  const liveIds = new Set(live.map(t => t.escalation_id));
+  const history = DUMMY_TICKETS.filter(t => !liveIds.has(t.escalation_id));
+  const all = [...live, ...history];
+
+  if (!all.length) {
+    el.innerHTML = `<div style="padding:48px;text-align:center;color:var(--g4);font-size:13px">
+      No tickets yet. Click <strong>+ New Ticket</strong> to get started.
+    </div>`;
+    return;
+  }
+
+  const rows = [
+    ...live.map(t => ticketRow(t, true)),
+    ...history.map(t => ticketRow(t, false)),
+  ].join('');
+  el.innerHTML = `
+    <div style="border:1px solid var(--g2);overflow:hidden">
+      <div style="padding:8px 20px;background:var(--g1);border-bottom:1px solid var(--g2);display:flex;align-items:center;justify-content:space-between">
+        <span style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g4)">${all.length} Escalations</span>
+        <span style="font-size:11px;color:var(--g4)">
+          <span class="badge badge-analysing">Analysing</span> →
+          <span class="badge badge-awaiting">Awaiting DRI</span> →
+          <span class="badge badge-approved">Approved</span> /
+          <span class="badge badge-rejected">Rejected</span> →
+          <span class="badge badge-review">Output Review</span> →
+          <span class="badge badge-resolved">Resolved</span>
+        </span>
+      </div>
+      ${rows}
+    </div>
+    <div style="font-size:11px;color:var(--g4);margin-top:8px">Auto-refreshes every 5 s</div>`;
+}
+
+// ── NEW TICKET MODAL ─────────────────────────────────────────────────────────
+function openNewTicketModal() {
+  const accountOpts = ACCOUNTS.map(a =>
+    `<option value="${a.id}">${a.id}</option>`).join('');
+  const quickBtns = DEMO_SCENARIOS.map((s, i) => `
+    <button onclick="quickFill(${i})"
+      style="background:var(--g1);border:1px solid var(--g2);padding:6px 12px;font:600 11px var(--cond);letter-spacing:.06em;text-transform:uppercase;cursor:pointer;color:var(--g5);transition:all .12s;white-space:nowrap"
+      onmouseover="this.style.background='var(--lpurple)';this.style.borderColor='var(--purple)';this.style.color='var(--purple)'"
+      onmouseout="this.style.background='var(--g1)';this.style.borderColor='var(--g2)';this.style.color='var(--g5)'"
+    >${s.label}</button>`).join('');
+
+  const overlay = document.createElement('div');
+  overlay.id = 'modal-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center';
+  overlay.onclick = e => { if (e.target === overlay) closeModal(); };
+
+  overlay.innerHTML = `
+    <div style="background:var(--white);width:100%;max-width:500px;border-top:3px solid var(--purple);box-shadow:0 20px 60px rgba(0,0,0,.3)">
+
+      <!-- header -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--g2)">
+        <div>
+          <div class="kicker">Step 1</div>
+          <div style="font-family:var(--cond);font-size:17px;font-weight:700;text-transform:uppercase">New Billing Escalation</div>
+        </div>
+        <button onclick="closeModal()" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--g4);line-height:1;padding:4px">✕</button>
+      </div>
+
+      <!-- quick fill -->
+      <div style="padding:14px 20px;background:#fafafa;border-bottom:1px solid var(--g2)">
+        <div style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g4);margin-bottom:8px">
+          Quick Fill — Demo Scenarios
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">${quickBtns}</div>
+      </div>
+
+      <!-- form -->
+      <div style="padding:20px">
+        <div id="modal-msg"></div>
+
+        <div style="background:var(--g1);border:1px solid var(--g2);padding:12px 14px;margin-bottom:12px">
+          <div style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g4);margin-bottom:7px">Account ID</div>
+          <select id="m-account" style="width:100%;background:var(--white);border:1px solid var(--g2);padding:8px 10px;font:400 13px var(--sans);color:var(--n90)">
+            <option value="" disabled selected>Select account…</option>
+            ${accountOpts}
+          </select>
+        </div>
+
+        <div style="background:var(--g1);border:1px solid var(--g2);padding:12px 14px;margin-bottom:12px">
+          <div style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g4);margin-bottom:7px">Dispute Type</div>
+          <select id="m-type" style="width:100%;background:var(--white);border:1px solid var(--g2);padding:8px 10px;font:400 13px var(--sans);color:var(--n90)">
+            <option value="billing_after_disconnect">Billing after disconnect</option>
+            <option value="estimated_read_dispute">Estimated read dispute</option>
+            <option value="billing_hold_missing">Billing hold missing</option>
+            <option value="gl_reversal_required">GL revenue dispute</option>
+          </select>
+        </div>
+
+        <div style="background:var(--g1);border:1px solid var(--g2);padding:12px 14px;margin-bottom:20px">
+          <div style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g4);margin-bottom:7px">Notes</div>
+          <textarea id="m-notes" style="width:100%;background:var(--white);border:1px solid var(--g2);padding:8px 10px;font:400 13px var(--sans);color:var(--n90);min-height:72px;resize:vertical" placeholder="Describe the customer's complaint…"></textarea>
+        </div>
+
+        <button id="modal-submit-btn" onclick="submitNewTicket()"
+          style="width:100%;background:var(--purple);color:var(--white);border:none;padding:14px;font:700 13px var(--cond);letter-spacing:.14em;text-transform:uppercase;cursor:pointer"
+          onmouseover="this.style.background='#8800d4'" onmouseout="this.style.background='var(--purple)'">
+          Submit — Trigger Analyst
+        </button>
+        <div style="margin-top:10px;font-size:11px;color:var(--g4);line-height:1.5">
+          On submit: DRI assigned (FR-10, BR-01) · Analyst triggered (FR-02) · Status set to <em>Analysing</em>
+        </div>
+      </div>
+    </div>`;
+
+  document.getElementById('app').appendChild(overlay);
+}
+
+function closeModal() {
+  const el = document.getElementById('modal-overlay');
+  if (el) el.remove();
+}
+
+function quickFill(idx) {
+  const s = DEMO_SCENARIOS[idx];
+  const acct = document.getElementById('m-account');
+  const type = document.getElementById('m-type');
+  const notes = document.getElementById('m-notes');
+  if (acct)  acct.value  = s.account;
+  if (type)  type.value  = s.type;
+  if (notes) notes.value = s.notes;
+  // flash selected button
+  document.querySelectorAll('#modal-overlay button').forEach(b => b.style.outline = '');
+}
+
+async function submitNewTicket() {
+  const acct  = document.getElementById('m-account')?.value;
+  const type  = document.getElementById('m-type')?.value;
+  const notes = document.getElementById('m-notes')?.value;
+  if (!acct) { document.getElementById('modal-msg').innerHTML = '<div class="alert alert-err">Please select an account.</div>'; return; }
+
+  const btn = document.getElementById('modal-submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+
+  try {
+    const res = await post('/csr/tickets', {
+      account_id: acct, csr_id: state.user.id,
+      dispute_type: type, notes: notes || null,
+    });
+    state.ticket_info[res.escalation_id] = {
+      dispute_type: type,
+      dispute_label: DISPUTE_LABELS[type] || type,
+    };
+    closeModal();
+    runLiveAnimation(res.escalation_id, acct);
+  } catch(e) {
+    document.getElementById('modal-msg').innerHTML = `<div class="alert alert-err">Error: ${e.message}</div>`;
+    btn.disabled = false;
+    btn.textContent = 'Submit — Trigger Analyst';
+  }
+}
+
+// submitTicket kept for backward compat (no longer used in CSR flow)
+async function submitTicket() { submitNewTicket(); }
+
+// ── LIVE ANIMATED PIPELINE RUN ───────────────────────────────────────────────
+const LIVE_SYSTEMS = [
+  { key:'ccb', name:'CC&B',  desc:'Billing · period, rules, bill' },
+  { key:'mdm', name:'MDM',   desc:'Meter reads · actual vs estimated' },
+  { key:'oms', name:'OMS',   desc:'Field service · disconnect events' },
+  { key:'crm', name:'CRM',   desc:'Complaints · billing holds' },
+  { key:'gl',  name:'GL',    desc:'Financials · posted revenue' },
+];
+const LIVE_CONFLICTS = [
+  { id:'C1', systems:'OMS ↔ CC&B', text:'Full-cycle bill despite mid-cycle disconnect' },
+  { id:'C2', systems:'MDM ↔ OMS',  text:'Estimated reads on post-disconnect days' },
+  { id:'C3', systems:'CRM ↔ CC&B', text:'Complaint on file, no billing hold' },
+  { id:'C4', systems:'GL ↔ CRM',   text:'Revenue posted for disputed bill' },
+];
+
+function runLiveAnimation(escId, accountId) {
+  clearPoll();
+  const expected = ACCT_MAP[accountId]?.expected_conflicts ?? 0;
+  const nav = navbar([]);
+  render(`${nav}
+    <div style="max-width:760px;margin:0 auto;padding:36px 32px">
+      <div style="text-align:center;margin-bottom:28px">
+        <div class="kicker">Analyst Agent · Live Run</div>
+        <div style="font-family:var(--cond);font-size:26px;font-weight:700;text-transform:uppercase">Reconciling <em style="color:var(--purple);font-style:normal">${acctName(accountId)}</em></div>
+        <div style="font-size:13px;color:var(--g4);margin-top:4px">${escId} · ${accountId} · ${acctAmount(accountId)} disputed</div>
+        <div id="live-timer" style="font-family:var(--cond);font-size:34px;font-weight:700;color:var(--purple);margin-top:14px">0.0s</div>
+        <div style="font-size:11px;color:var(--g4);text-transform:uppercase;letter-spacing:.06em">vs 6–8 hours · 6–9 teams (manual)</div>
+      </div>
+
+      <div style="font-family:var(--cond);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g4);margin-bottom:10px">Parallel ingestion · 5 source systems</div>
+      <div id="live-systems" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:24px">
+        ${LIVE_SYSTEMS.map(s=>`
+          <div id="live-sys-${s.key}" style="border:1px solid var(--g2);border-top:3px solid var(--g3);padding:12px 10px;text-align:center;opacity:.45;transition:all .3s">
+            <div style="font-family:var(--cond);font-size:15px;font-weight:700;color:var(--g5)">${s.name}</div>
+            <div style="font-size:9px;color:var(--g4);margin-top:3px;min-height:24px">${s.desc}</div>
+            <div class="live-sys-status" style="font-size:10px;font-family:var(--cond);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--g3);margin-top:6px">Idle</div>
+          </div>`).join('')}
+      </div>
+
+      <div id="live-conflicts-wrap" style="display:none">
+        <div style="font-family:var(--cond);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-bottom:10px">Cross-system conflict detection</div>
+        <div id="live-conflicts" style="margin-bottom:20px"></div>
+      </div>
+
+      <div id="live-final" style="text-align:center;display:none"></div>
+    </div>`);
+
+  const t0 = Date.now();
+  const timerEl = () => document.getElementById('live-timer');
+  const timer = setInterval(() => {
+    const el = timerEl(); if (!el) { clearInterval(timer); return; }
+    el.textContent = `${((Date.now()-t0)/1000).toFixed(1)}s`;
+  }, 100);
+
+  const setSys = (key, status, color) => {
+    const card = document.getElementById(`live-sys-${key}`);
+    if (!card) return;
+    card.style.opacity = '1';
+    card.style.borderTopColor = color;
+    const st = card.querySelector('.live-sys-status');
+    st.textContent = status; st.style.color = color;
+  };
+
+  const steps = [];
+  // Querying each system (staggered)
+  LIVE_SYSTEMS.forEach((s, i) => {
+    steps.push([400 + i*260, () => setSys(s.key, 'Querying', 'var(--purple)')]);
+    steps.push([400 + i*260 + 520, () => setSys(s.key, '✓ Retrieved', 'var(--green)')]);
+  });
+
+  // Reveal conflicts
+  const conflictsToShow = LIVE_CONFLICTS.slice(0, expected);
+  let base = 400 + LIVE_SYSTEMS.length*260 + 700;
+  if (expected > 0) {
+    steps.push([base, () => { document.getElementById('live-conflicts-wrap').style.display = 'block'; }]);
+    conflictsToShow.forEach((c, i) => {
+      steps.push([base + 300 + i*420, () => {
+        const wrap = document.getElementById('live-conflicts'); if (!wrap) return;
+        const div = document.createElement('div');
+        div.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--g2);border-left:3px solid var(--red);background:var(--lred);margin-bottom:8px;animation:fadein .4s';
+        div.innerHTML = `<strong style="color:var(--red);font-family:var(--cond)">${c.id}</strong>
+          <span style="font-size:13px;font-weight:600">${c.systems}</span>
+          <span style="font-size:12px;color:var(--g4)">${c.text}</span>
+          <span style="margin-left:auto" class="badge badge-conflict">● Conflict</span>`;
+        wrap.appendChild(div);
+      }]);
+    });
+  }
+
+  const finishAt = base + 300 + Math.max(conflictsToShow.length*420, 300) + 600;
+  steps.push([finishAt, () => {
+    clearInterval(timer);
+    const secs = ((Date.now()-t0)/1000).toFixed(1);
+    const fin = document.getElementById('live-final');
+    fin.style.display = 'block';
+    fin.innerHTML = `
+      <div style="border-top:1px solid var(--g2);padding-top:20px">
+        <div style="font-family:var(--cond);font-size:18px;font-weight:700;color:var(--green);margin-bottom:6px">
+          ✓ Context assembled in ${secs}s
+        </div>
+        <div style="font-size:13px;color:var(--g5);margin-bottom:16px">
+          ${expected>0 ? `${expected} conflict${expected>1?'s':''} surfaced` : 'No conflicts — all invariants clear'} ·
+          100% citation coverage · ${expected>0?'awaiting DRI approval':'auto-resolved'}
+        </div>
+        <button class="btn btn-primary" onclick="showTicketDetail('${escId}')">View Full Brief →</button>
+      </div>`;
+  }]);
+
+  steps.forEach(([delay, fn]) => setTimeout(fn, delay));
+}
+
+
+function ticketRow(t, live = true) {
+  const info = state.ticket_info[t.escalation_id] || {};
+  const label = info.dispute_label || t.dispute_label || DISPUTE_LABELS[info.dispute_type] || 'Billing dispute';
+  const dimStyle = live ? '' : 'opacity:.75';
+  const indicator = live
+    ? `<span style="color:var(--g3);font-size:14px">›</span>`
+    : `<span style="font-size:10px;color:var(--g3);font-family:var(--cond);letter-spacing:.06em;text-transform:uppercase">history ›</span>`;
+  return `
+    <div onclick="showTicketDetail('${t.escalation_id}')"
+      style="display:grid;grid-template-columns:1fr auto;align-items:center;padding:13px 20px;border-bottom:1px solid var(--g2);gap:12px;cursor:pointer;transition:background .12s;${dimStyle}"
+      onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background=''">
+      <div>
+        <div style="font-size:14px;font-weight:600;color:var(--n90);margin-bottom:2px">${acctName(t.account_id)} <span style="color:var(--g3);font-weight:400;font-size:12px">· ${t.account_id}</span></div>
+        <div style="font-size:12px;color:var(--g4)">${label} · ${acctAmount(t.account_id)} · ${timeAgo(t.opened_at)}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        ${badge(t.status)}
+        ${indicator}
+      </div>
+    </div>`;
+}
+
+function liveProgressPanel(steps) {
+  const active = steps.find(s => !s.done);
+  const name = active ? active.name : 'Finalising';
+  const sysChips = ['CC&B','MDM','OMS','CRM','GL'].map((s,i)=>
+    `<span style="font-family:var(--cond);font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--purple);background:var(--lpurple);padding:4px 10px;border-radius:3px;animation:blink 1.2s infinite;animation-delay:${(i*0.18).toFixed(2)}s">${s}</span>`
+  ).join('');
+  return `
+    <div style="border:1px solid var(--g2);border-top:3px solid var(--purple);padding:18px 20px;margin-top:4px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <span class="spinner"></span>
+        <div style="font-family:var(--cond);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--purple)">Analyst working — ${name}</div>
+      </div>
+      <div class="prog-track" style="margin-bottom:14px"></div>
+      <div id="live-status" style="font-size:12px;color:var(--g5);min-height:18px">Querying 5 source systems in parallel…</div>
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">${sysChips}</div>
+      <div style="font-size:11px;color:var(--g4);margin-top:14px">Live · auto-updates when the brief is ready — no refresh needed</div>
+    </div>`;
+}
+
+function startProgressAnimation(escId) {
+  const msgs = [
+    'Querying CC&B, MDM, OMS, CRM, GL in parallel…',
+    'Cross-referencing OMS disconnect against CC&B billing period…',
+    'Mapping MDM meter reads to the billing cycle…',
+    'Checking CRM complaint holds and GL posted revenue…',
+    'Detecting cross-system conflicts and drafting the brief…',
+  ];
+  let i = 0;
+  state.anim_timer = setInterval(() => {
+    const el = document.getElementById('live-status');
+    if (!el) { clearInterval(state.anim_timer); state.anim_timer = null; return; }
+    i = (i + 1) % msgs.length;
+    el.style.opacity = 0;
+    setTimeout(() => { el.textContent = msgs[i]; el.style.transition = 'opacity .3s'; el.style.opacity = 1; }, 200);
+  }, 1800);
+
+  // Poll for real completion (live tickets); re-render when the brief lands.
+  let tries = 0;
+  state.poll_timer = setInterval(async () => {
+    if (++tries > 30) { clearInterval(state.poll_timer); state.poll_timer = null; return; }
+    try {
+      const esc = await get(`/csr/tickets/detail/${escId}`);
+      if (esc.pipeline?.step_5_brief?.brief_text) showTicketDetail(escId);
+    } catch(_) {}
+  }, 2000);
+}
+
+// DRI-side live progress: rotate status messages and poll the brief endpoint,
+// re-rendering the DRI panel (and queue) the moment the brief is ready.
+function startDRIProgressAnimation(escId) {
+  const msgs = [
+    'Querying CC&B, MDM, OMS, CRM, GL in parallel…',
+    'Cross-referencing OMS disconnect against CC&B billing period…',
+    'Mapping MDM meter reads to the billing cycle…',
+    'Checking CRM complaint holds and GL posted revenue…',
+    'Detecting cross-system conflicts and drafting the brief…',
+  ];
+  let i = 0;
+  state.anim_timer = setInterval(() => {
+    const el = document.getElementById('live-status');
+    if (!el) { clearInterval(state.anim_timer); state.anim_timer = null; return; }
+    i = (i + 1) % msgs.length;
+    el.style.opacity = 0;
+    setTimeout(() => { el.textContent = msgs[i]; el.style.transition = 'opacity .3s'; el.style.opacity = 1; }, 200);
+  }, 1800);
+
+  let tries = 0;
+  state.dri_timer = setInterval(async () => {
+    if (state.dri_escalation !== escId || ++tries > 60) { clearInterval(state.dri_timer); state.dri_timer = null; return; }
+    try {
+      const d = await get(`/dri/brief/${escId}`);
+      if (d.brief?.brief_text) {
+        clearInterval(state.dri_timer); state.dri_timer = null;
+        loadDRIQueue();
+        selectDRITicket(escId);
+      }
+    } catch(_) {}
+  }, 2000);
+}
+
+async function showTicketDetail(escId) {
+  clearPoll();
+  const nav = navbar([]);
+  render(`${nav}
+    <div class="main">
+      <div style="margin-bottom:14px">
+        <button onclick="switchTab('tickets')" style="background:none;border:none;cursor:pointer;font:600 12px var(--cond);color:var(--purple);letter-spacing:.06em;text-transform:uppercase;padding:0">
+          ← Back to My Tickets
+        </button>
+      </div>
+      <div id="detail-body">
+        <div style="border:1px solid var(--g2);padding:32px;text-align:center">
+          <span class="spinner"></span> Loading ticket detail…
+        </div>
+      </div>
+    </div>`);
+
+  try {
+    const esc = await get(`/csr/tickets/detail/${escId}`);
+    const p = esc.pipeline || {};
+    const conflicts = p.step_4_conflicts?.conflicts || [];
+    const detected = conflicts.filter(c => c.detected);
+    const brief = p.step_5_brief || {};
+    const outputs = p.step_7_outputs || {};
+
+    // Pipeline step timeline
+    const steps = [
+      { num:1, name:'Trigger & DRI Assignment', data: p.step_1_trigger, done: !!p.step_1_trigger },
+      { num:2, name:'5-System Ingestion',       data: p.step_2_ingestion, done: !!p.step_2_ingestion?.completed_at },
+      { num:3, name:'Reconciliation',            data: p.step_3_reconciliation, done: !!p.step_3_reconciliation?.completed_at },
+      { num:4, name:'Conflict Detection',        data: p.step_4_conflicts, done: !!p.step_4_conflicts?.completed_at },
+      { num:5, name:'AI Decision Brief',         data: p.step_5_brief, done: !!p.step_5_brief?.completed_at },
+      { num:6, name:'DRI Decision',              data: p.step_6_dri, done: !!p.step_6_dri?.decided_at },
+      { num:7, name:'Outputs Dispatched',        data: p.step_7_outputs, done: !!p.step_7_outputs?.dispatched_at },
+    ];
+
+    const timelineHtml = steps.map(s => {
+      const active = !s.done && steps.slice(0, s.num-1).every(prev => prev.done);
+      const color  = s.done ? 'var(--green)' : active ? 'var(--purple)' : 'var(--g3)';
+      const icon   = s.done ? '✓' : active ? '◉' : s.num;
+      return `
+        <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:12px">
+          <div class="${active?'live-pulse':''}" style="width:28px;height:28px;border-radius:50%;background:${color};color:#fff;display:flex;align-items:center;justify-content:center;font:700 11px var(--cond);flex-shrink:0">${icon}</div>
+          <div style="padding-top:4px">
+            <div style="font-size:13px;font-weight:600;color:${s.done ? 'var(--n90)' : active ? 'var(--purple)' : 'var(--g3)'}">${s.name}</div>
+            ${s.done && s.data?.completed_at ? `<div style="font-size:11px;color:var(--g4)">${ts(s.data.completed_at)}</div>` : ''}
+            ${s.done && s.data?.decided_at   ? `<div style="font-size:11px;color:var(--g4)">${ts(s.data.decided_at)} · ${s.data.decision || ''}</div>` : ''}
+            ${active ? `<div style="font-size:11px;color:var(--purple);animation:blink 1.4s infinite">In progress…</div>` : ''}
+          </div>
+        </div>`;
+    }).join('');
+
+    const conflictsHtml = conflicts.length ? `
+      <div style="border:1px solid var(--g2);border-top:3px solid ${detected.length ? 'var(--red)' : 'var(--green)'};margin-bottom:16px">
+        <div style="padding:10px 16px;background:${detected.length ? 'var(--lred)' : 'var(--lgreen)'};border-bottom:1px solid var(--g2)">
+          <span style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:${detected.length ? 'var(--red)' : 'var(--green)'}">
+            ${detected.length} Conflict${detected.length !== 1 ? 's' : ''} Detected${detected.length ? ' — click to inspect source evidence' : ''}
+          </span>
+        </div>
+        ${conflicts.map(c => {
+          const boxId = `cev-${esc.escalation_id}-${c.id}`;
+          const clickable = c.detected;
+          return `
+          <div style="border-bottom:1px solid var(--g2)">
+            <div ${clickable?`onclick="toggleEvidence('${boxId}','${c.id}','${esc.account_id}')" style="cursor:pointer"`:'style=""'} class="cev-row" style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px">
+              <div style="font-size:13px;color:var(--g5)">
+                <strong style="color:${c.detected ? 'var(--red)' : 'var(--n90)'};font-family:var(--cond)">${c.id}</strong>
+                &nbsp; ${c.systems.map(s => s.toUpperCase()).join(' ↔ ')}
+                &nbsp; <span style="color:var(--g4);font-size:12px">${c.invariant.replace(/_/g,' ')}</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">${conflictBadge(c.detected)}${clickable?'<span style="font-family:var(--cond);font-size:10px;font-weight:700;color:var(--red)">▾</span>':''}</div>
+            </div>
+            ${clickable?`<div id="${boxId}" data-open="0" style="display:none;padding:12px 16px;border-top:1px solid var(--g2);background:#fcfcfc"></div>`:''}
+          </div>`;
+        }).join('')}
+      </div>` : '';
+
+    const briefHtml = brief.brief_text ? `
+      <div style="border:1px solid var(--g2);border-top:3px solid var(--purple);margin-bottom:16px">
+        <div style="padding:10px 16px;background:var(--lpurple);border-bottom:1px solid var(--g2)">
+          <span style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--purple)">AI Decision Brief</span>
+          <span style="font-size:11px;color:var(--purple);margin-left:10px">Citation coverage: ${((brief.citation_coverage||0)*100).toFixed(0)}%</span>
+        </div>
+        <div style="padding:16px;font-size:13px;line-height:1.7;color:var(--g5);white-space:pre-wrap">${escapeHtml(brief.brief_text)}</div>
+      </div>` : '';
+
+    const outputButtonsHtml = outputs.customer_summary ? outputPanel(esc) : '';
+    const isResolved = !!outputs.customer_summary;
+    const ribbonHtml = brief.brief_text ? roiRibbon({
+      minutes: isResolved ? '6 min' : '~6 min',
+      protectedUsd: detected.length ? acctAmount(esc.account_id) : '$0',
+      auditPct: Math.round((brief.citation_coverage||1)*100),
+      conflicts: detected.length,
+    }) : '';
+
+    document.getElementById('detail-body').innerHTML = `
+      ${ribbonHtml}
+      <div style="display:grid;grid-template-columns:260px 1fr;gap:20px;align-items:start">
+
+        <!-- Left: pipeline timeline -->
+        <div style="border:1px solid var(--g2);border-top:3px solid var(--purple)">
+          <div style="padding:10px 16px;background:var(--lpurple);border-bottom:1px solid var(--g2)">
+            <span style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--purple)">Pipeline Status</span>
+          </div>
+          <div style="padding:16px">${timelineHtml}</div>
+        </div>
+
+        <!-- Right: detail content -->
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+            <span style="font-family:var(--cond);font-size:18px;font-weight:700">${acctName(esc.account_id)}</span>
+            <span class="tag">${esc.escalation_id}</span>
+            <span class="tag">${esc.account_id}</span>
+            ${badge(esc.status)}
+            <span style="font-size:12px;color:var(--g4);margin-left:auto">DRI: ${esc.dri_id || '—'} · Opened: ${ts(esc.opened_at)}</span>
+          </div>
+          ${conflictsHtml}
+          ${briefHtml}
+          ${outputButtonsHtml}
+          ${!brief.brief_text ? liveProgressPanel(steps) : ''}
+        </div>
+      </div>`;
+
+    if (!brief.brief_text) startProgressAnimation(escId);
+  } catch(e) {
+    const dummy = DUMMY_TICKETS.find(d => d.escalation_id === escId);
+    if (dummy) {
+      renderHistoryDetail(dummy);
+    } else {
+      document.getElementById('detail-body').innerHTML = `<div class="alert alert-err">${e.message}</div>`;
+    }
+  }
+}
+
+function renderHistoryDetail(t) {
+  const conflictCount = t.conflicts_detected ?? 0;
+  const conflictColor = conflictCount > 0 ? 'var(--red)' : 'var(--green)';
+  const PIPELINE_STEPS = [
+    'Trigger & DRI Assignment',
+    '5-System Ingestion',
+    'Reconciliation',
+    'Conflict Detection',
+    'AI Decision Brief',
+    'DRI Decision',
+    'Outputs Dispatched',
+  ];
+  const completedSteps = {
+    resolved: 7, approved: 7, rejected: 6, awaiting_dri: 5,
+    analysing: 4, running: 3, initiated: 1,
+  }[t.status] || 7;
+
+  const timelineHtml = PIPELINE_STEPS.map((name, i) => {
+    const done = (i + 1) <= completedSteps;
+    const color = done ? 'var(--green)' : 'var(--g3)';
+    const icon  = done ? '✓' : (i + 1);
+    return `
+      <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:12px">
+        <div style="width:28px;height:28px;border-radius:50%;background:${color};color:#fff;display:flex;align-items:center;justify-content:center;font:700 11px var(--cond);flex-shrink:0">${icon}</div>
+        <div style="padding-top:4px">
+          <div style="font-size:13px;font-weight:600;color:${done ? 'var(--n90)' : 'var(--g3)'}">${name}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('detail-body').innerHTML = `
+    <div style="display:grid;grid-template-columns:260px 1fr;gap:20px;align-items:start">
+      <div style="border:1px solid var(--g2);border-top:3px solid var(--purple)">
+        <div style="padding:10px 16px;background:var(--lpurple);border-bottom:1px solid var(--g2)">
+          <span style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--purple)">Pipeline Status</span>
+        </div>
+        <div style="padding:16px">${timelineHtml}</div>
+      </div>
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+          <span style="font-family:var(--cond);font-size:18px;font-weight:700">${t.escalation_id}</span>
+          <span class="tag">${t.account_id}</span>
+          ${badge(t.status)}
+          <span style="font-size:12px;color:var(--g4);margin-left:auto">Opened: ${ts(t.opened_at)}</span>
+        </div>
+        <div style="border:1px solid var(--g2);border-top:3px solid ${conflictColor};margin-bottom:16px">
+          <div style="padding:10px 16px;background:${conflictCount > 0 ? 'var(--lred)' : 'var(--lgreen)'};border-bottom:1px solid var(--g2)">
+            <span style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:${conflictColor}">
+              ${conflictCount} Conflict${conflictCount !== 1 ? 's' : ''} Detected
+            </span>
+          </div>
+          <div style="padding:14px 16px;font-size:13px;color:var(--g5)">
+            <strong>${t.dispute_label}</strong> — ${conflictCount > 0
+              ? `${conflictCount} cross-system conflict${conflictCount !== 1 ? 's' : ''} identified during reconciliation.`
+              : 'No conflicts detected. Pipeline ran clean.'}
+          </div>
+        </div>
+        ${['resolved','approved'].includes(t.status) ? outputButtons(t.escalation_id, 'history') : `
+        <div style="padding:12px 16px;background:var(--g1);border:1px solid var(--g2);font-size:12px;color:var(--g4)">
+          Historical record — outputs available for resolved tickets only.
+        </div>`}
+      </div>
+    </div>`;
+}
+
+// ── OUTPUT BUTTONS & MODALS ───────────────────────────────────────────────────
+// View-only output buttons (mode = 'history' for dummy tickets, 'view' for live read-only).
+function outputButtons(escId, mode) {
+  const btn = (type, label, bg, fg, hoverBg) => `
+    <button onclick="openOutputModal('${escId}','${type}','${mode}')"
+      style="display:flex;align-items:center;gap:7px;background:${bg};color:${fg};border:1.5px solid ${fg};padding:10px 18px;font:700 11px var(--cond);letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .15s;flex:1;justify-content:center;min-width:160px"
+      onmouseover="this.style.background='${hoverBg}';this.style.color='#fff';this.style.borderColor='${hoverBg}'"
+      onmouseout="this.style.background='${bg}';this.style.color='${fg}';this.style.borderColor='${fg}'"
+    >${label}</button>`;
+  return `
+    <div style="border:1px solid var(--g2);border-top:3px solid var(--g3);margin-top:4px">
+      <div style="padding:10px 16px;background:var(--g1);border-bottom:1px solid var(--g2)">
+        <span style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g4)">Step 7 — Output Documents</span>
+      </div>
+      <div style="padding:16px;display:flex;gap:10px;flex-wrap:wrap">
+        ${btn('customer','✉ Customer Email','var(--lgreen)','var(--green)','var(--green)')}
+        ${btn('executive','◈ Executive Brief','var(--lblue)','var(--blue)','var(--blue)')}
+        ${btn('jira','⬡ Engineer Ticket','#FFF3E5','var(--amber)','var(--amber)')}
+      </div>
+    </div>`;
+}
+
+// CSR review panel: per-output approval status + Review/Edit/Approve (or View once approved).
+const OUTPUT_DEFS = [
+  ['customer',  '✉ Customer Email',   'var(--green)', 'customer_summary'],
+  ['executive', '◈ Executive Brief',  'var(--blue)',  'executive_brief'],
+  ['jira',      '⬡ Engineer Ticket',  'var(--amber)', 'engineering_handoff'],
+];
+
+function outputPanel(esc) {
+  const outs = esc.pipeline?.step_7_outputs || {};
+  const inReview = esc.status === 'awaiting_output_review';
+  const escId = esc.escalation_id;
+  const isCSR = state.user?.role === 'csr';
+
+  const approvedCount = OUTPUT_DEFS.filter(([, , , f]) =>
+    esc.status === 'resolved' || (outs[f] || {}).review_status === 'approved').length;
+
+  const rows = OUTPUT_DEFS.map(([type, label, color, f]) => {
+    const o = outs[f] || {};
+    const approved = esc.status === 'resolved' || o.review_status === 'approved';
+    const chip = approved
+      ? `<span class="badge badge-approved" style="font-size:9px">✓ Approved${o.edited ? ' · edited' : ''}</span>`
+      : `<span class="badge badge-review" style="font-size:9px">● Pending review</span>`;
+    const canReview = inReview && isCSR && !approved;
+    const btnLabel = canReview ? 'Review & Approve →' : 'View';
+    const btnMode  = canReview ? 'review' : 'view';
+    return `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--g2)">
+        <div style="display:flex;align-items:center;gap:10px;min-width:0">
+          <span style="font-size:14px;color:${color}">${label.split(' ')[0]}</span>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--n90)">${label.replace(/^\S+\s/,'')}</div>
+            <div style="font-size:11px;color:var(--g4)">${approved && o.reviewed_by ? `Approved by ${o.reviewed_by}` : 'Draft generated by analyst agent'}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+          ${chip}
+          <button onclick="openOutputModal('${escId}','${type}','${btnMode}')"
+            style="background:${canReview ? color : 'var(--white)'};color:${canReview ? '#fff' : color};border:1.5px solid ${color};padding:7px 14px;font:700 10px var(--cond);letter-spacing:.06em;text-transform:uppercase;cursor:pointer">${btnLabel}</button>
+        </div>
+      </div>`;
+  }).join('');
+
+  const headerColor = inReview ? 'var(--amber)' : 'var(--green)';
+  const headerText = inReview
+    ? `CSR Output Review — ${approvedCount}/3 approved`
+    : 'Step 7 — Dispatched Outputs (all approved)';
+
+  return `
+    <div style="border:1px solid var(--g2);border-top:3px solid ${headerColor};margin-top:4px">
+      <div style="padding:10px 16px;background:${inReview ? '#FFF3E5' : 'var(--lgreen)'};border-bottom:1px solid var(--g2);display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <span style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:${headerColor}">${headerText}</span>
+        ${inReview && isCSR ? `<span style="font-size:11px;color:var(--g4)">Review, edit &amp; approve each before dispatch</span>` : ''}
+      </div>
+      ${rows}
+      ${inReview && isCSR ? `<div style="padding:10px 16px;font-size:11px;color:var(--g4)">Outputs are sent only after all 3 are approved. Each approval is recorded in the audit trail.</div>` : ''}
+    </div>`;
+}
+
+// Field metadata shared by the review form (render) and approveOutput (read-back).
+const REVIEW_FIELDS = {
+  customer: [
+    { key: 'what_we_found',     label: 'What we found',     type: 'textarea' },
+    { key: 'what_we_done',      label: "What we've done",   type: 'textarea' },
+    { key: 'what_happens_next', label: 'What happens next',  type: 'textarea' },
+    { key: 'next_update_date',  label: 'Next update date',   type: 'input' },
+  ],
+  executive: [
+    { key: 'situation',           label: 'Situation',                 type: 'textarea' },
+    { key: 'financial_impact',    label: 'Financial impact',          type: 'textarea' },
+    { key: 'findings',            label: 'Findings (one per line)',   type: 'list' },
+    { key: 'next_steps',          label: 'Next steps (one per line)', type: 'list' },
+    { key: 'regulatory_exposure', label: 'Regulatory exposure',       type: 'textarea' },
+  ],
+  jira: [
+    { key: 'title',               label: 'Title',                          type: 'input' },
+    { key: 'priority',            label: 'Priority',                       type: 'input' },
+    { key: 'description',         label: 'Description',                    type: 'textarea' },
+    { key: 'acceptance_criteria', label: 'Acceptance criteria (one/line)', type: 'list' },
+  ],
+};
+const OUTPUT_FIELD_KEY = { customer: 'customer_summary', executive: 'executive_brief', jira: 'engineering_handoff' };
+const OUTPUT_API_TYPE  = { customer: 'customer', executive: 'executive', jira: 'engineering' };
+
+function buildReviewForm(type, content, escId) {
+  state.review_content = JSON.parse(JSON.stringify(content || {}));
+  const fields = REVIEW_FIELDS[type] || [];
+  const inputStyle = 'width:100%;padding:9px 11px;border:1.5px solid var(--g2);font:400 13px var(--sans);box-sizing:border-box';
+  const rows = fields.map(f => {
+    const raw = content?.[f.key];
+    const val = f.type === 'list' ? (Array.isArray(raw) ? raw.join('\n') : (raw || '')) : (raw ?? '');
+    const id = `rv-${type}-${f.key}`;
+    const control = f.type === 'input'
+      ? `<input id="${id}" value="${escapeHtml(String(val))}" style="${inputStyle}"/>`
+      : `<textarea id="${id}" style="${inputStyle};min-height:${f.type === 'list' ? 96 : 70}px;resize:vertical">${escapeHtml(String(val))}</textarea>`;
+    return `
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--g4);margin-bottom:5px">${f.label}</label>
+        ${control}
+      </div>`;
+  }).join('');
+
+  return `
+    <div style="background:var(--lpurple);border-left:3px solid var(--purple);padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--purple)">
+      Review the draft below, edit if needed, then approve. Approval is logged in the audit trail; the output is dispatched only after all 3 are approved.
+    </div>
+    ${rows}
+    <div id="review-msg"></div>
+    <button class="btn btn-approve" style="width:100%;padding:13px;font-size:12px;letter-spacing:.1em;margin-top:6px"
+      onclick="approveOutput('${escId}','${type}')">APPROVE${type === 'customer' ? ' CUSTOMER EMAIL' : type === 'executive' ? ' EXECUTIVE BRIEF' : ' ENGINEER TICKET'}</button>`;
+}
+
+async function approveOutput(escId, type) {
+  const content = JSON.parse(JSON.stringify(state.review_content || {}));
+  (REVIEW_FIELDS[type] || []).forEach(f => {
+    const el = document.getElementById(`rv-${type}-${f.key}`);
+    if (!el) return;
+    content[f.key] = f.type === 'list'
+      ? el.value.split('\n').map(s => s.trim()).filter(Boolean)
+      : el.value;
+  });
+  const changed = JSON.stringify(content) !== JSON.stringify(state.review_content);
+  showAlert('review-msg', '<span class="spinner"></span> Recording approval…', 'info');
+  try {
+    const res = await post('/csr/outputs/review', {
+      escalation_id: escId,
+      output_type: OUTPUT_API_TYPE[type],
+      reviewed_by: state.user.id,
+      edited_content: changed ? content : null,
+    });
+    const modal = document.getElementById('output-modal');
+    if (modal) modal.remove();
+    showTicketDetail(escId);
+    showAlert('csr-msg', res.message, res.all_approved ? 'ok' : 'info');
+  } catch (e) {
+    showAlert('review-msg', e.message, 'err');
+  }
+}
+
+async function openOutputModal(escId, type, mode = 'view') {
+  const existing = document.getElementById('output-modal');
+  if (existing) existing.remove();
+
+  const titles = { customer: 'Customer Email', executive: 'Executive Brief', jira: 'Engineer Ticket' };
+  const colors  = { customer: 'var(--green)',   executive: 'var(--blue)',     jira: 'var(--amber)' };
+  const kicker = mode === 'review' ? 'Step 7 — Review &amp; Approve Draft' : 'Step 7 — Output Document';
+
+  const overlay = document.createElement('div');
+  overlay.id = 'output-modal';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:flex;align-items:center;justify-content:center;padding:24px';
+  overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+  overlay.innerHTML = `
+    <div style="background:var(--white);width:100%;max-width:660px;max-height:82vh;display:flex;flex-direction:column;border-top:3px solid ${colors[type]};box-shadow:0 20px 60px rgba(0,0,0,.3)">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--g2);flex-shrink:0">
+        <div>
+          <div style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:${colors[type]};margin-bottom:2px">${kicker}</div>
+          <div style="font-family:var(--cond);font-size:17px;font-weight:700;text-transform:uppercase">${titles[type]}</div>
+        </div>
+        <button onclick="document.getElementById('output-modal').remove()" style="background:none;border:none;cursor:pointer;font-size:22px;color:var(--g4);line-height:1;padding:4px 8px">✕</button>
+      </div>
+      <div id="output-modal-body" style="padding:20px;overflow-y:auto;flex:1">
+        <div style="text-align:center;padding:32px"><span class="spinner"></span></div>
+      </div>
+    </div>`;
+  document.getElementById('app').appendChild(overlay);
+
+  const body = document.getElementById('output-modal-body');
+  try {
+    if (mode === 'history') {
+      const dummy = DUMMY_TICKETS.find(d => d.escalation_id === escId);
+      body.innerHTML = buildMockOutput(type, dummy, escId);
+      return;
+    }
+    const esc = await get(`/csr/tickets/detail/${escId}`);
+    const outs = esc.pipeline?.step_7_outputs || {};
+    if (mode === 'review') {
+      body.innerHTML = buildReviewForm(type, (outs[OUTPUT_FIELD_KEY[type]] || {}).content || {}, escId);
+    } else {
+      body.innerHTML = buildLiveOutput(type, outs, esc);
+    }
+  } catch(e) {
+    body.innerHTML = `<div class="alert alert-err">${e.message}</div>`;
+  }
+}
+
+function buildLiveOutput(type, outputs, esc) {
+  if (type === 'customer') {
+    const cs = outputs.customer_summary?.content || {};
+    return `
+      <div style="margin-bottom:14px;display:grid;grid-template-columns:60px 1fr;gap:6px;font-size:13px">
+        <span style="font-weight:700;color:var(--g4)">To</span><span>${esc.account_id} — Account Holder</span>
+        <span style="font-weight:700;color:var(--g4)">Subject</span><span>Update on your billing dispute — ${esc.escalation_id}</span>
+      </div>
+      <hr style="border:none;border-top:1px solid var(--g2);margin:14px 0"/>
+      <div style="font-size:13px;line-height:1.8;color:var(--g5)">
+        <p style="margin-bottom:12px">Dear Valued Customer,</p>
+        <p style="margin-bottom:12px"><strong>What we found:</strong><br>${escapeHtml(cs.what_we_found||'—')}</p>
+        <p style="margin-bottom:12px"><strong>What we've done:</strong><br>${escapeHtml(cs.what_we_done||'—')}</p>
+        <p style="margin-bottom:12px"><strong>What happens next:</strong><br>${escapeHtml(cs.what_happens_next||'—')}</p>
+        ${cs.next_update_date ? `<p style="color:var(--g4);font-size:12px;margin:0">Expected resolution date: ${cs.next_update_date}</p>` : ''}
+      </div>`;
+  }
+  if (type === 'executive') {
+    const eb = outputs.executive_brief?.content || {};
+    const findings  = Array.isArray(eb.findings)   ? eb.findings   : [];
+    const nextSteps = Array.isArray(eb.next_steps)  ? eb.next_steps : [];
+    return `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+        <div style="background:var(--g1);padding:10px 14px;border:1px solid var(--g2)">
+          <div style="font-size:10px;font-weight:700;color:var(--g4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Escalation</div>
+          <div style="font-size:13px;font-weight:600">${esc.escalation_id}</div>
+        </div>
+        <div style="background:var(--g1);padding:10px 14px;border:1px solid var(--g2)">
+          <div style="font-size:10px;font-weight:700;color:var(--g4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Account</div>
+          <div style="font-size:13px;font-weight:600">${esc.account_id}</div>
+        </div>
+      </div>
+      <div style="margin-bottom:14px"><div style="font-size:10px;font-weight:700;color:var(--g4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Situation</div>
+        <div style="font-size:13px;line-height:1.7;color:var(--g5)">${escapeHtml(eb.situation||'—')}</div></div>
+      <div style="margin-bottom:14px"><div style="font-size:10px;font-weight:700;color:var(--g4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Financial Impact</div>
+        <div style="font-size:13px;color:var(--g5)">${escapeHtml(eb.financial_impact||'—')}</div></div>
+      ${findings.length ? `<div style="margin-bottom:14px"><div style="font-size:10px;font-weight:700;color:var(--g4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Findings</div>
+        <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.8;color:var(--g5)">${findings.map(f=>`<li>${escapeHtml(f)}</li>`).join('')}</ul></div>` : ''}
+      ${nextSteps.length ? `<div style="margin-bottom:14px"><div style="font-size:10px;font-weight:700;color:var(--g4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Next Steps</div>
+        <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.8;color:var(--g5)">${nextSteps.map(s=>`<li>${escapeHtml(s)}</li>`).join('')}</ul></div>` : ''}
+      ${eb.regulatory_exposure ? `<div style="background:var(--lblue);border-left:3px solid var(--blue);padding:10px 14px;font-size:12px;color:var(--blue)"><strong>Regulatory:</strong> ${escapeHtml(eb.regulatory_exposure)}</div>` : ''}`;
+  }
+  if (type === 'jira') {
+    const eh = outputs.engineering_handoff?.content || {};
+    const criteria = Array.isArray(eh.acceptance_criteria) ? eh.acceptance_criteria : [];
+    const systems  = Array.isArray(eh.linked_systems)      ? eh.linked_systems      : [];
+    return `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+        <span style="background:var(--amber);color:#fff;font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px">JIRA</span>
+        <span style="font-size:14px;font-weight:700">BILL-${esc.escalation_id.replace('ESC-','')}</span>
+        <span style="background:var(--lred);color:var(--red);font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px">${eh.priority||'P1'}</span>
+      </div>
+      <div style="margin-bottom:14px"><div style="font-size:10px;font-weight:700;color:var(--g4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Summary</div>
+        <div style="font-size:13px;font-weight:600">${escapeHtml(eh.title||'')}</div></div>
+      ${systems.length ? `<div style="margin-bottom:14px"><div style="font-size:10px;font-weight:700;color:var(--g4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Linked Systems</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">${systems.map(s=>`<span class="tag">${s.toUpperCase()}</span>`).join('')}</div></div>` : ''}
+      ${criteria.length ? `<div><div style="font-size:10px;font-weight:700;color:var(--g4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Acceptance Criteria</div>
+        <ol style="margin:0;padding-left:18px;font-size:12px;line-height:1.9;color:var(--g5)">${criteria.map(c=>`<li>${escapeHtml(c)}</li>`).join('')}</ol></div>` : ''}`;
+  }
+  return '<div class="empty">No output data available.</div>';
+}
+
+function buildMockOutput(type, t, escId) {
+  const n       = t?.conflicts_detected ?? 0;
+  const label   = t?.dispute_label || 'Billing dispute';
+  const acct    = t?.account_id    || escId;
+  const seq     = escId.replace('ESC-','');
+  const ids     = n > 0 ? Array.from({length:n},(_,i)=>`C${i+1}`).join(', ') : 'none';
+
+  if (type === 'customer') return `
+    <div style="margin-bottom:14px;display:grid;grid-template-columns:60px 1fr;gap:6px;font-size:13px">
+      <span style="font-weight:700;color:var(--g4)">To</span><span>${acct} — Account Holder</span>
+      <span style="font-weight:700;color:var(--g4)">Subject</span><span>Update on your billing dispute — ${escId}</span>
+    </div>
+    <hr style="border:none;border-top:1px solid var(--g2);margin:14px 0"/>
+    <div style="font-size:13px;line-height:1.8;color:var(--g5)">
+      <p style="margin-bottom:12px">Dear Valued Customer,</p>
+      <p style="margin-bottom:12px"><strong>What we found:</strong><br>We identified ${n} billing discrepancy(ies) on your account (${acct}) related to: ${label}. A service disconnection event was cross-referenced against your meter reads and billing records.</p>
+      <p style="margin-bottom:12px"><strong>What we've done:</strong><br>Our reconciliation system flagged the affected charges and escalated for DRI approval. The billing record has been corrected across all relevant systems.</p>
+      <p style="margin-bottom:12px"><strong>What happens next:</strong><br>${n > 0 ? 'Applicable credits or adjustments have been applied. You will receive a revised statement within 3–5 business days.' : 'No adjustments were required. Your account is in good standing.'}</p>
+      <p style="color:var(--g4);font-size:12px;margin:0">This dispute has been resolved — no further action required.</p>
+    </div>`;
+
+  if (type === 'executive') return `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      <div style="background:var(--g1);padding:10px 14px;border:1px solid var(--g2)">
+        <div style="font-size:10px;font-weight:700;color:var(--g4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Escalation</div>
+        <div style="font-size:13px;font-weight:600">${escId}</div>
+      </div>
+      <div style="background:var(--g1);padding:10px 14px;border:1px solid var(--g2)">
+        <div style="font-size:10px;font-weight:700;color:var(--g4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Account</div>
+        <div style="font-size:13px;font-weight:600">${acct}</div>
+      </div>
+    </div>
+    <div style="margin-bottom:14px"><div style="font-size:10px;font-weight:700;color:var(--g4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Situation</div>
+      <div style="font-size:13px;line-height:1.7;color:var(--g5)">Billing reconciliation escalation for account ${acct}. Dispute type: ${label}. ${n} conflict(s) detected across CC&amp;B, MDM, OMS, CRM, and GL systems.</div></div>
+    <div style="margin-bottom:14px"><div style="font-size:10px;font-weight:700;color:var(--g4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Financial Impact</div>
+      <div style="font-size:13px;color:var(--g5)">${n} conflict(s) resolved. Estimated revenue at risk mitigated. Billing adjustment applied where applicable.</div></div>
+    <div style="margin-bottom:14px"><div style="font-size:10px;font-weight:700;color:var(--g4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Next Steps</div>
+      <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.8;color:var(--g5)">
+        <li>Post-disconnect billing suppression verified in CC&amp;B</li>
+        <li>MDM estimated reads corrected for post-disconnect period</li>
+        <li>GL revenue entry reviewed and adjusted as required</li>
+        <li>Customer notified via plain-language summary</li>
+      </ul></div>
+    <div style="background:var(--lblue);border-left:3px solid var(--blue);padding:10px 14px;font-size:12px;color:var(--blue)"><strong>Regulatory:</strong> No outstanding regulatory exposure. Audit trail complete.</div>`;
+
+  if (type === 'jira') return `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+      <span style="background:var(--amber);color:#fff;font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px">JIRA</span>
+      <span style="font-size:14px;font-weight:700">BILL-${seq}</span>
+      <span style="background:var(--lred);color:var(--red);font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px">P1</span>
+    </div>
+    <div style="margin-bottom:14px"><div style="font-size:10px;font-weight:700;color:var(--g4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Summary</div>
+      <div style="font-size:13px;font-weight:600">[${acct}] Billing Reconciliation — ${n} conflict(s) detected: ${ids}</div></div>
+    <div style="margin-bottom:14px"><div style="font-size:10px;font-weight:700;color:var(--g4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Linked Systems</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag">CC&amp;B</span><span class="tag">MDM</span><span class="tag">OMS</span><span class="tag">CRM</span><span class="tag">GL</span></div></div>
+    <div><div style="font-size:10px;font-weight:700;color:var(--g4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Acceptance Criteria</div>
+      <ol style="margin:0;padding-left:18px;font-size:12px;line-height:1.9;color:var(--g5)">
+        <li>AC1: Post-disconnect billing suppression applied for ${acct} — verified in CC&amp;B</li>
+        <li>AC2: MDM estimated reads zeroed for all post-disconnect days — verified in MDM</li>
+        <li>AC3: CRM billing_hold flag propagated to CC&amp;B billing rules — verified in CRM</li>
+        <li>AC4: GL revenue entry flagged for reversal; credit note generated — verified in GL</li>
+        <li>AC5: Audit trail complete with ≥1 entry per pipeline step — verified in audit_trail</li>
+        <li>AC6: All 3 output documents dispatched and stored in escalation pipeline</li>
+      </ol></div>`;
+
+  return '<div class="empty">No output data available.</div>';
+}
+
+// ── DRI ──────────────────────────────────────────────────────────────────────
+function renderDRI() {
+  const nav = navbar([]);
+  render(`${nav}
+    <div style="display:grid;grid-template-columns:320px 1fr;min-height:calc(100vh - 52px)">
+
+      <!-- LEFT: Ticket Queue -->
+      <div style="border-right:2px solid var(--g2)">
+        <div style="padding:10px 20px;background:var(--lpurple);border-bottom:1px solid var(--g2);border-top:3px solid var(--purple);display:flex;align-items:center;justify-content:space-between">
+          <span style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--purple)">Screen 1 — Ticket Queue</span>
+          <button onclick="loadDRIQueue()" style="background:none;border:none;cursor:pointer;font-size:14px;color:var(--purple);padding:0" title="Refresh">↻</button>
+        </div>
+        <div id="dri-queue-list">
+          <div style="padding:32px;text-align:center"><span class="spinner"></span></div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Analyst Brief + Decision -->
+      <div>
+        <div style="padding:10px 20px;background:var(--lpurple);border-bottom:1px solid var(--g2);border-top:3px solid var(--purple)">
+          <span style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--purple)">Screen 2 — Analyst Brief + Decision</span>
+        </div>
+        <div id="dri-brief-panel" style="padding:24px 28px;max-width:760px">
+          <div style="color:var(--g4);font-size:13px;padding:48px 0;text-align:center">
+            Select a ticket from the queue to review the analyst brief.
+          </div>
+        </div>
+      </div>
+
+    </div>`);
+  loadDRIQueue();
+}
+
+async function loadDRIQueue() {
+  const el = document.getElementById('dri-queue-list');
+  if (!el) return;
+  try {
+    const items = await get(`/dri/queue/${state.user.id}`);
+    if (!items.length) {
+      el.innerHTML = '<div style="padding:32px 20px;text-align:center;color:var(--g4);font-size:13px">No escalations assigned.</div>';
+      return;
+    }
+    el.innerHTML = items.map(t => driQueueItem(t)).join('');
+    // Auto-select first awaiting_dri ticket
+    const first = items.find(t => t.status === 'awaiting_dri') || items[0];
+    if (first && !state.dri_escalation) selectDRITicket(first.escalation_id);
+    else if (state.dri_escalation) highlightDRIItem(state.dri_escalation);
+  } catch(e) {
+    el.innerHTML = `<div style="padding:16px 20px"><div class="alert alert-err">${e.message}</div></div>`;
+  }
+}
+
+function driQueueItem(t) {
+  const isAwaiting  = t.status === 'awaiting_dri';
+  const isPending   = ['analysing','running','initiated'].includes(t.status);
+  const isCompleted = ['resolved','approved','rejected'].includes(t.status);
+  const label = DISPUTE_LABELS[t.dispute_type] || 'Billing dispute';
+
+  let subtext, actionEl;
+  if (isAwaiting) {
+    subtext   = `${label} · Analyst brief ready`;
+    actionEl  = `<span style="font-family:var(--cond);font-size:11px;font-weight:700;color:var(--purple);letter-spacing:.04em;white-space:nowrap">Review →</span>`;
+  } else if (isPending) {
+    subtext   = `${label} · Analysing...`;
+    actionEl  = `<span style="font-family:var(--cond);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:var(--g2);color:var(--g4);padding:2px 8px">PENDING</span>`;
+  } else {
+    const verb = t.status === 'rejected' ? 'Rejected' : 'Approved';
+    subtext   = `${label} · ${verb} ${timeAgo(t.opened_at)}`;
+    actionEl  = badge(t.status);
+  }
+
+  return `
+    <div data-dri-item="${t.escalation_id}" onclick="selectDRITicket('${t.escalation_id}')"
+      style="padding:16px 20px;border-bottom:1px solid var(--g2);cursor:pointer;transition:background .12s"
+      onmouseover="if(state.dri_escalation!=='${t.escalation_id}')this.style.background='#fafafa'"
+      onmouseout="if(state.dri_escalation!=='${t.escalation_id}')this.style.background=''">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+        <div style="min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <span style="font-family:var(--cond);font-size:14px;font-weight:700;color:var(--n90)">${acctName(t.account_id)}</span>
+            ${isAwaiting ? `<span class="badge badge-new" style="font-size:9px">NEW</span>` : ''}
+          </div>
+          <div style="font-size:12px;color:var(--g4)">${t.account_id} · ${acctAmount(t.account_id)} · ${subtext}</div>
+        </div>
+        <div style="flex-shrink:0;padding-top:2px">${actionEl}</div>
+      </div>
+    </div>`;
+}
+
+function highlightDRIItem(escId) {
+  document.querySelectorAll('[data-dri-item]').forEach(el => {
+    const sel = el.dataset.driItem === escId;
+    el.style.background     = sel ? 'var(--lpurple)' : '';
+    el.style.borderLeft     = sel ? '3px solid var(--purple)' : '';
+    el.style.paddingLeft    = sel ? '17px' : '20px';
+  });
+}
+
+async function selectDRITicket(escId) {
+  state.dri_escalation = escId;
+  highlightDRIItem(escId);
+  if (state.dri_timer) { clearInterval(state.dri_timer); state.dri_timer = null; }
+  if (state.anim_timer) { clearInterval(state.anim_timer); state.anim_timer = null; }
+  const panel = document.getElementById('dri-brief-panel');
+  if (!panel) return;
+  panel.innerHTML = '<div style="text-align:center;padding:48px"><span class="spinner"></span></div>';
+  try {
+    const data = await get(`/dri/brief/${escId}`);
+    const conflicts = data.conflicts?.conflicts || [];
+    const brief     = data.brief || {};
+    const recs      = brief.recommendations || [];
+    const detected  = conflicts.filter(c => c.detected);
+    const alreadyDecided = data.status !== 'awaiting_dri';
+    const acct = data.account_id;
+    const noBriefYet = !brief.brief_text;
+
+    // Pipeline still running — show the same live progress view as the CSR side,
+    // then poll and auto-render the brief the moment step 5 lands.
+    if (noBriefYet) {
+      let p = {};
+      try { p = (await get(`/csr/tickets/detail/${escId}`)).pipeline || {}; } catch(_) {}
+      const steps = [
+        { num:1, name:'Trigger & DRI Assignment', done: !!p.step_1_trigger },
+        { num:2, name:'5-System Ingestion',        done: !!p.step_2_ingestion?.completed_at },
+        { num:3, name:'Reconciliation',            done: !!p.step_3_reconciliation?.completed_at },
+        { num:4, name:'Conflict Detection',        done: !!p.step_4_conflicts?.completed_at },
+        { num:5, name:'AI Decision Brief',         done: !!p.step_5_brief?.completed_at },
+      ];
+      const timelineHtml = steps.map(s => {
+        const active = !s.done && steps.slice(0, s.num-1).every(prev => prev.done);
+        const color  = s.done ? 'var(--green)' : active ? 'var(--purple)' : 'var(--g3)';
+        const icon   = s.done ? '✓' : active ? '◉' : s.num;
+        return `
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+            <div class="${active?'live-pulse':''}" style="width:26px;height:26px;border-radius:50%;background:${color};color:#fff;display:flex;align-items:center;justify-content:center;font:700 11px var(--cond);flex-shrink:0">${icon}</div>
+            <div style="font-size:13px;font-weight:600;color:${s.done ? 'var(--n90)' : active ? 'var(--purple)' : 'var(--g3)'}">${s.name}${active ? ' <span style="font-weight:400;animation:blink 1.4s infinite">· in progress…</span>' : ''}</div>
+          </div>`;
+      }).join('');
+
+      panel.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap">
+          <div>
+            <div style="font-family:var(--cond);font-size:18px;font-weight:700">${acctName(acct)}</div>
+            <div style="font-size:12px;color:var(--g4)">${acct} · ${acctAmount(acct)} disputed · ${ACCT_MAP[acct]?.tariff||''}</div>
+          </div>
+          <span style="font-family:var(--cond);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:var(--g2);color:var(--g4);padding:3px 10px">Analysing</span>
+        </div>
+        <div style="border:1px solid var(--g2);padding:18px 20px;margin-bottom:16px">
+          <div style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--purple);margin-bottom:14px">Pipeline Progress</div>
+          ${timelineHtml}
+        </div>
+        ${liveProgressPanel(steps)}`;
+      startDRIProgressAnimation(escId);
+      return;
+    }
+
+    // Expandable conflict rows with evidence drill-down
+    const conflictRows = detected.map(c => {
+      const boxId = `ev-${escId}-${c.id}`;
+      return `
+        <div style="border:1px solid var(--g2);border-left:3px solid var(--red);margin-bottom:8px">
+          <div onclick="toggleEvidence('${boxId}','${c.id}','${acct}')" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;cursor:pointer;background:var(--lred)" onmouseover="this.style.background='#ffe3e8'" onmouseout="this.style.background='var(--lred)'">
+            <div style="font-size:13px;color:var(--g5)">
+              <strong style="color:var(--red);font-family:var(--cond)">${c.id}</strong>
+              &nbsp;${c.systems.map(s=>s.toUpperCase()).join(' ↔ ')}
+              &nbsp;<span style="color:var(--g4);font-size:12px">${c.invariant.replace(/_/g,' ')}</span>
+            </div>
+            <span style="font-family:var(--cond);font-size:10px;font-weight:700;color:var(--red);letter-spacing:.06em;white-space:nowrap">View evidence ▾</span>
+          </div>
+          <div id="${boxId}" data-open="0" style="display:none;padding:12px 14px;border-top:1px solid var(--g2)"></div>
+        </div>`;
+    }).join('');
+
+    const recsTable = recs.length ? `
+      <div style="margin-bottom:20px">
+        <div style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g4);margin-bottom:8px">Recommended Actions</div>
+        <div style="border:1px solid var(--g2);overflow:hidden">
+          <table><thead><tr><th>Conflict</th><th>Action</th><th>Cited Source</th></tr></thead>
+          <tbody>${recs.map(r=>`
+            <tr>
+              <td><strong style="color:var(--purple);font-family:var(--cond)">${r.conflict_id}</strong></td>
+              <td>${(r.action||'').replace(/_/g,' ')}</td>
+              <td><span class="tag">${(r.cited_system||'').toUpperCase()}</span></td>
+            </tr>`).join('')}</tbody></table>
+        </div>
+      </div>` : '';
+
+    const ribbon = noBriefYet ? '' : roiRibbon({
+      minutes: '6 min', protectedUsd: detected.length ? acctAmount(acct) : '$0',
+      auditPct: Math.round((brief.citation_coverage||1)*100), conflicts: detected.length,
+    });
+
+    panel.innerHTML = `
+      ${noBriefYet ? `
+        <div style="color:var(--g4);font-size:13px;padding:40px 0;text-align:center">
+          <span class="spinner"></span>&nbsp; Pipeline still running — brief not yet available.
+        </div>` : `
+
+        ${ribbon}
+
+        <!-- Customer + review timer -->
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+          <div>
+            <div style="font-family:var(--cond);font-size:18px;font-weight:700">${acctName(acct)}</div>
+            <div style="font-size:12px;color:var(--g4)">${acct} · ${acctAmount(acct)} disputed · ${ACCT_MAP[acct]?.tariff||''}</div>
+          </div>
+          ${alreadyDecided ? '' : `<div style="text-align:right">
+            <div id="dri-review-timer" style="font-family:var(--cond);font-size:20px;font-weight:700;color:var(--green)">0:00</div>
+            <div style="font-size:10px;color:var(--g4);text-transform:uppercase;letter-spacing:.06em">Review time · target &lt; 5 min</div>
+          </div>`}
+        </div>
+
+        <!-- Analyst Brief -->
+        ${(() => { const cf = confidenceScore(brief); return `
+        <div style="border-left:3px solid var(--purple);background:var(--lpurple);padding:16px 20px;margin-bottom:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;flex-wrap:wrap">
+            <div style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--purple)">
+              Analyst Brief · ${acct} · citation ${Math.round((brief.citation_coverage||1)*100)}%
+            </div>
+            <div title="AI confidence in this analysis, derived from evidence completeness and citation coverage"
+              style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--g2);border-left:3px solid ${cf.color};padding:5px 12px">
+              <span style="font-family:var(--cond);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g4)">AI Confidence</span>
+              <span style="font-family:var(--cond);font-size:18px;font-weight:700;color:${cf.color};line-height:1">${cf.score}%</span>
+              <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:${cf.color}">${cf.label}</span>
+            </div>
+          </div>
+          <div style="font-size:13px;line-height:1.75;color:var(--g5);white-space:pre-wrap">${escapeHtml(brief.brief_text)}</div>
+        </div>`; })()}
+
+        <!-- Conflicts -->
+        ${detected.length ? `
+        <div style="margin-bottom:18px">
+          <div style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--red);margin-bottom:8px">
+            ${detected.length} Conflict${detected.length > 1 ? 's' : ''} Detected — click to inspect source evidence
+          </div>
+          ${conflictRows}
+        </div>` : `
+        <div style="border-left:3px solid var(--green);background:var(--lgreen);padding:14px 18px;margin-bottom:20px">
+          <div style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin-bottom:4px">No Conflicts Detected</div>
+          <div style="font-size:13px;color:var(--g5)">All 4 invariants checked — no cross-system conflicts identified.</div>
+        </div>`}
+
+        ${recsTable}
+
+        ${alreadyDecided ? `
+          <div class="alert alert-ok" style="margin-bottom:14px">Decision already recorded — status: <strong>${data.status}</strong>.</div>
+          ${data.status === 'awaiting_output_review'
+            ? `<div class="alert alert-info" style="margin-bottom:14px">3 output drafts generated — awaiting CSR review &amp; approval before dispatch.</div>`
+            : ''}
+          ${outputButtons(escId, 'view')}
+        ` : `
+          <div id="decision-msg"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+            <button class="btn btn-approve" style="padding:14px;font-size:12px;letter-spacing:.12em" onclick="recordDRIDecision('approved')">APPROVE</button>
+            <button class="btn btn-reject"  style="padding:14px;font-size:12px;letter-spacing:.12em" onclick="showDRIReason('rejected')">REJECT</button>
+          </div>
+          <div id="dri-reason-group" style="display:none;margin-bottom:14px">
+            <div style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--g4);margin-bottom:6px">Rejection Reason (required on reject)</div>
+            <textarea id="dri-reason-text" style="width:100%;padding:10px 12px;border:1.5px solid var(--g2);font:400 13px var(--sans);min-height:72px;resize:vertical" placeholder="Provide written reason…"></textarea>
+            <button class="btn btn-reject" style="margin-top:8px;width:100%;padding:12px" onclick="recordDRIDecision('rejected')">Confirm Reject</button>
+          </div>
+          <div style="font-size:11px;color:var(--g4);line-height:1.6">
+            Approval logged with timestamp + DRI identity (FR-09) · On approve, 3 output drafts are generated for CSR review before dispatch (FR-07)
+          </div>
+        `}
+      `}`;
+
+    // Start review timer
+    if (!alreadyDecided && !noBriefYet) {
+      const start = Date.now();
+      state.dri_timer = setInterval(() => {
+        const el = document.getElementById('dri-review-timer');
+        if (!el) { clearInterval(state.dri_timer); state.dri_timer = null; return; }
+        const s = Math.floor((Date.now() - start) / 1000);
+        el.textContent = `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+        el.style.color = s < 300 ? 'var(--green)' : 'var(--amber)';
+      }, 1000);
+    }
+  } catch(e) {
+    panel.innerHTML = `<div class="alert alert-err">${e.message}</div>`;
+  }
+}
+
+async function recordDRIDecision(decision) {
+  const reason = document.getElementById('dri-reason-text')?.value || null;
+  if (decision === 'rejected' && !reason) {
+    showAlert('decision-msg', 'A written reason is required for rejection.', 'err');
+    return;
+  }
+  document.querySelectorAll('.btn-approve,.btn-reject').forEach(b => b.disabled = true);
+  showAlert('decision-msg', '<span class="spinner"></span> Recording decision…', 'info');
+  try {
+    const res = await post('/dri/decision', {
+      escalation_id: state.dri_escalation,
+      decision,
+      decided_by: state.user.id,
+      reason: reason || null,
+    });
+    showAlert('decision-msg', `<strong>${res.decision.toUpperCase()}</strong> — ${res.message}`, 'ok');
+    // Reload queue then re-select to show updated state + output buttons
+    await loadDRIQueue();
+    setTimeout(() => selectDRITicket(state.dri_escalation), 800);
+  } catch(e) {
+    showAlert('decision-msg', 'Error: ' + e.message, 'err');
+    document.querySelectorAll('.btn-approve,.btn-reject').forEach(b => b.disabled = false);
+  }
+}
+
+function showDRIReason(decision) {
+  const rg = document.getElementById('dri-reason-group');
+  if (rg) rg.style.display = 'block';
+}
+
+// ── ANALYST MANAGER (SUP) ─────────────────────────────────────────────────────
+function renderAM() {
+  const nav = navbar([['tactical','Tactical Ops'], ['strategic','Strategic Insights']]);
+  if (state.tab === 'strategic') renderAMStrategic(nav);
+  else renderAMTactical(nav);
+}
+
+// ── TACTICAL OPS ──────────────────────────────────────────────────────────────
+function renderAMTactical(nav) {
+  const sub = state.am_sub || 'executions';
+  render(`${nav}
+    <div class="page-header">
+      <div class="kicker">SUP · Tactical Operations</div>
+      <div class="page-title">Execution &amp; <em>Audit</em></div>
+    </div>
+    <div class="main">
+      <div id="am-health-strip"><div class="card"><span class="spinner"></span> Loading NFR metrics…</div></div>
+
+      <div style="display:flex;gap:4px;border-bottom:2px solid var(--g2);margin:20px 0 18px">
+        <button onclick="amSwitchSub('executions')" style="background:none;border:none;cursor:pointer;font:700 11px var(--cond);letter-spacing:.08em;text-transform:uppercase;padding:8px 16px;border-bottom:3px solid ${sub==='executions'?'var(--purple)':'transparent'};margin-bottom:-2px;color:${sub==='executions'?'var(--purple)':'var(--g4)'}">Executions</button>
+        <button onclick="amSwitchSub('audit')" style="background:none;border:none;cursor:pointer;font:700 11px var(--cond);letter-spacing:.08em;text-transform:uppercase;padding:8px 16px;border-bottom:3px solid ${sub==='audit'?'var(--purple)':'transparent'};margin-bottom:-2px;color:${sub==='audit'?'var(--purple)':'var(--g4)'}">Full Audit Log</button>
+      </div>
+
+      <div id="am-sub-body"></div>
+    </div>`);
+  loadAMHealthStrip();
+  if (sub === 'audit') renderAMAuditSub();
+  else loadAMExecutions();
+}
+
+function amSwitchSub(sub) {
+  state.am_sub = sub;
+  renderAMTactical(navbar([['tactical','Tactical Ops'], ['strategic','Strategic Insights']]));
+}
+
+async function loadAMHealthStrip() {
+  const el = document.getElementById('am-health-strip');
+  if (!el) return;
+  try {
+    const h = await get('/analyst-manager/health');
+    const aMs = h.avg_assembly_time_ms;
+    const aDisp = aMs!=null ? `${(aMs/1000).toFixed(1)}s` : '—';
+    const aCls  = aMs==null?'':aMs<420000?'metric-good':'metric-bad';
+    const nfrCls = h.nfr_01_compliance_pct>=95?'metric-good':h.nfr_01_compliance_pct>=80?'metric-warn':'metric-bad';
+    const audCls = h.audit_completeness_pct>=99?'metric-good':'metric-bad';
+    const driCls = h.pending_dri_count===0?'metric-good':h.pending_dri_count<=3?'metric-warn':'metric-bad';
+    el.innerHTML = `
+      <div class="metrics-grid">
+        <div class="metric-card"><div class="metric-label">Avg Assembly Time</div><div class="metric-value ${aCls}">${aDisp}</div><div class="metric-sub">Target &lt; 420 s (7 min)</div></div>
+        <div class="metric-card"><div class="metric-label">NFR-01 Compliance</div><div class="metric-value ${nfrCls}">${h.nfr_01_compliance_pct}%</div><div class="metric-sub">Speed targets met</div></div>
+        <div class="metric-card"><div class="metric-label">Audit Completeness</div><div class="metric-value ${audCls}">${h.audit_completeness_pct}%</div><div class="metric-sub">Target: 100% · was ~40%</div></div>
+        <div class="metric-card"><div class="metric-label">DRI Backlog</div><div class="metric-value ${driCls}">${h.pending_dri_count}</div><div class="metric-sub">Awaiting decision</div></div>
+      </div>`;
+  } catch(e) {
+    el.innerHTML = `<div class="alert alert-err">${e.message}</div>`;
+  }
+}
+
+async function loadAMExecutions() {
+  const el = document.getElementById('am-sub-body');
+  if (!el) return;
+  el.innerHTML = '<div style="padding:24px;text-align:center"><span class="spinner"></span></div>';
+  try {
+    const executions = await get('/analyst-manager/executions');
+    if (!executions.length) {
+      el.innerHTML = '<div style="border:1px solid var(--g2);padding:32px;text-align:center;color:var(--g4);font-size:13px">No executions yet. Raise a ticket to begin.</div>';
+      return;
+    }
+    const rows = executions.map(e=>`
+      <tr onclick="openExecutionDrill('${e.escalation_id}','${e.execution_id}')" style="cursor:pointer" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background=''">
+        <td><strong style="font-family:var(--cond)">${e.execution_id}</strong></td>
+        <td><span class="tag">${e.escalation_id}</span></td>
+        <td><span class="tag">${e.account_id}</span></td>
+        <td>${badge(e.overall_status)}</td>
+        <td>${e.agent_duration_ms!=null?(e.agent_duration_ms/1000).toFixed(1)+'s':'—'}</td>
+        <td style="color:var(--red);font-weight:700;font-family:var(--cond)">${e.conflicts_detected}</td>
+        <td>${e.nfr_breaches>0?`<span style="color:var(--red)">⚠ ${e.nfr_breaches}</span>`:'<span style="color:var(--green)">✓ 0</span>'}</td>
+        <td style="color:var(--g4);font-size:12px">${ts(e.created_at)}</td>
+        <td style="color:var(--g3);font-size:14px">›</td>
+      </tr>`).join('');
+    el.innerHTML = `
+      <div style="font-size:12px;color:var(--g4);margin-bottom:8px">${executions.length} executions · click a row to drill into its full audit trail</div>
+      <div style="border:1px solid var(--g2);overflow:hidden">
+        <table>
+          <thead><tr>
+            <th>Execution</th><th>Escalation</th><th>Account</th><th>Status</th>
+            <th>Assembly</th><th>Conflicts</th><th>NFR</th><th>Created</th><th></th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  } catch(e) {
+    el.innerHTML = `<div class="alert alert-err">${e.message}</div>`;
+  }
+}
+
+async function openExecutionDrill(escId, execId) {
+  const existing = document.getElementById('drill-modal');
+  if (existing) existing.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'drill-modal';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:flex;align-items:center;justify-content:center;padding:24px';
+  overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+  overlay.innerHTML = `
+    <div style="background:var(--white);width:100%;max-width:900px;max-height:84vh;display:flex;flex-direction:column;border-top:3px solid var(--purple);box-shadow:0 20px 60px rgba(0,0,0,.3)">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--g2);flex-shrink:0">
+        <div>
+          <div style="font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--purple);margin-bottom:2px">Execution Audit Trail · FR-09</div>
+          <div style="font-family:var(--cond);font-size:17px;font-weight:700">${escId} <span style="color:var(--g4);font-size:13px">· ${execId}</span></div>
+        </div>
+        <button onclick="document.getElementById('drill-modal').remove()" style="background:none;border:none;cursor:pointer;font-size:22px;color:var(--g4);line-height:1;padding:4px 8px">✕</button>
+      </div>
+      <div id="drill-body" style="padding:20px;overflow-y:auto;flex:1"><div style="text-align:center;padding:32px"><span class="spinner"></span></div></div>
+    </div>`;
+  document.getElementById('app').appendChild(overlay);
+
+  const body = document.getElementById('drill-body');
+  try {
+    const entries = await get(`/analyst-manager/audit-trail/${escId}`);
+    if (!entries.length) {
+      body.innerHTML = '<div style="text-align:center;color:var(--g4);padding:32px;font-size:13px">No audit entries recorded for this escalation.</div>';
+      return;
+    }
+    // Group by pipeline step
+    const byStep = {};
+    entries.forEach(e => { (byStep[e.pipeline_step] = byStep[e.pipeline_step] || []).push(e); });
+    const stepNames = {1:'Trigger',2:'Ingestion',3:'Reconciliation',4:'Conflict Detection',5:'Brief',6:'DRI Decision',7:'Output Dispatch'};
+    const sections = Object.keys(byStep).sort((a,b)=>a-b).map(step => {
+      const rows = byStep[step].map(e => `
+        <tr>
+          <td><span class="badge badge-${e.claim_type==='conflict'?'conflict':'initiated'}" style="font-size:9px">${e.claim_type}</span></td>
+          <td style="font-weight:700;color:var(--purple);font-family:var(--cond)">${(e.source_system||'').toUpperCase()}</td>
+          <td style="font-family:monospace;font-size:11px;color:var(--g4)">${e.field||'—'}</td>
+          <td style="font-size:12px">${escapeHtml(String(e.value||''))}</td>
+          <td style="font-size:11px;color:var(--g4);white-space:nowrap">${ts(e.recorded_at)}</td>
+          <td style="font-size:11px;color:var(--g4)">${e.actor}</td>
+        </tr>`).join('');
+      return `
+        <div style="margin-bottom:16px">
+          <div style="font-family:var(--cond);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g5);margin-bottom:6px">Step ${step} — ${stepNames[step]||''} <span style="color:var(--g3)">(${byStep[step].length})</span></div>
+          <div style="border:1px solid var(--g2);overflow:hidden">
+            <table><thead><tr><th>Type</th><th>System</th><th>Field</th><th>Value</th><th>Recorded</th><th>Actor</th></tr></thead><tbody>${rows}</tbody></table>
+          </div>
+        </div>`;
+    }).join('');
+    body.innerHTML = `<div style="font-size:12px;color:var(--g4);margin-bottom:12px">${entries.length} immutable audit entries across ${Object.keys(byStep).length} pipeline steps</div>${sections}`;
+  } catch(e) {
+    body.innerHTML = `<div class="alert alert-err">${e.message}</div>`;
+  }
+}
+
+function renderAMAuditSub() {
+  const el = document.getElementById('am-sub-body');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="card gray" style="margin-bottom:16px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end">
+        <div class="form-group" style="margin:0">
+          <label>Source System</label>
+          <select id="f-system">
+            <option value="">All Systems</option>
+            <option>ccb</option><option>mdm</option><option>oms</option>
+            <option>crm</option><option>gl</option><option>agent</option><option>dri</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin:0">
+          <label>Claim Type</label>
+          <select id="f-claim">
+            <option value="">All Types</option>
+            <option>system_fact</option><option>conflict</option>
+            <option>recommendation</option><option>dri_decision</option><option>output_dispatch</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin:0">
+          <label>Limit</label>
+          <select id="f-limit">
+            <option value="50">50</option><option value="100" selected>100</option><option value="200">200</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="loadAudit()">Query</button>
+      </div>
+    </div>
+    <div id="audit-body"><div style="text-align:center;color:var(--g4);padding:40px;font-size:13px">Run a query to view audit entries.</div></div>`;
+}
+
+async function loadAudit() {
+  const system = document.getElementById('f-system').value;
+  const claim  = document.getElementById('f-claim').value;
+  const limit  = document.getElementById('f-limit').value;
+  let url = `/analyst-manager/audit-trail?limit=${limit}`;
+  if (system) url += `&source_system=${system}`;
+  if (claim)  url += `&claim_type=${claim}`;
+  const el = document.getElementById('audit-body');
+  el.innerHTML = '<div class="spinner"></div> Querying…';
+  try {
+    const entries = await get(url);
+    if (!entries.length) {
+      el.innerHTML = '<div style="text-align:center;color:var(--g4);padding:32px;font-size:13px">No audit entries match the filters.</div>';
+      return;
+    }
+    const rows = entries.map(e=>`
+      <tr>
+        <td><span class="tag">${e.escalation_id}</span></td>
+        <td style="font-family:var(--cond);font-size:11px;color:var(--g4)">${e.pipeline_step}</td>
+        <td><span class="badge badge-${e.claim_type==='conflict'?'conflict':'initiated'}" style="font-size:9px">${e.claim_type}</span></td>
+        <td style="font-weight:700;color:var(--purple);font-family:var(--cond)">${(e.source_system||'').toUpperCase()}</td>
+        <td style="font-family:monospace;font-size:11px;color:var(--g4)">${e.field||'—'}</td>
+        <td style="font-size:12px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escapeHtml(String(e.value||''))}">${escapeHtml(String(e.value||''))}</td>
+        <td style="font-size:11px;color:var(--g4)">${ts(e.recorded_at)}</td>
+        <td style="font-size:11px;color:var(--g4)">${e.actor}</td>
+      </tr>`).join('');
+    el.innerHTML = `
+      <div style="font-size:12px;color:var(--g4);margin-bottom:8px">${entries.length} entries</div>
+      <div style="border:1px solid var(--g2);overflow:hidden;overflow-x:auto">
+        <table>
+          <thead><tr>
+            <th>Escalation</th><th>Step</th><th>Type</th><th>System</th>
+            <th>Field</th><th>Value</th><th>Recorded At</th><th>Actor</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  } catch(e) {
+    el.innerHTML=`<div class="alert alert-err">${e.message}</div>`;
+  }
+}
+
+// ── STRATEGIC INSIGHTS ────────────────────────────────────────────────────────
+function renderAMStrategic(nav) {
+  const period = state.am_period || 'monthly';
+  render(`${nav}
+    <div class="page-header">
+      <div class="kicker">SUP · Strategic Insights</div>
+      <div class="page-title">Findings &amp; <em>Trends</em></div>
+    </div>
+    <div class="main">
+      <div class="flex-between" style="margin-bottom:18px">
+        <div style="font-size:12px;color:var(--g4);max-width:560px;line-height:1.6">
+          Aggregate conflict patterns over time. These signals feed the Engineering team's
+          problem-identification backlog — turning recurring billing conflicts into permanent architectural fixes.
+        </div>
+        <div style="display:flex;border:1px solid var(--g2);overflow:hidden;flex-shrink:0">
+          <button onclick="amSetPeriod('monthly')" style="background:${period==='monthly'?'var(--purple)':'var(--white)'};color:${period==='monthly'?'#fff':'var(--g5)'};border:none;cursor:pointer;font:700 10px var(--cond);letter-spacing:.08em;text-transform:uppercase;padding:8px 16px">Monthly</button>
+          <button onclick="amSetPeriod('quarterly')" style="background:${period==='quarterly'?'var(--purple)':'var(--white)'};color:${period==='quarterly'?'#fff':'var(--g5)'};border:none;cursor:pointer;font:700 10px var(--cond);letter-spacing:.08em;text-transform:uppercase;padding:8px 16px;border-left:1px solid var(--g2)">Quarterly</button>
+        </div>
+      </div>
+      <div id="strategic-body"><div class="card"><span class="spinner"></span> Loading insights…</div></div>
+    </div>`);
+  loadStrategic(period);
+}
+
+function amSetPeriod(p) {
+  state.am_period = p;
+  renderAMStrategic(navbar([['tactical','Tactical Ops'], ['strategic','Strategic Insights']]));
+}
+
+const CONFLICT_COLORS = { C1:'#A100FF', C2:'#004F9F', C3:'#B45000', C4:'#007A3D' };
+
+async function loadStrategic(period) {
+  const el = document.getElementById('strategic-body');
+  if (!el) return;
+  try {
+    const d = await get(`/analyst-manager/strategic?period=${period}`);
+    const s = d.summary;
+    const recDelta = (s.recurrence_baseline_pct - s.recurrence_rate_pct).toFixed(1);
+    const recovPct = Math.round(s.recovered_usd / s.est_exposure_usd * 100);
+
+    // KPI strip
+    const kpis = `
+      <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:24px">
+        <div class="metric-card">
+          <div class="metric-label">Total Findings</div>
+          <div class="metric-value metric-purple">${s.total_findings}</div>
+          <div class="metric-sub">Conflicts across window</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Top Conflict Pattern</div>
+          <div class="metric-value" style="font-size:20px;color:${CONFLICT_COLORS[s.top_conflict.id]}">${s.top_conflict.id} · ${s.top_conflict.pct}%</div>
+          <div class="metric-sub">${s.top_conflict.label}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Recurrence Rate</div>
+          <div class="metric-value metric-good">${s.recurrence_rate_pct}%</div>
+          <div class="metric-sub">↓ ${recDelta} pts from ${s.recurrence_baseline_pct}% baseline</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Revenue Recovered</div>
+          <div class="metric-value metric-good">$${(s.recovered_usd/1000).toFixed(0)}k</div>
+          <div class="metric-sub">${recovPct}% of $${(s.est_exposure_usd/1000).toFixed(0)}k exposure</div>
+        </div>
+      </div>`;
+
+    // Findings trend — vertical bar chart
+    const maxC = Math.max(...d.findings_trend.map(b => b.conflicts));
+    const trendBars = d.findings_trend.map(b => {
+      const hPct = Math.round(b.conflicts / maxC * 100);
+      return `
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
+          <div style="font-size:11px;font-weight:700;color:var(--g5);font-family:var(--cond)">${b.conflicts}</div>
+          <div style="width:100%;max-width:46px;height:140px;display:flex;align-items:flex-end">
+            <div style="width:100%;height:${hPct}%;background:linear-gradient(180deg,var(--purple),var(--mpurple));border-radius:3px 3px 0 0" title="${b.conflicts} conflicts · ${b.escalations} escalations"></div>
+          </div>
+          <div style="font-size:11px;color:var(--g4);font-family:var(--cond);font-weight:600">${b.label}</div>
+          <div style="font-size:10px;color:var(--green)">${b.recurrence_pct}%</div>
+        </div>`;
+    }).join('');
+
+    const trendChart = `
+      <div style="border:1px solid var(--g2);border-top:3px solid var(--purple);padding:18px 20px;margin-bottom:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div style="font-family:var(--cond);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g5)">Findings Trend</div>
+          <div style="font-size:11px;color:var(--g4)">Bar = conflicts · <span style="color:var(--green)">green = recurrence %</span></div>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:12px">${trendBars}</div>
+      </div>`;
+
+    // Conflict distribution — horizontal ranked bars
+    const maxPct = Math.max(...d.conflict_distribution.map(c => c.pct));
+    const distRows = d.conflict_distribution.map(c => `
+      <div style="margin-bottom:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+          <div style="font-size:13px;color:var(--g5)">
+            <strong style="color:${CONFLICT_COLORS[c.id]};font-family:var(--cond)">${c.id}</strong>
+            &nbsp;<span style="font-weight:600">${c.systems}</span>
+            &nbsp;<span style="color:var(--g4);font-size:12px">${c.label}</span>
+          </div>
+          <div style="font-size:13px;font-weight:700;font-family:var(--cond);color:var(--g5)">${c.pct}% <span style="color:var(--g3);font-weight:400">(${c.count})</span></div>
+        </div>
+        <div style="height:10px;background:var(--g1);border-radius:5px;overflow:hidden">
+          <div style="width:${Math.round(c.pct/maxPct*100)}%;height:100%;background:${CONFLICT_COLORS[c.id]};border-radius:5px"></div>
+        </div>
+      </div>`).join('');
+
+    const distChart = `
+      <div style="border:1px solid var(--g2);border-top:3px solid var(--blue);padding:18px 20px;margin-bottom:16px">
+        <div style="font-family:var(--cond);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g5);margin-bottom:16px">Conflict Type Distribution</div>
+        ${distRows}
+      </div>`;
+
+    // Engineering design signals
+    const sigRows = d.engineering_signals.map(g => {
+      const pColor = g.priority==='P1'?'var(--red)':g.priority==='P2'?'var(--amber)':'var(--g4)';
+      return `
+        <div style="border:1px solid var(--g2);border-left:3px solid ${CONFLICT_COLORS[g.conflict_id]};padding:14px 18px;margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+            <span style="background:${pColor};color:#fff;font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:.06em;padding:2px 8px">${g.priority}</span>
+            <strong style="font-family:var(--cond);color:${CONFLICT_COLORS[g.conflict_id]}">${g.conflict_id}</strong>
+            <span style="font-size:13px;font-weight:600">${g.systems}</span>
+            <span style="font-size:12px;color:var(--g4)">${g.label}</span>
+            <span style="margin-left:auto;font-size:12px;color:var(--g5);font-family:var(--cond);font-weight:700">${g.recurrence_pct}% of findings</span>
+          </div>
+          <div style="font-size:12px;color:var(--g5);line-height:1.6;margin-bottom:6px"><strong style="color:var(--red)">Root cause:</strong> ${g.root_cause}</div>
+          <div style="font-size:12px;color:var(--g5);line-height:1.6;margin-bottom:8px"><strong style="color:var(--green)">Recommended fix:</strong> ${g.recommendation}</div>
+          <div style="font-size:11px;color:var(--g4)">Linked Jira: <span class="tag">${g.linked_jira}</span></div>
+        </div>`;
+    }).join('');
+
+    const sigPanel = `
+      <div style="border:1px solid var(--g2);border-top:3px solid var(--amber);padding:18px 20px;margin-bottom:16px">
+        <div style="font-family:var(--cond);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g5);margin-bottom:4px">Engineering Design Signals</div>
+        <div style="font-size:12px;color:var(--g4);margin-bottom:16px">Recurring conflicts ranked by volume, each mapped to its architectural root cause and recommended permanent fix.</div>
+        ${sigRows}
+      </div>`;
+
+    // Financial exposure trend — grouped bars
+    const maxF = Math.max(...d.financial_trend.map(f => f.exposure_usd));
+    const finBars = d.financial_trend.map(f => {
+      const eH = Math.round(f.exposure_usd / maxF * 100);
+      const rH = Math.round(f.recovered_usd / maxF * 100);
+      return `
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
+          <div style="width:100%;height:120px;display:flex;align-items:flex-end;justify-content:center;gap:3px">
+            <div style="width:40%;height:${eH}%;background:var(--g3);border-radius:3px 3px 0 0" title="Exposure $${f.exposure_usd.toLocaleString()}"></div>
+            <div style="width:40%;height:${rH}%;background:var(--green);border-radius:3px 3px 0 0" title="Recovered $${f.recovered_usd.toLocaleString()}"></div>
+          </div>
+          <div style="font-size:11px;color:var(--g4);font-family:var(--cond);font-weight:600">${f.label}</div>
+        </div>`;
+    }).join('');
+
+    const finChart = `
+      <div style="border:1px solid var(--g2);border-top:3px solid var(--green);padding:18px 20px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div style="font-family:var(--cond);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g5)">Financial Exposure vs Recovery</div>
+          <div style="font-size:11px;color:var(--g4)"><span style="color:var(--g3)">■</span> Exposure &nbsp; <span style="color:var(--green)">■</span> Recovered</div>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:12px">${finBars}</div>
+      </div>`;
+
+    el.innerHTML = kpis + trendChart
+      + `<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start"><div>${distChart}</div><div>${finChart}</div></div>`
+      + sigPanel;
+  } catch(e) {
+    el.innerHTML = `<div class="alert alert-err">${e.message}</div>`;
+  }
+}
+
+// ── BOOT ─────────────────────────────────────────────────────────────────────
+renderLogin();
+</script>
+</body>
+</html>
